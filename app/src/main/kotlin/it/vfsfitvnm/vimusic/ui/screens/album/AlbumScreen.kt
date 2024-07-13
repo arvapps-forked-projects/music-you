@@ -127,7 +127,8 @@ fun AlbumScreen(
                             ?.let(Database::update)
                     }
                 },
-                icon = if (album?.bookmarkedAt == null) Icons.Outlined.BookmarkAdd else Icons.Filled.Bookmark
+                icon = if (album?.bookmarkedAt == null) Icons.Outlined.BookmarkAdd else Icons.Filled.Bookmark,
+                inTopBar = true
             )
 
             TooltipIconButton(
@@ -148,7 +149,8 @@ fun AlbumScreen(
                         )
                     }
                 },
-                icon = Icons.Outlined.Share
+                icon = Icons.Outlined.Share,
+                inTopBar = true
             )
         },
         tabColumnContent = tabs

@@ -117,20 +117,23 @@ fun LocalPlaylistScreen(
                                     }
                                 }
                             },
-                            icon = Icons.Outlined.Sync
+                            icon = Icons.Outlined.Sync,
+                            inTopBar = true
                         )
                     }
 
                     TooltipIconButton(
                         description = R.string.rename_playlist,
                         onClick = { isRenaming = true },
-                        icon = Icons.Outlined.Edit
+                        icon = Icons.Outlined.Edit,
+                        inTopBar = true
                     )
 
                     TooltipIconButton(
                         description = R.string.delete_playlist,
                         onClick = { isDeleting = true },
-                        icon = Icons.Outlined.Delete
+                        icon = Icons.Outlined.Delete,
+                        inTopBar = true
                     )
                 },
                 scrollBehavior = scrollBehavior

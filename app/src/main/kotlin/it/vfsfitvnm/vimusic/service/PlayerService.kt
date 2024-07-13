@@ -726,7 +726,7 @@ class PlayerService : InvincibleService(), Player.Listener, PlaybackStatsListene
                 createNotificationChannel(
                     NotificationChannel(
                         NotificationChannelId,
-                        "Now playing",
+                        getString(R.string.now_playing),
                         NotificationManager.IMPORTANCE_LOW
                     ).apply {
                         setSound(null, null)
@@ -740,7 +740,7 @@ class PlayerService : InvincibleService(), Player.Listener, PlaybackStatsListene
                 createNotificationChannel(
                     NotificationChannel(
                         SleepTimerNotificationChannelId,
-                        "Sleep timer",
+                        getString(R.string.sleep_timer),
                         NotificationManager.IMPORTANCE_LOW
                     ).apply {
                         setSound(null, null)
@@ -907,7 +907,7 @@ class PlayerService : InvincibleService(), Player.Listener, PlaybackStatsListene
             timerJob = coroutineScope.timer(delayMillis) {
                 val notification = NotificationCompat
                     .Builder(this@PlayerService, SleepTimerNotificationChannelId)
-                    .setContentTitle("Sleep timer ended")
+                    .setContentTitle(getString(R.string.sleep_timer_ended))
                     .setPriority(NotificationCompat.PRIORITY_DEFAULT)
                     .setAutoCancel(true)
                     .setOnlyAlertOnce(true)

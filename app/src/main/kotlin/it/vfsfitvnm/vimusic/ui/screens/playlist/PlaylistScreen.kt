@@ -94,7 +94,8 @@ fun PlaylistScreen(
                     TooltipIconButton(
                         description = R.string.import_playlist,
                         onClick = { isImportingPlaylist = true },
-                        icon = Icons.Outlined.LibraryAdd
+                        icon = Icons.Outlined.LibraryAdd,
+                        inTopBar = true
                     )
 
                     TooltipIconButton(
@@ -120,7 +121,8 @@ fun PlaylistScreen(
                                 )
                             }
                         },
-                        icon = Icons.Outlined.Share
+                        icon = Icons.Outlined.Share,
+                        inTopBar = true
                     )
                 },
                 colors = TopAppBarDefaults.mediumTopAppBarColors(scrolledContainerColor = MaterialTheme.colorScheme.surface),

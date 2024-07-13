@@ -10,6 +10,7 @@ import androidx.compose.material3.TooltipBox
 import androidx.compose.material3.rememberTooltipState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
@@ -25,10 +26,12 @@ import androidx.compose.ui.window.PopupPositionProvider
 fun TooltipIconButton(
     @StringRes description: Int,
     onClick: () -> Unit,
-    icon: ImageVector
+    icon: ImageVector,
+    modifier: Modifier = Modifier,
+    inTopBar: Boolean = false
 ) {
     TooltipBox(
-        positionProvider = rememberTooltipPosition(),
+        positionProvider = rememberTooltipPosition(inTopBar = inTopBar),
         tooltip = {
             PlainTooltip {
                 Text(text = stringResource(id = description))
@@ -36,7 +39,10 @@ fun TooltipIconButton(
         },
         state = rememberTooltipState()
     ) {
-        IconButton(onClick = onClick) {
+        IconButton(
+            onClick = onClick,
+            modifier = modifier
+        ) {
             Icon(
                 imageVector = icon,
                 contentDescription = stringResource(id = description)
@@ -46,10 +52,8 @@ fun TooltipIconButton(
 }
 
 @Composable
-fun rememberTooltipPosition(): PopupPositionProvider {
-    val tooltipAnchorSpacing = with(LocalDensity.current) {
-        4.dp.roundToPx()
-    }
+fun rememberTooltipPosition(inTopBar: Boolean): PopupPositionProvider {
+    val tooltipAnchorSpacing = with(LocalDensity.current) { 4.dp.roundToPx() }
     return remember(tooltipAnchorSpacing) {
         object : PopupPositionProvider {
             override fun calculatePosition(
@@ -59,7 +63,8 @@ fun rememberTooltipPosition(): PopupPositionProvider {
                 popupContentSize: IntSize
             ): IntOffset {
                 val x = anchorBounds.left + (anchorBounds.width - popupContentSize.width) / 2
-                val y = anchorBounds.bottom + tooltipAnchorSpacing
+                val y =
+                    if (inTopBar) anchorBounds.bottom + tooltipAnchorSpacing else anchorBounds.top - popupContentSize.height - tooltipAnchorSpacing
                 return IntOffset(x, y)
             }
         }

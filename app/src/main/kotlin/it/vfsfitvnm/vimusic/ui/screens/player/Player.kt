@@ -60,6 +60,7 @@ import it.vfsfitvnm.vimusic.Database
 import it.vfsfitvnm.vimusic.LocalPlayerServiceBinder
 import it.vfsfitvnm.vimusic.R
 import it.vfsfitvnm.vimusic.models.LocalMenuState
+import it.vfsfitvnm.vimusic.ui.components.TooltipIconButton
 import it.vfsfitvnm.vimusic.ui.components.themed.BaseMediaItemMenu
 import it.vfsfitvnm.vimusic.utils.DisposableListener
 import it.vfsfitvnm.vimusic.utils.formatAsDuration
@@ -232,8 +233,8 @@ fun Player(
             modifier = Modifier
                 .align(Alignment.BottomCenter)
                 .fillMaxWidth()
-                .clickable { isQueueOpen = true }
                 .clip(RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp))
+                .clickable { isQueueOpen = true }
                 .background(MaterialTheme.colorScheme.surfaceColorAtElevation(5.dp))
                 .padding(horizontal = 8.dp, vertical = 4.dp)
                 .pointerInput(Unit) {
@@ -260,12 +261,11 @@ fun Player(
                 maxLines = 1
             )
 
-            IconButton(onClick = { isShowingSleepTimerDialog = true }) {
-                Icon(
-                    imageVector = if (sleepTimerMillisLeft == null) Icons.Outlined.Timer else Icons.Filled.Timer,
-                    contentDescription = stringResource(id = R.string.sleep_timer)
-                )
-            }
+            TooltipIconButton(
+                description = R.string.sleep_timer,
+                onClick = { isShowingSleepTimerDialog = true },
+                icon = if (sleepTimerMillisLeft == null) Icons.Outlined.Timer else Icons.Filled.Timer
+            )
 
             IconButton(
                 onClick = {

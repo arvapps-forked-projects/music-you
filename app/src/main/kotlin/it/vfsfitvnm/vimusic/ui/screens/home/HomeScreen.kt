@@ -61,13 +61,15 @@ fun HomeScreen(
                     TooltipIconButton(
                         description = R.string.search,
                         onClick = { navController.navigate(route = "search") },
-                        icon = Icons.Outlined.Search
+                        icon = Icons.Outlined.Search,
+                        inTopBar = true
                     )
 
                     TooltipIconButton(
                         description = R.string.settings,
                         onClick = { navController.navigate(route = "settings") },
-                        icon = Icons.Outlined.Settings
+                        icon = Icons.Outlined.Settings,
+                        inTopBar = true
                     )
                 },
                 scrollBehavior = scrollBehavior

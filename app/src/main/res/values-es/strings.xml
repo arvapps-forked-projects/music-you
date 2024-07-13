@@ -141,4 +141,7 @@
     <string name="sync_playlist">Sincronizar lista</string>
     <string name="delete_playlist">Eliminar lista</string>
     <string name="random">Aleatorio</string>
+    <string name="queue_loop">Repetir la cola</string>
+    <string name="sleep_timer_ended">El temporizador de apagado ha terminado</string>
+    <string name="now_playing">Reproduciendo</string>
 </resources>

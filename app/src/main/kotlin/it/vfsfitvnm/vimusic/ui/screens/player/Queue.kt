@@ -59,6 +59,7 @@ import it.vfsfitvnm.vimusic.LocalPlayerServiceBinder
 import it.vfsfitvnm.vimusic.R
 import it.vfsfitvnm.vimusic.models.LocalMenuState
 import it.vfsfitvnm.vimusic.ui.components.MusicBars
+import it.vfsfitvnm.vimusic.ui.components.TooltipIconButton
 import it.vfsfitvnm.vimusic.ui.components.themed.QueuedMediaItemMenu
 import it.vfsfitvnm.vimusic.ui.items.ListItemPlaceholder
 import it.vfsfitvnm.vimusic.ui.items.MediaSongItem
@@ -282,28 +283,24 @@ fun Queue(
             )
 
             Row {
-                IconButton(
+                TooltipIconButton(
+                    description = R.string.shuffle,
                     onClick = {
                         reorderingState.coroutineScope.launch {
                             reorderingState.lazyListState.animateScrollToItem(0)
                         }.invokeOnCompletion {
                             player.shuffleQueue()
                         }
-                    }
-                ) {
-                    Icon(
-                        imageVector = Icons.Outlined.Shuffle,
-                        contentDescription = null
-                    )
-                }
+                    },
+                    icon = Icons.Outlined.Shuffle
+                )
 
-                IconButton(onClick = { queueLoopEnabled = !queueLoopEnabled }) {
-                    Icon(
-                        imageVector = Icons.Outlined.Repeat,
-                        contentDescription = null,
-                        modifier = Modifier.alpha(if (queueLoopEnabled) 1F else Dimensions.lowOpacity)
-                    )
-                }
+                TooltipIconButton(
+                    description = R.string.queue_loop,
+                    onClick = { queueLoopEnabled = !queueLoopEnabled },
+                    icon = Icons.Outlined.Repeat,
+                    modifier = Modifier.alpha(if (queueLoopEnabled) 1F else Dimensions.lowOpacity)
+                )
             }
         }
     }

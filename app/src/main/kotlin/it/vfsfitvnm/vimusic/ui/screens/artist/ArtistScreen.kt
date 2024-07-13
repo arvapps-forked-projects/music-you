@@ -111,7 +111,8 @@ fun ArtistScreen(
                             ?.let(Database::update)
                     }
                 },
-                icon = if (viewModel.artist?.bookmarkedAt == null) Icons.Outlined.BookmarkAdd else Icons.Filled.Bookmark
+                icon = if (viewModel.artist?.bookmarkedAt == null) Icons.Outlined.BookmarkAdd else Icons.Filled.Bookmark,
+                inTopBar = true
             )
 
             TooltipIconButton(
@@ -128,7 +129,8 @@ fun ArtistScreen(
 
                     context.startActivity(Intent.createChooser(sendIntent, null))
                 },
-                icon = Icons.Outlined.Share
+                icon = Icons.Outlined.Share,
+                inTopBar = true
             )
         },
         tabColumnContent = tabs
