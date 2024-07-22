@@ -2,18 +2,21 @@ package it.vfsfitvnm.vimusic.ui.screens.player
 
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
-import androidx.compose.foundation.gestures.detectVerticalDragGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowColumn
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.PlaylistPlay
@@ -23,6 +26,7 @@ import androidx.compose.material.icons.outlined.MoreHoriz
 import androidx.compose.material.icons.outlined.Remove
 import androidx.compose.material.icons.outlined.Timer
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilledTonalIconButton
 import androidx.compose.material3.Icon
@@ -50,9 +54,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.media3.common.MediaItem
 import androidx.media3.common.Player
 import it.vfsfitvnm.innertube.models.NavigationEndpoint
@@ -74,7 +78,7 @@ import kotlinx.coroutines.withContext
 
 @OptIn(
     ExperimentalAnimationApi::class,
-    ExperimentalMaterial3Api::class
+    ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class
 )
 @Composable
 fun Player(
@@ -229,65 +233,63 @@ fun Player(
             }
         }
 
-        Row(
-            modifier = Modifier
-                .align(Alignment.BottomCenter)
-                .fillMaxWidth()
-                .clip(RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp))
-                .clickable { isQueueOpen = true }
-                .background(MaterialTheme.colorScheme.surfaceColorAtElevation(5.dp))
-                .padding(horizontal = 8.dp, vertical = 4.dp)
-                .pointerInput(Unit) {
-                    detectVerticalDragGestures(
-                        onVerticalDrag = { _, dragAmount ->
-                            if (dragAmount < 0) isQueueOpen = true
-                        }
-                    )
-                },
-            verticalAlignment = Alignment.CenterVertically
+        SwipeToOpenBox(
+            modifier = Modifier.align(Alignment.BottomCenter),
+            openAction = { isQueueOpen = true },
+            anchorValue = 150F
         ) {
-            IconButton(onClick = { isQueueOpen = true }) {
-                Icon(
-                    imageVector = Icons.AutoMirrored.Outlined.PlaylistPlay,
-                    contentDescription = null
-                )
-            }
-
-            Text(
-                text = nextSongTitle,
-                style = MaterialTheme.typography.labelLarge,
-                modifier = Modifier.weight(1F),
-                overflow = TextOverflow.Ellipsis,
-                maxLines = 1
-            )
-
-            TooltipIconButton(
-                description = R.string.sleep_timer,
-                onClick = { isShowingSleepTimerDialog = true },
-                icon = if (sleepTimerMillisLeft == null) Icons.Outlined.Timer else Icons.Filled.Timer
-            )
-
-            IconButton(
-                onClick = {
-                    menuState.display {
-                        BaseMediaItemMenu(
-                            onDismiss = menuState::hide,
-                            mediaItem = mediaItem,
-                            onStartRadio = {
-                                binder.stopRadio()
-                                binder.player.seamlessPlay(mediaItem)
-                                binder.setupRadio(NavigationEndpoint.Endpoint.Watch(videoId = mediaItem.mediaId))
-                            },
-                            onGoToAlbum = onGoToAlbum,
-                            onGoToArtist = onGoToArtist
-                        )
-                    }
-                }
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp))
+                    .clickable { isQueueOpen = true }
+                    .background(MaterialTheme.colorScheme.surfaceColorAtElevation(5.dp))
+                    .padding(horizontal = 8.dp, vertical = 4.dp),
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Icon(
-                    imageVector = Icons.Outlined.MoreHoriz,
-                    contentDescription = null,
+                IconButton(onClick = { isQueueOpen = true }) {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Outlined.PlaylistPlay,
+                        contentDescription = null
+                    )
+                }
+
+                Text(
+                    text = nextSongTitle,
+                    style = MaterialTheme.typography.labelLarge,
+                    modifier = Modifier.weight(1F),
+                    overflow = TextOverflow.Ellipsis,
+                    maxLines = 1
                 )
+
+                TooltipIconButton(
+                    description = R.string.sleep_timer,
+                    onClick = { isShowingSleepTimerDialog = true },
+                    icon = if (sleepTimerMillisLeft == null) Icons.Outlined.Timer else Icons.Filled.Timer
+                )
+
+                IconButton(
+                    onClick = {
+                        menuState.display {
+                            BaseMediaItemMenu(
+                                onDismiss = menuState::hide,
+                                mediaItem = mediaItem,
+                                onStartRadio = {
+                                    binder.stopRadio()
+                                    binder.player.seamlessPlay(mediaItem)
+                                    binder.setupRadio(NavigationEndpoint.Endpoint.Watch(videoId = mediaItem.mediaId))
+                                },
+                                onGoToAlbum = onGoToAlbum,
+                                onGoToArtist = onGoToArtist
+                            )
+                        }
+                    }
+                ) {
+                    Icon(
+                        imageVector = Icons.Outlined.MoreHoriz,
+                        contentDescription = null,
+                    )
+                }
             }
         }
 
@@ -317,14 +319,45 @@ fun Player(
                     },
                     text = {
                         sleepTimerMillisLeft?.let {
-                            Text(
-                                text = formatAsDuration(it),
+                            FlowColumn(
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .padding(top = 16.dp),
-                                textAlign = TextAlign.Center,
-                                style = MaterialTheme.typography.titleMedium
-                            )
+                                verticalArrangement = Arrangement.spacedBy(
+                                    space = 8.dp,
+                                    alignment = Alignment.CenterVertically
+                                ),
+                                horizontalArrangement = Arrangement.spacedBy(
+                                    space = 8.dp,
+                                    alignment = Alignment.CenterHorizontally
+                                )
+                            ) {
+                                Box(
+                                    modifier = Modifier
+                                        .size(126.sp.value.dp)
+                                        .border(
+                                            width = 4.dp,
+                                            color = MaterialTheme.colorScheme.primary,
+                                            shape = CircleShape
+                                        ),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Text(
+                                        text = formatAsDuration(it),
+                                        style = MaterialTheme.typography.titleMedium
+                                    )
+                                }
+
+                                Button(
+                                    onClick = {
+                                        binder.startSleepTimer(it + 60 * 1000L)
+                                        isShowingSleepTimerDialog = false
+                                    },
+                                    modifier = Modifier.align(Alignment.CenterHorizontally)
+                                ) {
+                                    Text(text = "+1:00")
+                                }
+                            }
                         }
                     }
                 )

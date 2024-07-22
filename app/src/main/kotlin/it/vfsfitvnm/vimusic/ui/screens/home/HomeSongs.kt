@@ -21,6 +21,7 @@ import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.outlined.PlaylistPlay
 import androidx.compose.material.icons.outlined.ArrowDownward
 import androidx.compose.material.icons.outlined.Shuffle
 import androidx.compose.material3.DropdownMenu
@@ -54,13 +55,16 @@ import it.vfsfitvnm.vimusic.LocalPlayerServiceBinder
 import it.vfsfitvnm.vimusic.R
 import it.vfsfitvnm.vimusic.enums.SongSortBy
 import it.vfsfitvnm.vimusic.enums.SortOrder
+import it.vfsfitvnm.vimusic.models.ActionInfo
 import it.vfsfitvnm.vimusic.models.LocalMenuState
 import it.vfsfitvnm.vimusic.models.Song
+import it.vfsfitvnm.vimusic.ui.components.SwipeToActionBox
 import it.vfsfitvnm.vimusic.ui.components.themed.InHistoryMediaItemMenu
 import it.vfsfitvnm.vimusic.ui.items.LocalSongItem
 import it.vfsfitvnm.vimusic.ui.styling.onOverlay
 import it.vfsfitvnm.vimusic.ui.styling.overlay
 import it.vfsfitvnm.vimusic.utils.asMediaItem
+import it.vfsfitvnm.vimusic.utils.enqueue
 import it.vfsfitvnm.vimusic.utils.forcePlayAtIndex
 import it.vfsfitvnm.vimusic.utils.forcePlayFromBeginning
 import it.vfsfitvnm.vimusic.utils.rememberPreference
@@ -202,50 +206,59 @@ fun HomeSongs(
                 items = items,
                 key = { _, song -> song.id }
             ) { index, song ->
-                LocalSongItem(
+                SwipeToActionBox(
                     modifier = Modifier.animateItemPlacement(),
-                    song = song,
-                    onClick = {
-                        binder?.stopRadio()
-                        binder?.player?.forcePlayAtIndex(
-                            items.map(Song::asMediaItem),
-                            index
-                        )
-                    },
-                    onLongClick = {
-                        menuState.display {
-                            InHistoryMediaItemMenu(
-                                song = song,
-                                onDismiss = menuState::hide,
-                                onGoToAlbum = onGoToAlbum,
-                                onGoToArtist = onGoToArtist
+                    primaryAction = ActionInfo(
+                        onClick = { binder?.player?.enqueue(song.asMediaItem) },
+                        icon = Icons.AutoMirrored.Outlined.PlaylistPlay,
+                        description = R.string.enqueue
+                    )
+                ) {
+                    LocalSongItem(
+                        modifier = Modifier.animateItemPlacement(),
+                        song = song,
+                        onClick = {
+                            binder?.stopRadio()
+                            binder?.player?.forcePlayAtIndex(
+                                items.map(Song::asMediaItem),
+                                index
                             )
-                        }
-                    },
-                    onThumbnailContent = if (sortBy == SongSortBy.PlayTime) ({
-                        Text(
-                            text = song.formattedTotalPlayTime,
-                            style = MaterialTheme.typography.labelMedium,
-                            color = MaterialTheme.colorScheme.onOverlay,
-                            maxLines = 2,
-                            overflow = TextOverflow.Ellipsis,
-                            textAlign = TextAlign.Center,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .background(
-                                    brush = Brush.verticalGradient(
-                                        colors = listOf(
-                                            Color.Transparent,
-                                            MaterialTheme.colorScheme.overlay
-                                        )
-                                    ),
-                                    shape = MaterialTheme.shapes.medium
+                        },
+                        onLongClick = {
+                            menuState.display {
+                                InHistoryMediaItemMenu(
+                                    song = song,
+                                    onDismiss = menuState::hide,
+                                    onGoToAlbum = onGoToAlbum,
+                                    onGoToArtist = onGoToArtist
                                 )
-                                .padding(horizontal = 8.dp, vertical = 4.dp)
-                                .align(Alignment.BottomCenter)
-                        )
-                    }) else null
-                )
+                            }
+                        },
+                        onThumbnailContent = if (sortBy == SongSortBy.PlayTime) ({
+                            Text(
+                                text = song.formattedTotalPlayTime,
+                                style = MaterialTheme.typography.labelMedium,
+                                color = MaterialTheme.colorScheme.onOverlay,
+                                maxLines = 2,
+                                overflow = TextOverflow.Ellipsis,
+                                textAlign = TextAlign.Center,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .background(
+                                        brush = Brush.verticalGradient(
+                                            colors = listOf(
+                                                Color.Transparent,
+                                                MaterialTheme.colorScheme.overlay
+                                            )
+                                        ),
+                                        shape = MaterialTheme.shapes.medium
+                                    )
+                                    .padding(horizontal = 8.dp, vertical = 4.dp)
+                                    .align(Alignment.BottomCenter)
+                            )
+                        }) else null
+                    )
+                }
             }
         }
     }

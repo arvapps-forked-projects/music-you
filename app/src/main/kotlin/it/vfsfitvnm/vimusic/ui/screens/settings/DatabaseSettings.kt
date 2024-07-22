@@ -109,7 +109,8 @@ fun DatabaseSettings() {
             modifier = Modifier
                 .padding(horizontal = 16.dp)
                 .padding(bottom = 4.dp),
-            style = MaterialTheme.typography.titleMedium
+            color = MaterialTheme.colorScheme.primary,
+            style = MaterialTheme.typography.labelLarge
         )
 
         SwitchSettingEntry(
@@ -151,7 +152,8 @@ fun DatabaseSettings() {
             modifier = Modifier
                 .padding(horizontal = 16.dp)
                 .padding(bottom = 4.dp),
-            style = MaterialTheme.typography.titleMedium
+            color = MaterialTheme.colorScheme.primary,
+            style = MaterialTheme.typography.labelLarge
         )
 
         SettingsEntry(

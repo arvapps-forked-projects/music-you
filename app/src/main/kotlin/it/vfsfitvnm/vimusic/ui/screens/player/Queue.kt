@@ -2,7 +2,6 @@ package it.vfsfitvnm.vimusic.ui.screens.player
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
-import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.core.updateTransition
 import androidx.compose.animation.fadeIn
@@ -26,14 +25,10 @@ import androidx.compose.material.icons.outlined.DragHandle
 import androidx.compose.material.icons.outlined.PlaylistRemove
 import androidx.compose.material.icons.outlined.Repeat
 import androidx.compose.material.icons.outlined.Shuffle
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.SwipeToDismissBox
-import androidx.compose.material3.SwipeToDismissBoxValue
 import androidx.compose.material3.Text
-import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -57,8 +52,10 @@ import it.vfsfitvnm.compose.reordering.rememberReorderingState
 import it.vfsfitvnm.compose.reordering.reorder
 import it.vfsfitvnm.vimusic.LocalPlayerServiceBinder
 import it.vfsfitvnm.vimusic.R
+import it.vfsfitvnm.vimusic.models.ActionInfo
 import it.vfsfitvnm.vimusic.models.LocalMenuState
 import it.vfsfitvnm.vimusic.ui.components.MusicBars
+import it.vfsfitvnm.vimusic.ui.components.SwipeToActionBox
 import it.vfsfitvnm.vimusic.ui.components.TooltipIconButton
 import it.vfsfitvnm.vimusic.ui.components.themed.QueuedMediaItemMenu
 import it.vfsfitvnm.vimusic.ui.items.ListItemPlaceholder
@@ -73,7 +70,7 @@ import it.vfsfitvnm.vimusic.utils.shuffleQueue
 import it.vfsfitvnm.vimusic.utils.windows
 import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalAnimationApi::class, ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun Queue(
     onGoToAlbum: (String) -> Unit,
@@ -135,47 +132,17 @@ fun Queue(
                 val isPlayingThisMediaItem = mediaItemIndex == window.firstPeriodIndex
                 val currentWindow by rememberUpdatedState(window)
 
-                val dismissState = rememberSwipeToDismissBoxState(
-                    confirmValueChange = { value ->
-                        if (value == SwipeToDismissBoxValue.EndToStart) {
-                            if (!isPlayingThisMediaItem) player.removeMediaItem(currentWindow.firstPeriodIndex)
-                        }
-
-                        return@rememberSwipeToDismissBoxState false
-                    }
-                )
-
-                SwipeToDismissBox(
-                    state = dismissState,
-                    backgroundContent = {
-                        val color by animateColorAsState(
-                            targetValue = if (dismissState.targetValue == SwipeToDismissBoxValue.EndToStart) MaterialTheme.colorScheme.errorContainer else Color.Transparent,
-                            label = "background"
-                        )
-
-                        Row(
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .background(color)
-                                .padding(horizontal = 16.dp),
-                            horizontalArrangement = Arrangement.End,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            if (dismissState.targetValue == SwipeToDismissBoxValue.EndToStart) {
-                                Icon(
-                                    imageVector = Icons.Outlined.PlaylistRemove,
-                                    contentDescription = null,
-                                    tint = MaterialTheme.colorScheme.onErrorContainer
-                                )
-                            }
-                        }
-                    },
+                SwipeToActionBox(
                     modifier = Modifier.draggedItem(
                         reorderingState = reorderingState,
                         index = window.firstPeriodIndex
                     ),
-                    enableDismissFromStartToEnd = false,
-                    enableDismissFromEndToStart = !isPlayingThisMediaItem
+                    destructiveAction = ActionInfo(
+                        enabled = !isPlayingThisMediaItem,
+                        onClick = { player.removeMediaItem(currentWindow.firstPeriodIndex) },
+                        icon = Icons.Outlined.PlaylistRemove,
+                        description = R.string.remove_from_queue
+                    )
                 ) {
                     MediaSongItem(
                         song = window.mediaItem,

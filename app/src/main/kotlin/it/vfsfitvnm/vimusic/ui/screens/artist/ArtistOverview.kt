@@ -32,7 +32,7 @@ import it.vfsfitvnm.innertube.Innertube
 import it.vfsfitvnm.innertube.models.NavigationEndpoint
 import it.vfsfitvnm.vimusic.LocalPlayerServiceBinder
 import it.vfsfitvnm.vimusic.R
-import it.vfsfitvnm.vimusic.models.IconButtonInfo
+import it.vfsfitvnm.vimusic.models.ActionInfo
 import it.vfsfitvnm.vimusic.models.LocalMenuState
 import it.vfsfitvnm.vimusic.ui.components.CoverScaffold
 import it.vfsfitvnm.vimusic.ui.components.ShimmerHost
@@ -72,7 +72,7 @@ fun ArtistOverview(
         val shuffleEndpoint = youtubeArtistPage?.shuffleEndpoint
 
         CoverScaffold(
-            primaryButton = IconButtonInfo(
+            primaryButton = ActionInfo(
                 enabled = radioEndpoint != null,
                 onClick = {
                     binder?.stopRadio()
@@ -81,7 +81,7 @@ fun ArtistOverview(
                 icon = Icons.Outlined.Podcasts,
                 description = R.string.start_radio
             ),
-            secondaryButton = IconButtonInfo(
+            secondaryButton = ActionInfo(
                 enabled = shuffleEndpoint != null,
                 onClick = {
                     binder?.stopRadio()

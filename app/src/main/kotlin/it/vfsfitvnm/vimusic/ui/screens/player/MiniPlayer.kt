@@ -3,7 +3,6 @@ package it.vfsfitvnm.vimusic.ui.screens.player
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.gestures.detectVerticalDragGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -40,7 +39,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -100,129 +98,125 @@ fun MiniPlayer(openPlayer: () -> Unit) {
         }
     )
 
-    SwipeToDismissBox(
-        state = dismissState,
-        backgroundContent = {
-            val color by animateColorAsState(
-                targetValue = when (dismissState.targetValue) {
-                    SwipeToDismissBoxValue.StartToEnd -> MaterialTheme.colorScheme.primaryContainer
-                    SwipeToDismissBoxValue.EndToStart -> MaterialTheme.colorScheme.primaryContainer
-                    SwipeToDismissBoxValue.Settled -> Color.Transparent
-                },
-                label = "background"
-            )
-
-            Row(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(color)
-                    .padding(horizontal = 16.dp),
-                horizontalArrangement = when (dismissState.targetValue) {
-                    SwipeToDismissBoxValue.StartToEnd -> Arrangement.Start
-                    SwipeToDismissBoxValue.EndToStart -> Arrangement.End
-                    SwipeToDismissBoxValue.Settled -> Arrangement.Center
-                },
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Icon(
-                    imageVector = when (dismissState.targetValue) {
-                        SwipeToDismissBoxValue.StartToEnd -> Icons.Outlined.SkipPrevious
-                        SwipeToDismissBoxValue.EndToStart -> Icons.Outlined.SkipNext
-                        SwipeToDismissBoxValue.Settled -> Icons.Outlined.PlayArrow
-                    },
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.onPrimaryContainer
-                )
-            }
+    SwipeToOpenBox(
+        openAction = openPlayer,
+        closeAction = {
+            binder.stopRadio()
+            binder.player.clearMediaItems()
         }
     ) {
-        Surface(
-            modifier = Modifier
-                .clickable(onClick = openPlayer)
-                .pointerInput(Unit) {
-                    detectVerticalDragGestures(
-                        onVerticalDrag = { _, dragAmount ->
-                            if (dragAmount < 0) openPlayer()
-                            else if (dragAmount > 20) {
-                                binder.stopRadio()
-                                binder.player.clearMediaItems()
+        SwipeToDismissBox(
+            state = dismissState,
+            backgroundContent = {
+                val color by animateColorAsState(
+                    targetValue = when (dismissState.targetValue) {
+                        SwipeToDismissBoxValue.StartToEnd -> MaterialTheme.colorScheme.primaryContainer
+                        SwipeToDismissBoxValue.EndToStart -> MaterialTheme.colorScheme.primaryContainer
+                        SwipeToDismissBoxValue.Settled -> Color.Transparent
+                    },
+                    label = "background"
+                )
+
+                Row(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(color)
+                        .padding(horizontal = 16.dp),
+                    horizontalArrangement = when (dismissState.targetValue) {
+                        SwipeToDismissBoxValue.StartToEnd -> Arrangement.Start
+                        SwipeToDismissBoxValue.EndToStart -> Arrangement.End
+                        SwipeToDismissBoxValue.Settled -> Arrangement.Center
+                    },
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        imageVector = when (dismissState.targetValue) {
+                            SwipeToDismissBoxValue.StartToEnd -> Icons.Outlined.SkipPrevious
+                            SwipeToDismissBoxValue.EndToStart -> Icons.Outlined.SkipNext
+                            SwipeToDismissBoxValue.Settled -> Icons.Outlined.PlayArrow
+                        },
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.onPrimaryContainer
+                    )
+                }
+            }
+        ) {
+            Surface(
+                modifier = Modifier.clickable(onClick = openPlayer),
+                color = MaterialTheme.colorScheme.surfaceColorAtElevation(1.dp)
+            ) {
+                Column {
+                    LinearProgressIndicator(
+                        progress = { positionAndDuration.first.toFloat() / positionAndDuration.second.absoluteValue },
+                        modifier = Modifier.fillMaxWidth(),
+                        color = MaterialTheme.colorScheme.primary
+                    )
+
+                    ListItem(
+                        headlineContent = {
+                            Text(
+                                text = mediaItem.mediaMetadata.title?.toString() ?: "",
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis
+                            )
+                        },
+                        supportingContent = {
+                            Text(
+                                text = mediaItem.mediaMetadata.artist?.toString() ?: "",
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis
+                            )
+                        },
+                        leadingContent = {
+                            AsyncImage(
+                                model = mediaItem.mediaMetadata.artworkUri.thumbnail(Dimensions.thumbnails.song.px),
+                                contentDescription = null,
+                                contentScale = ContentScale.Crop,
+                                modifier = Modifier
+                                    .clip(MaterialTheme.shapes.medium)
+                                    .size(52.dp)
+                            )
+                        },
+                        trailingContent = {
+                            Row {
+                                IconButton(
+                                    onClick = {
+                                        if (shouldBePlaying) {
+                                            binder.player.pause()
+                                        } else {
+                                            if (binder.player.playbackState == Player.STATE_IDLE) {
+                                                binder.player.prepare()
+                                            } else if (binder.player.playbackState == Player.STATE_ENDED) {
+                                                binder.player.seekToDefaultPosition(0)
+                                            }
+                                            binder.player.play()
+                                        }
+                                    }
+                                ) {
+                                    Icon(
+                                        imageVector =
+                                        if (shouldBePlaying) Icons.Outlined.Pause
+                                        else if (binder.player.playbackState == Player.STATE_ENDED) Icons.Outlined.Replay
+                                        else Icons.Outlined.PlayArrow,
+                                        contentDescription = null,
+                                    )
+                                }
+
+                                IconButton(
+                                    onClick = {
+                                        binder.stopRadio()
+                                        binder.player.clearMediaItems()
+                                    }
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Outlined.Clear,
+                                        contentDescription = null,
+                                    )
+                                }
                             }
                         }
                     )
-                },
-            color = MaterialTheme.colorScheme.surfaceColorAtElevation(1.dp)
-        ) {
-            Column {
-                LinearProgressIndicator(
-                    progress = { positionAndDuration.first.toFloat() / positionAndDuration.second.absoluteValue },
-                    modifier = Modifier.fillMaxWidth(),
-                    color = MaterialTheme.colorScheme.primary
-                )
-
-                ListItem(
-                    headlineContent = {
-                        Text(
-                            text = mediaItem.mediaMetadata.title?.toString() ?: "",
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis
-                        )
-                    },
-                    supportingContent = {
-                        Text(
-                            text = mediaItem.mediaMetadata.artist?.toString() ?: "",
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis
-                        )
-                    },
-                    leadingContent = {
-                        AsyncImage(
-                            model = mediaItem.mediaMetadata.artworkUri.thumbnail(Dimensions.thumbnails.song.px),
-                            contentDescription = null,
-                            contentScale = ContentScale.Crop,
-                            modifier = Modifier
-                                .clip(MaterialTheme.shapes.medium)
-                                .size(52.dp)
-                        )
-                    },
-                    trailingContent = {
-                        Row {
-                            IconButton(
-                                onClick = {
-                                    if (shouldBePlaying) {
-                                        binder.player.pause()
-                                    } else {
-                                        if (binder.player.playbackState == Player.STATE_IDLE) {
-                                            binder.player.prepare()
-                                        } else if (binder.player.playbackState == Player.STATE_ENDED) {
-                                            binder.player.seekToDefaultPosition(0)
-                                        }
-                                        binder.player.play()
-                                    }
-                                }
-                            ) {
-                                Icon(
-                                    imageVector =
-                                    if (shouldBePlaying) Icons.Outlined.Pause
-                                    else if (binder.player.playbackState == Player.STATE_ENDED) Icons.Outlined.Replay
-                                    else Icons.Outlined.PlayArrow,
-                                    contentDescription = null,
-                                )
-                            }
-
-                            IconButton(
-                                onClick = {
-                                    binder.stopRadio()
-                                    binder.player.clearMediaItems()
-                                }
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Outlined.Clear,
-                                    contentDescription = null,
-                                )
-                            }
-                        }
-                    }
-                )
+                }
             }
         }
     }

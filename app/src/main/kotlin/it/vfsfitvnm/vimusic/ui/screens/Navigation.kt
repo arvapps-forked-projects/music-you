@@ -10,29 +10,23 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.Lifecycle
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
-import it.vfsfitvnm.vimusic.Database
 import it.vfsfitvnm.vimusic.enums.BuiltInPlaylist
 import it.vfsfitvnm.vimusic.enums.SettingsSection
-import it.vfsfitvnm.vimusic.models.SearchQuery
 import it.vfsfitvnm.vimusic.ui.screens.album.AlbumScreen
 import it.vfsfitvnm.vimusic.ui.screens.artist.ArtistScreen
 import it.vfsfitvnm.vimusic.ui.screens.builtinplaylist.BuiltInPlaylistScreen
 import it.vfsfitvnm.vimusic.ui.screens.home.HomeScreen
 import it.vfsfitvnm.vimusic.ui.screens.localplaylist.LocalPlaylistScreen
 import it.vfsfitvnm.vimusic.ui.screens.playlist.PlaylistScreen
-import it.vfsfitvnm.vimusic.ui.screens.search.SearchResultScreen
 import it.vfsfitvnm.vimusic.ui.screens.search.SearchScreen
 import it.vfsfitvnm.vimusic.ui.screens.settings.SettingsPage
 import it.vfsfitvnm.vimusic.ui.screens.settings.SettingsScreen
-import it.vfsfitvnm.vimusic.utils.pauseSearchHistoryKey
-import it.vfsfitvnm.vimusic.utils.preferences
 
 @OptIn(ExperimentalFoundationApi::class, ExperimentalAnimationApi::class)
 @Composable
@@ -164,52 +158,9 @@ fun Navigation(
             }
         }
 
-        composable(
-            route = "search?text={text}",
-            arguments = listOf(
-                navArgument(
-                    name = "text",
-                    builder = {
-                        type = NavType.StringType
-                        defaultValue = ""
-                    }
-                )
-            )
-        ) { navBackStackEntry ->
-            val context = LocalContext.current
-            val text = navBackStackEntry.arguments?.getString("text") ?: ""
-
+        composable(route = "search") {
             PlayerScaffold {
                 SearchScreen(
-                    initialTextInput = text,
-                    pop = popDestination,
-                    onSearch = { query ->
-                        navController.navigate(route = "searchResults/$query")
-
-                        if (!context.preferences.getBoolean(pauseSearchHistoryKey, false)) {
-                            it.vfsfitvnm.vimusic.query {
-                                Database.insert(SearchQuery(query = query))
-                            }
-                        }
-                    }
-                )
-            }
-        }
-
-        composable(
-            route = "searchResults/{query}",
-            arguments = listOf(
-                navArgument(
-                    name = "query",
-                    builder = { type = NavType.StringType }
-                )
-            )
-        ) { navBackStackEntry ->
-            val query = navBackStackEntry.arguments?.getString("query") ?: ""
-
-            PlayerScaffold {
-                SearchResultScreen(
-                    query = query,
                     pop = popDestination,
                     onAlbumClick = navigateToAlbum,
                     onArtistClick = navigateToArtist,

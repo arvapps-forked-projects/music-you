@@ -18,10 +18,11 @@ import androidx.compose.ui.unit.dp
 import it.vfsfitvnm.innertube.Innertube
 import it.vfsfitvnm.vimusic.LocalPlayerServiceBinder
 import it.vfsfitvnm.vimusic.R
-import it.vfsfitvnm.vimusic.models.IconButtonInfo
+import it.vfsfitvnm.vimusic.models.ActionInfo
 import it.vfsfitvnm.vimusic.models.LocalMenuState
 import it.vfsfitvnm.vimusic.ui.components.CoverScaffold
 import it.vfsfitvnm.vimusic.ui.components.ShimmerHost
+import it.vfsfitvnm.vimusic.ui.components.SwipeToActionBox
 import it.vfsfitvnm.vimusic.ui.components.themed.NonQueuedMediaItemMenu
 import it.vfsfitvnm.vimusic.ui.components.themed.adaptiveThumbnailContent
 import it.vfsfitvnm.vimusic.ui.items.ListItemPlaceholder
@@ -52,7 +53,7 @@ fun PlaylistSongList(
     ) {
         item(key = "thumbnail") {
             CoverScaffold(
-                primaryButton = IconButtonInfo(
+                primaryButton = ActionInfo(
                     onClick = {
                         playlistPage?.songsPage?.items?.let { songs ->
                             if (songs.isNotEmpty()) {
@@ -66,7 +67,7 @@ fun PlaylistSongList(
                     icon = Icons.Outlined.Shuffle,
                     description = R.string.shuffle
                 ),
-                secondaryButton = IconButtonInfo(
+                secondaryButton = ActionInfo(
                     onClick = {
                         playlistPage?.songsPage?.items?.map(Innertube.SongItem::asMediaItem)
                             ?.let { mediaItems ->
@@ -85,26 +86,34 @@ fun PlaylistSongList(
         }
 
         itemsIndexed(items = playlistPage?.songsPage?.items ?: emptyList()) { index, song ->
-            SongItem(
-                song = song,
-                onClick = {
-                    playlistPage?.songsPage?.items?.map(Innertube.SongItem::asMediaItem)
-                        ?.let { mediaItems ->
-                            binder?.stopRadio()
-                            binder?.player?.forcePlayAtIndex(mediaItems, index)
+            SwipeToActionBox(
+                primaryAction = ActionInfo(
+                    onClick = { binder?.player?.enqueue(song.asMediaItem) },
+                    icon = Icons.AutoMirrored.Outlined.PlaylistPlay,
+                    description = R.string.enqueue
+                )
+            ) {
+                SongItem(
+                    song = song,
+                    onClick = {
+                        playlistPage?.songsPage?.items?.map(Innertube.SongItem::asMediaItem)
+                            ?.let { mediaItems ->
+                                binder?.stopRadio()
+                                binder?.player?.forcePlayAtIndex(mediaItems, index)
+                            }
+                    },
+                    onLongClick = {
+                        menuState.display {
+                            NonQueuedMediaItemMenu(
+                                onDismiss = menuState::hide,
+                                mediaItem = song.asMediaItem,
+                                onGoToAlbum = onGoToAlbum,
+                                onGoToArtist = onGoToArtist
+                            )
                         }
-                },
-                onLongClick = {
-                    menuState.display {
-                        NonQueuedMediaItemMenu(
-                            onDismiss = menuState::hide,
-                            mediaItem = song.asMediaItem,
-                            onGoToAlbum = onGoToAlbum,
-                            onGoToArtist = onGoToArtist
-                        )
                     }
-                }
-            )
+                )
+            }
         }
 
         if (playlistPage == null) {

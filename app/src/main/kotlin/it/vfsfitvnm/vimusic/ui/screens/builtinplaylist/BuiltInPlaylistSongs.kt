@@ -24,11 +24,12 @@ import it.vfsfitvnm.vimusic.Database
 import it.vfsfitvnm.vimusic.LocalPlayerServiceBinder
 import it.vfsfitvnm.vimusic.R
 import it.vfsfitvnm.vimusic.enums.BuiltInPlaylist
-import it.vfsfitvnm.vimusic.models.IconButtonInfo
+import it.vfsfitvnm.vimusic.models.ActionInfo
 import it.vfsfitvnm.vimusic.models.LocalMenuState
 import it.vfsfitvnm.vimusic.models.Song
 import it.vfsfitvnm.vimusic.models.SongWithContentLength
 import it.vfsfitvnm.vimusic.ui.components.CoverScaffold
+import it.vfsfitvnm.vimusic.ui.components.SwipeToActionBox
 import it.vfsfitvnm.vimusic.ui.components.themed.InHistoryMediaItemMenu
 import it.vfsfitvnm.vimusic.ui.components.themed.NonQueuedMediaItemMenu
 import it.vfsfitvnm.vimusic.ui.items.LocalSongItem
@@ -78,7 +79,7 @@ fun BuiltInPlaylistSongs(
     ) {
         item(key = "thumbnail") {
             CoverScaffold(
-                primaryButton = IconButtonInfo(
+                primaryButton = ActionInfo(
                     enabled = songs.isNotEmpty(),
                     onClick = {
                         binder?.stopRadio()
@@ -89,7 +90,7 @@ fun BuiltInPlaylistSongs(
                     icon = Icons.Outlined.Shuffle,
                     description = R.string.shuffle
                 ),
-                secondaryButton = IconButtonInfo(
+                secondaryButton = ActionInfo(
                     enabled = songs.isNotEmpty(),
                     onClick = {
                         binder?.player?.enqueue(songs.map(Song::asMediaItem))
@@ -112,36 +113,44 @@ fun BuiltInPlaylistSongs(
             key = { _, song -> song.id },
             contentType = { _, song -> song },
         ) { index, song ->
-            LocalSongItem(
+            SwipeToActionBox(
                 modifier = Modifier.animateItemPlacement(),
-                song = song,
-                onClick = {
-                    binder?.stopRadio()
-                    binder?.player?.forcePlayAtIndex(
-                        songs.map(Song::asMediaItem),
-                        index
-                    )
-                },
-                onLongClick = {
-                    menuState.display {
-                        when (builtInPlaylist) {
-                            BuiltInPlaylist.Favorites -> NonQueuedMediaItemMenu(
-                                mediaItem = song.asMediaItem,
-                                onDismiss = menuState::hide,
-                                onGoToAlbum = onGoToAlbum,
-                                onGoToArtist = onGoToArtist
-                            )
+                primaryAction = ActionInfo(
+                    onClick = { binder?.player?.enqueue(song.asMediaItem) },
+                    icon = Icons.AutoMirrored.Outlined.PlaylistPlay,
+                    description = R.string.enqueue
+                )
+            ) {
+                LocalSongItem(
+                    song = song,
+                    onClick = {
+                        binder?.stopRadio()
+                        binder?.player?.forcePlayAtIndex(
+                            songs.map(Song::asMediaItem),
+                            index
+                        )
+                    },
+                    onLongClick = {
+                        menuState.display {
+                            when (builtInPlaylist) {
+                                BuiltInPlaylist.Favorites -> NonQueuedMediaItemMenu(
+                                    mediaItem = song.asMediaItem,
+                                    onDismiss = menuState::hide,
+                                    onGoToAlbum = onGoToAlbum,
+                                    onGoToArtist = onGoToArtist
+                                )
 
-                            BuiltInPlaylist.Offline -> InHistoryMediaItemMenu(
-                                song = song,
-                                onDismiss = menuState::hide,
-                                onGoToAlbum = onGoToAlbum,
-                                onGoToArtist = onGoToArtist
-                            )
+                                BuiltInPlaylist.Offline -> InHistoryMediaItemMenu(
+                                    song = song,
+                                    onDismiss = menuState::hide,
+                                    onGoToAlbum = onGoToAlbum,
+                                    onGoToArtist = onGoToArtist
+                                )
+                            }
                         }
                     }
-                }
-            )
+                )
+            }
         }
     }
 }

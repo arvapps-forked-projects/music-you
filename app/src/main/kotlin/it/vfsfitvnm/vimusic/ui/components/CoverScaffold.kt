@@ -12,12 +12,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import it.vfsfitvnm.vimusic.models.IconButtonInfo
+import it.vfsfitvnm.vimusic.models.ActionInfo
 
 @Composable
 fun CoverScaffold(
-    primaryButton: IconButtonInfo,
-    secondaryButton: IconButtonInfo,
+    primaryButton: ActionInfo,
+    secondaryButton: ActionInfo,
     content: @Composable () -> Unit
 ) {
     Box(

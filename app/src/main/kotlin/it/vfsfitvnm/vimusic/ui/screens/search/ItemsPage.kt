@@ -17,9 +17,10 @@ import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
-import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.res.stringResource
@@ -43,8 +44,8 @@ inline fun <T : Innertube.Item> ItemsPage(
     crossinline itemContent: @Composable LazyGridItemScope.(T) -> Unit,
     noinline itemPlaceholderContent: @Composable () -> Unit,
     modifier: Modifier = Modifier,
-    initialPlaceholderCount: Int = 16,
-    continuationPlaceholderCount: Int = 6,
+    initialPlaceholderCount: Int = 8,
+    continuationPlaceholderCount: Int = 3,
     emptyItemsText: String = stringResource(id = R.string.no_items_found),
     noinline itemsPageProvider: (suspend (String?) -> Result<Innertube.ItemsPage<T>?>?)? = null,
 ) {
@@ -57,31 +58,33 @@ inline fun <T : Innertube.Item> ItemsPage(
     val listLayout = tag.contains("songs") || tag.contains("videos")
     val artistsLayout = tag.contains("artists")
 
-    LaunchedEffect(lazyGridState, updatedItemsPageProvider) {
+    val shouldLoadMore by remember {
+        derivedStateOf {
+            lazyGridState.layoutInfo.visibleItemsInfo.any { it.key.toString().contains("loading") }
+        }
+    }
+
+    LaunchedEffect(shouldLoadMore, updatedItemsPageProvider) {
+        if (!shouldLoadMore) return@LaunchedEffect
         val currentItemsPageProvider = updatedItemsPageProvider ?: return@LaunchedEffect
 
-        snapshotFlow { lazyGridState.layoutInfo.visibleItemsInfo.any { it.key == "loading0" } }
-            .collect { shouldLoadMore ->
-                if (!shouldLoadMore) return@collect
-
-                withContext(Dispatchers.IO) {
-                    currentItemsPageProvider(itemsPage?.continuation)
-                }?.onSuccess {
-                    if (it == null) {
-                        if (itemsPage == null) {
-                            viewModel.setItems(
-                                tag = tag,
-                                items = Innertube.ItemsPage(items = null, continuation = null)
-                            )
-                        }
-                    } else {
-                        viewModel.setItems(
-                            tag = tag,
-                            items = itemsPage + it
-                        )
-                    }
+        withContext(Dispatchers.IO) {
+            currentItemsPageProvider(itemsPage?.continuation)
+        }?.onSuccess {
+            if (it == null) {
+                if (itemsPage == null) {
+                    viewModel.setItems(
+                        tag = tag,
+                        items = Innertube.ItemsPage(items = null, continuation = null)
+                    )
                 }
+            } else {
+                viewModel.setItems(
+                    tag = tag,
+                    items = itemsPage + it
+                )
             }
+        }
     }
 
     LazyVerticalGrid(

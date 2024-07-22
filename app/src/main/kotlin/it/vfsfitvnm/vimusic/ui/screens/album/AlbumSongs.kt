@@ -29,7 +29,7 @@ import androidx.compose.ui.unit.dp
 import it.vfsfitvnm.vimusic.Database
 import it.vfsfitvnm.vimusic.LocalPlayerServiceBinder
 import it.vfsfitvnm.vimusic.R
-import it.vfsfitvnm.vimusic.models.IconButtonInfo
+import it.vfsfitvnm.vimusic.models.ActionInfo
 import it.vfsfitvnm.vimusic.models.LocalMenuState
 import it.vfsfitvnm.vimusic.models.Song
 import it.vfsfitvnm.vimusic.ui.components.CoverScaffold
@@ -67,7 +67,7 @@ fun AlbumSongs(
     ) {
         item(key = "thumbnail") {
             CoverScaffold(
-                primaryButton = IconButtonInfo(
+                primaryButton = ActionInfo(
                     enabled = songs.isNotEmpty(),
                     onClick = {
                         binder?.stopRadio()
@@ -78,7 +78,7 @@ fun AlbumSongs(
                     icon = Icons.Outlined.Shuffle,
                     description = R.string.shuffle
                 ),
-                secondaryButton = IconButtonInfo(
+                secondaryButton = ActionInfo(
                     enabled = songs.isNotEmpty(),
                     onClick = {
                         binder?.player?.enqueue(songs.map(Song::asMediaItem))
