@@ -89,6 +89,16 @@ interface Database {
     @RewriteQueriesToDropUnusedColumns
     fun songsByPlayTimeDesc(): Flow<List<Song>>
 
+    @Transaction
+    @Query("SELECT * FROM Song WHERE totalPlayTimeMs > 0 ORDER BY artistsText ASC")
+    @RewriteQueriesToDropUnusedColumns
+    fun songsByArtistsAsc(): Flow<List<Song>>
+
+    @Transaction
+    @Query("SELECT * FROM Song WHERE totalPlayTimeMs > 0 ORDER BY artistsText DESC")
+    @RewriteQueriesToDropUnusedColumns
+    fun songsByArtistsDesc(): Flow<List<Song>>
+
     fun songs(sortBy: SongSortBy, sortOrder: SortOrder): Flow<List<Song>> {
         return when (sortBy) {
             SongSortBy.PlayTime -> when (sortOrder) {
@@ -102,6 +112,10 @@ interface Database {
             SongSortBy.DateAdded -> when (sortOrder) {
                 SortOrder.Ascending -> songsByRowIdAsc()
                 SortOrder.Descending -> songsByRowIdDesc()
+            }
+            SongSortBy.Artist -> when (sortOrder) {
+                SortOrder.Ascending -> songsByArtistsAsc()
+                SortOrder.Descending -> songsByArtistsDesc()
             }
         }
     }

@@ -135,13 +135,7 @@ fun HomeSongs(
                     TextButton(
                         onClick = { isSorting = true }
                     ) {
-                        Text(
-                            text = when (sortBy) {
-                                SongSortBy.PlayTime -> stringResource(id = R.string.play_time)
-                                SongSortBy.Title -> stringResource(id = R.string.title)
-                                SongSortBy.DateAdded -> stringResource(id = R.string.date_added)
-                            }
-                        )
+                        Text(text = stringResource(id = sortBy.text))
                     }
 
                     IconButton(
@@ -172,13 +166,7 @@ fun HomeSongs(
                         SongSortBy.entries.forEach { entry ->
                             DropdownMenuItem(
                                 text = {
-                                    Text(
-                                        text = when (entry) {
-                                            SongSortBy.PlayTime -> stringResource(id = R.string.play_time)
-                                            SongSortBy.Title -> stringResource(id = R.string.title)
-                                            SongSortBy.DateAdded -> stringResource(id = R.string.date_added)
-                                        }
-                                    )
+                                    Text(text = stringResource(id = entry.text))
                                 },
                                 onClick = {
                                     isSorting = false
