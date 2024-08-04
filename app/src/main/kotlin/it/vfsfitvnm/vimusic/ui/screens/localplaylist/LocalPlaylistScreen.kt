@@ -3,7 +3,6 @@ package it.vfsfitvnm.vimusic.ui.screens.localplaylist
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material.icons.outlined.Delete
@@ -38,6 +37,7 @@ import it.vfsfitvnm.vimusic.models.SongPlaylistMap
 import it.vfsfitvnm.vimusic.query
 import it.vfsfitvnm.vimusic.transaction
 import it.vfsfitvnm.vimusic.ui.components.TooltipIconButton
+import it.vfsfitvnm.vimusic.ui.components.consumeCustomWindowInsets
 import it.vfsfitvnm.vimusic.ui.components.themed.ConfirmationDialog
 import it.vfsfitvnm.vimusic.ui.components.themed.TextFieldDialog
 import it.vfsfitvnm.vimusic.utils.asMediaItem
@@ -143,7 +143,7 @@ fun LocalPlaylistScreen(
         Surface(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(paddingValues)
+                .consumeCustomWindowInsets(paddingValues)
         ) {
             LocalPlaylistSongs(
                 playlistId = playlistId,

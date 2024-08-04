@@ -3,8 +3,8 @@ package it.vfsfitvnm.vimusic.ui.screens.playlist
 import android.content.Intent
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material.icons.outlined.LibraryAdd
@@ -12,7 +12,6 @@ import androidx.compose.material.icons.outlined.Share
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MediumTopAppBar
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
@@ -125,7 +124,6 @@ fun PlaylistScreen(
                         inTopBar = true
                     )
                 },
-                colors = TopAppBarDefaults.mediumTopAppBarColors(scrolledContainerColor = MaterialTheme.colorScheme.surface),
                 scrollBehavior = scrollBehavior
             )
         }
@@ -133,7 +131,7 @@ fun PlaylistScreen(
         Surface(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(paddingValues)
+                .consumeWindowInsets(paddingValues)
         ) {
             PlaylistSongList(
                 playlistPage = playlistPage,

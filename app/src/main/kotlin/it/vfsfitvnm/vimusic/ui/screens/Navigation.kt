@@ -5,8 +5,7 @@ import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
+import androidx.compose.foundation.layout.Column
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -32,17 +31,17 @@ import it.vfsfitvnm.vimusic.ui.screens.settings.SettingsScreen
 @Composable
 fun Navigation(
     navController: NavHostController,
-    player: @Composable () -> Unit = {}
+    player: @Composable (Boolean) -> Unit = {}
 ) {
     @Composable
     fun PlayerScaffold(content: @Composable () -> Unit) {
-        Scaffold(
-            bottomBar = { player() }
-        ) { paddingValues ->
+        Column {
             Surface(
-                modifier = Modifier.padding(paddingValues),
+                modifier = Modifier.weight(1F),
                 content = content
             )
+
+            player(true)
         }
     }
 
@@ -64,7 +63,7 @@ fun Navigation(
         composable(route = "home") {
             HomeScreen(
                 navController = navController,
-                player = player
+                player = { player(false) }
             )
         }
 

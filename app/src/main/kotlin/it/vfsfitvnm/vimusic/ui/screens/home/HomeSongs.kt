@@ -12,6 +12,8 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -115,14 +117,15 @@ fun HomeSongs(
                     )
                 }
             }
-        }
+        },
+        contentWindowInsets = WindowInsets(bottom = 0)
     ) { paddingValues ->
         LazyVerticalGrid(
             columns = GridCells.Adaptive(minSize = 400.dp),
             contentPadding = PaddingValues(bottom = if (items.isNotEmpty()) 16.dp + 72.dp else 16.dp),
             modifier = Modifier
                 .fillMaxSize()
-                .padding(paddingValues)
+                .consumeWindowInsets(paddingValues)
         ) {
             item(
                 key = "header",

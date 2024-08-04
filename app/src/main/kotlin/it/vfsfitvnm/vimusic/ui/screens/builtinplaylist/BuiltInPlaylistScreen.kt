@@ -3,7 +3,6 @@ package it.vfsfitvnm.vimusic.ui.screens.builtinplaylist
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -21,6 +20,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import it.vfsfitvnm.vimusic.R
 import it.vfsfitvnm.vimusic.enums.BuiltInPlaylist
+import it.vfsfitvnm.vimusic.ui.components.consumeCustomWindowInsets
 
 @OptIn(ExperimentalMaterial3Api::class)
 @ExperimentalFoundationApi
@@ -63,7 +63,7 @@ fun BuiltInPlaylistScreen(
         Surface(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(paddingValues)
+                .consumeCustomWindowInsets(paddingValues)
         ) {
             BuiltInPlaylistSongs(
                 builtInPlaylist = builtInPlaylist,
