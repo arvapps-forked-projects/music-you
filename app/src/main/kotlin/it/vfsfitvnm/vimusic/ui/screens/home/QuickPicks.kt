@@ -134,7 +134,7 @@ fun QuickPicks(
                         item {
                             LocalSongItem(
                                 modifier = Modifier
-                                    .animateItemPlacement()
+                                    .animateItem()
                                     .width(itemInHorizontalGridWidth),
                                 song = song,
                                 onClick = {
@@ -171,7 +171,7 @@ fun QuickPicks(
                     ) { song ->
                         SongItem(
                             modifier = Modifier
-                                .animateItemPlacement()
+                                .animateItem()
                                 .width(itemInHorizontalGridWidth),
                             song = song,
                             onClick = {

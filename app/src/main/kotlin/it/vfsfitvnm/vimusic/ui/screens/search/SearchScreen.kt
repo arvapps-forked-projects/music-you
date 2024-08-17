@@ -21,8 +21,10 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
+import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SearchBar
+import androidx.compose.material3.SearchBarDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -68,14 +70,14 @@ fun SearchScreen(
     var suggestionsResult: Result<List<String>?>? by remember { mutableStateOf(null) }
 
     var query by rememberSaveable { mutableStateOf("") }
-    var active by rememberSaveable { mutableStateOf(true) }
+    var expanded by rememberSaveable { mutableStateOf(true) }
     var searchText: String? by rememberSaveable { mutableStateOf(null) }
     val focusRequester = remember { FocusRequester() }
 
     fun onSearch(searchQuery: String) {
         query = searchQuery
         searchText = searchQuery
-        active = false
+        expanded = false
 
         if (!context.preferences.getBoolean(pauseSearchHistoryKey, false)) {
             query {
@@ -103,42 +105,50 @@ fun SearchScreen(
         modifier = Modifier.fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
+        val onExpandedChange: (Boolean) -> Unit = { expandedState ->
+            if (searchText.isNullOrEmpty() && !expandedState) pop()
+            else expanded = expandedState
+        }
+
         SearchBar(
-            query = query,
-            onQueryChange = { query = it },
-            onSearch = {
-                if (query.isNotBlank()) {
-                    searchText = query
-                    active = false
-                }
-            },
-            active = active,
-            onActiveChange = { activeState ->
-                if (searchText.isNullOrEmpty() && !activeState) pop()
-                else active = activeState
-            },
-            modifier = Modifier.focusRequester(focusRequester),
-            placeholder = {
-                Text(text = stringResource(id = R.string.search))
-            },
-            leadingIcon = {
-                IconButton(onClick = pop) {
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Outlined.ArrowBack,
-                        contentDescription = null
-                    )
-                }
-            },
-            trailingIcon = {
-                if (query.isNotBlank() && active) {
-                    IconButton(onClick = { query = "" }) {
-                        Icon(
-                            imageVector = Icons.Outlined.Close,
-                            contentDescription = null
-                        )
+            inputField = {
+                SearchBarDefaults.InputField(
+                    query = query,
+                    onQueryChange = { query = it },
+                    onSearch = {
+                        if (query.isNotBlank()) {
+                            searchText = query
+                            expanded = false
+                        }
+                    },
+                    expanded = expanded,
+                    onExpandedChange = onExpandedChange,
+                    placeholder = {
+                        Text(text = stringResource(id = R.string.search))
+                    },
+                    leadingIcon = {
+                        IconButton(onClick = pop) {
+                            Icon(
+                                imageVector = Icons.AutoMirrored.Outlined.ArrowBack,
+                                contentDescription = null
+                            )
+                        }
+                    },
+                    trailingIcon = {
+                        if (query.isNotBlank() && expanded) {
+                            IconButton(onClick = { query = "" }) {
+                                Icon(
+                                    imageVector = Icons.Outlined.Close,
+                                    contentDescription = null
+                                )
+                            }
+                        }
                     }
-                }
-            }
+                )
+            },
+            expanded = expanded,
+            onExpandedChange = onExpandedChange,
+            modifier = Modifier.focusRequester(focusRequester)
         ) {
             LazyColumn {
                 items(
@@ -181,7 +191,10 @@ fun SearchScreen(
                                     )
                                 }
                             }
-                        }
+                        },
+                        colors = ListItemDefaults.colors(
+                            containerColor = SearchBarDefaults.colors().containerColor
+                        )
                     )
                 }
 
@@ -208,7 +221,10 @@ fun SearchScreen(
                                         contentDescription = null
                                     )
                                 }
-                            }
+                            },
+                            colors = ListItemDefaults.colors(
+                                containerColor = SearchBarDefaults.colors().containerColor
+                            )
                         )
                     }
                 } ?: suggestionsResult?.exceptionOrNull()?.let {

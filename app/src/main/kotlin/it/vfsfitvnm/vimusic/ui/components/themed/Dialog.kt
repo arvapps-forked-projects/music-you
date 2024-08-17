@@ -7,7 +7,9 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.AlertDialogDefaults
 import androidx.compose.material3.ListItem
+import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
@@ -189,7 +191,10 @@ inline fun <T> ValueSelectorDialog(
                                     onValueSelected(value)
                                 }
                             )
-                        }
+                        },
+                        colors = ListItemDefaults.colors(
+                            containerColor = AlertDialogDefaults.containerColor
+                        )
                     )
                 }
             }

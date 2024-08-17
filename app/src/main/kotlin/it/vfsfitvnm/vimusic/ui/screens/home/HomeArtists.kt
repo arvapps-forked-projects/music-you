@@ -150,7 +150,7 @@ fun HomeArtistList(
 
         items(items = items, key = Artist::id) { artist ->
             LocalArtistItem(
-                modifier = Modifier.animateItemPlacement(),
+                modifier = Modifier.animateItem(),
                 artist = artist,
                 onClick = { onArtistClick(artist) }
             )

@@ -6,15 +6,10 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.WindowInsetsSides
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.navigationBars
-import androidx.compose.foundation.layout.only
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Clear
 import androidx.compose.material.icons.outlined.Pause
@@ -22,18 +17,18 @@ import androidx.compose.material.icons.outlined.PlayArrow
 import androidx.compose.material.icons.outlined.Replay
 import androidx.compose.material.icons.outlined.SkipNext
 import androidx.compose.material.icons.outlined.SkipPrevious
+import androidx.compose.material3.BottomSheetDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.ListItem
+import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
 import androidx.compose.material3.SwipeToDismissBox
 import androidx.compose.material3.SwipeToDismissBoxValue
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberSwipeToDismissBoxState
-import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -65,7 +60,7 @@ import kotlin.math.absoluteValue
 @Composable
 fun MiniPlayer(
     openPlayer: () -> Unit,
-    applyPadding: Boolean
+    stopPlayer: () -> Unit
 ) {
     val binder = LocalPlayerServiceBinder.current
     binder?.player ?: return
@@ -106,129 +101,103 @@ fun MiniPlayer(
         }
     )
 
-    SwipeToOpenBox(
-        modifier = if (applyPadding) Modifier.windowInsetsPadding(
-            WindowInsets.navigationBars.only(WindowInsetsSides.Bottom)
-        ) else Modifier,
-        openAction = openPlayer,
-        closeAction = {
-            binder.stopRadio()
-            binder.player.clearMediaItems()
-        }
-    ) {
-        SwipeToDismissBox(
-            state = dismissState,
-            backgroundContent = {
-                val color by animateColorAsState(
-                    targetValue = when (dismissState.targetValue) {
-                        SwipeToDismissBoxValue.StartToEnd -> MaterialTheme.colorScheme.primaryContainer
-                        SwipeToDismissBoxValue.EndToStart -> MaterialTheme.colorScheme.primaryContainer
-                        SwipeToDismissBoxValue.Settled -> Color.Transparent
-                    },
-                    label = "background"
-                )
+    SwipeToDismissBox(
+        state = dismissState,
+        backgroundContent = {
+            val color by animateColorAsState(
+                targetValue = if (dismissState.targetValue == SwipeToDismissBoxValue.Settled) Color.Transparent else MaterialTheme.colorScheme.primaryContainer,
+                label = "background"
+            )
 
-                Row(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .background(color)
-                        .padding(horizontal = 16.dp),
-                    horizontalArrangement = when (dismissState.targetValue) {
-                        SwipeToDismissBoxValue.StartToEnd -> Arrangement.Start
-                        SwipeToDismissBoxValue.EndToStart -> Arrangement.End
-                        SwipeToDismissBoxValue.Settled -> Arrangement.Center
-                    },
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(76.dp)
+                    .background(color)
+                    .padding(horizontal = 16.dp),
+                horizontalArrangement = if (dismissState.targetValue == SwipeToDismissBoxValue.StartToEnd) Arrangement.Start else Arrangement.End,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                if (dismissState.targetValue != SwipeToDismissBoxValue.Settled) {
                     Icon(
-                        imageVector = when (dismissState.targetValue) {
-                            SwipeToDismissBoxValue.StartToEnd -> Icons.Outlined.SkipPrevious
-                            SwipeToDismissBoxValue.EndToStart -> Icons.Outlined.SkipNext
-                            SwipeToDismissBoxValue.Settled -> Icons.Outlined.PlayArrow
-                        },
+                        imageVector = if (dismissState.targetValue == SwipeToDismissBoxValue.StartToEnd) Icons.Outlined.SkipPrevious else Icons.Outlined.SkipNext,
                         contentDescription = null,
                         tint = MaterialTheme.colorScheme.onPrimaryContainer
                     )
                 }
             }
-        ) {
-            Surface(
-                modifier = Modifier.clickable(onClick = openPlayer),
-                color = MaterialTheme.colorScheme.surfaceColorAtElevation(1.dp)
-            ) {
-                Column {
-                    LinearProgressIndicator(
-                        progress = { positionAndDuration.first.toFloat() / positionAndDuration.second.absoluteValue },
-                        modifier = Modifier.fillMaxWidth(),
-                        color = MaterialTheme.colorScheme.primary
+        }
+    ) {
+        Column(modifier = Modifier.clickable(onClick = openPlayer)) {
+            ListItem(
+                headlineContent = {
+                    Text(
+                        text = mediaItem.mediaMetadata.title?.toString() ?: "",
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
                     )
-
-                    ListItem(
-                        headlineContent = {
-                            Text(
-                                text = mediaItem.mediaMetadata.title?.toString() ?: "",
-                                maxLines = 1,
-                                overflow = TextOverflow.Ellipsis
-                            )
-                        },
-                        supportingContent = {
-                            Text(
-                                text = mediaItem.mediaMetadata.artist?.toString() ?: "",
-                                maxLines = 1,
-                                overflow = TextOverflow.Ellipsis
-                            )
-                        },
-                        leadingContent = {
-                            AsyncImage(
-                                model = mediaItem.mediaMetadata.artworkUri.thumbnail(Dimensions.thumbnails.song.px),
-                                contentDescription = null,
-                                contentScale = ContentScale.Crop,
-                                modifier = Modifier
-                                    .clip(MaterialTheme.shapes.medium)
-                                    .size(52.dp)
-                            )
-                        },
-                        trailingContent = {
-                            Row {
-                                IconButton(
-                                    onClick = {
-                                        if (shouldBePlaying) {
-                                            binder.player.pause()
-                                        } else {
-                                            if (binder.player.playbackState == Player.STATE_IDLE) {
-                                                binder.player.prepare()
-                                            } else if (binder.player.playbackState == Player.STATE_ENDED) {
-                                                binder.player.seekToDefaultPosition(0)
-                                            }
-                                            binder.player.play()
-                                        }
+                },
+                supportingContent = {
+                    Text(
+                        text = mediaItem.mediaMetadata.artist?.toString() ?: "",
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                },
+                leadingContent = {
+                    AsyncImage(
+                        model = mediaItem.mediaMetadata.artworkUri.thumbnail(Dimensions.thumbnails.song.px),
+                        contentDescription = null,
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier
+                            .clip(MaterialTheme.shapes.medium)
+                            .size(52.dp)
+                    )
+                },
+                trailingContent = {
+                    Row {
+                        IconButton(
+                            onClick = {
+                                if (shouldBePlaying) binder.player.pause()
+                                else {
+                                    if (binder.player.playbackState == Player.STATE_IDLE) {
+                                        binder.player.prepare()
+                                    } else if (binder.player.playbackState == Player.STATE_ENDED) {
+                                        binder.player.seekToDefaultPosition(0)
                                     }
-                                ) {
-                                    Icon(
-                                        imageVector =
-                                        if (shouldBePlaying) Icons.Outlined.Pause
-                                        else if (binder.player.playbackState == Player.STATE_ENDED) Icons.Outlined.Replay
-                                        else Icons.Outlined.PlayArrow,
-                                        contentDescription = null,
-                                    )
-                                }
-
-                                IconButton(
-                                    onClick = {
-                                        binder.stopRadio()
-                                        binder.player.clearMediaItems()
-                                    }
-                                ) {
-                                    Icon(
-                                        imageVector = Icons.Outlined.Clear,
-                                        contentDescription = null,
-                                    )
+                                    binder.player.play()
                                 }
                             }
+                        ) {
+                            Icon(
+                                imageVector =
+                                if (shouldBePlaying) Icons.Outlined.Pause
+                                else if (binder.player.playbackState == Player.STATE_ENDED) Icons.Outlined.Replay
+                                else Icons.Outlined.PlayArrow,
+                                contentDescription = null,
+                            )
                         }
-                    )
-                }
-            }
+
+                        IconButton(
+                            onClick = stopPlayer
+                        ) {
+                            Icon(
+                                imageVector = Icons.Outlined.Clear,
+                                contentDescription = null,
+                            )
+                        }
+                    }
+                },
+                colors = ListItemDefaults.colors(
+                    containerColor = BottomSheetDefaults.ContainerColor
+                )
+            )
+
+            LinearProgressIndicator(
+                progress = { positionAndDuration.first.toFloat() / positionAndDuration.second.absoluteValue },
+                modifier = Modifier.fillMaxWidth(),
+                color = MaterialTheme.colorScheme.primary
+            )
         }
     }
 }

@@ -114,7 +114,7 @@ fun BuiltInPlaylistSongs(
             contentType = { _, song -> song },
         ) { index, song ->
             SwipeToActionBox(
-                modifier = Modifier.animateItemPlacement(),
+                modifier = Modifier.animateItem(),
                 primaryAction = ActionInfo(
                     onClick = { binder?.player?.enqueue(song.asMediaItem) },
                     icon = Icons.AutoMirrored.Outlined.PlaylistPlay,

@@ -17,6 +17,7 @@ import androidx.compose.material.icons.outlined.MoreVert
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
+import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -126,7 +127,8 @@ fun ListItemContainer(
     onLongClick: (() -> Unit)? = null,
     maxLines: Int = 1,
     color: Color = MaterialTheme.colorScheme.surfaceVariant,
-    thumbnail: @Composable () -> Unit,
+    containerColor: Color = ListItemDefaults.colors().containerColor,
+    thumbnail: @Composable (size: Dp) -> Unit,
     thumbnailHeight: Dp = 56.dp,
     thumbnailAspectRatio: Float = 1F,
     trailingContent: @Composable (() -> Unit)? = null
@@ -173,7 +175,7 @@ fun ListItemContainer(
                     .background(color),
                 contentAlignment = Alignment.Center
             ) {
-                thumbnail()
+                thumbnail(thumbnailHeight)
             }
         },
         trailingContent = {
@@ -186,7 +188,10 @@ fun ListItemContainer(
                     )
                 }
             }
-        }
+        },
+        colors = ListItemDefaults.colors(
+            containerColor = containerColor
+        )
     )
 }
 

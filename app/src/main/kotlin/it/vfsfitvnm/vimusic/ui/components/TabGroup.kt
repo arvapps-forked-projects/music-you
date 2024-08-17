@@ -1,6 +1,5 @@
 package it.vfsfitvnm.vimusic.ui.components
 
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.pager.PagerState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -14,7 +13,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import it.vfsfitvnm.vimusic.models.Section
 import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TabGroup(
     pagerState: PagerState,

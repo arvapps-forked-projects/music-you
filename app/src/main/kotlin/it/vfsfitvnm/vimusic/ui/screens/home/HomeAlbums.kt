@@ -158,7 +158,7 @@ fun HomeAlbums(
             key = Album::id
         ) { album ->
             LocalAlbumItem(
-                modifier = Modifier.animateItemPlacement(),
+                modifier = Modifier.animateItem(),
                 album = album,
                 onClick = { onAlbumClick(album) }
             )

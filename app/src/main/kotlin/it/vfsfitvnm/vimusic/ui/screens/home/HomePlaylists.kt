@@ -200,7 +200,7 @@ fun HomePlaylists(
 
         items(items = items, key = { it.playlist.id }) { playlistPreview ->
             LocalPlaylistItem(
-                modifier = Modifier.animateItemPlacement(),
+                modifier = Modifier.animateItem(),
                 playlist = playlistPreview,
                 onClick = { onPlaylistClick(playlistPreview.playlist) }
             )

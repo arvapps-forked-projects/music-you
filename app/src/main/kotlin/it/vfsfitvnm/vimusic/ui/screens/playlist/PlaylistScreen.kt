@@ -3,7 +3,6 @@ package it.vfsfitvnm.vimusic.ui.screens.playlist
 import android.content.Intent
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
@@ -39,6 +38,7 @@ import it.vfsfitvnm.vimusic.models.SongPlaylistMap
 import it.vfsfitvnm.vimusic.query
 import it.vfsfitvnm.vimusic.transaction
 import it.vfsfitvnm.vimusic.ui.components.TooltipIconButton
+import it.vfsfitvnm.vimusic.ui.components.consumeCustomWindowInsets
 import it.vfsfitvnm.vimusic.ui.components.themed.TextFieldDialog
 import it.vfsfitvnm.vimusic.utils.asMediaItem
 import it.vfsfitvnm.vimusic.utils.completed
@@ -131,7 +131,7 @@ fun PlaylistScreen(
         Surface(
             modifier = Modifier
                 .fillMaxSize()
-                .consumeWindowInsets(paddingValues)
+                .consumeCustomWindowInsets(paddingValues)
         ) {
             PlaylistSongList(
                 playlistPage = playlistPage,

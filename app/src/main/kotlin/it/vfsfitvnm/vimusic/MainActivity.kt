@@ -10,46 +10,59 @@ import android.os.IBinder
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SheetValue
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
+import androidx.compose.material3.rememberStandardBottomSheetState
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.lifecycleScope
 import androidx.media3.common.MediaItem
 import androidx.media3.common.Player
+import androidx.navigation.NavDestination.Companion.hierarchy
+import androidx.navigation.NavGraph.Companion.findStartDestination
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import it.vfsfitvnm.innertube.Innertube
 import it.vfsfitvnm.innertube.models.bodies.BrowseBody
 import it.vfsfitvnm.innertube.requests.playlistPage
 import it.vfsfitvnm.innertube.requests.song
 import it.vfsfitvnm.vimusic.models.LocalMenuState
+import it.vfsfitvnm.vimusic.models.Screen
 import it.vfsfitvnm.vimusic.service.PlayerService
 import it.vfsfitvnm.vimusic.ui.screens.Navigation
-import it.vfsfitvnm.vimusic.ui.screens.player.MiniPlayer
-import it.vfsfitvnm.vimusic.ui.screens.player.Player
+import it.vfsfitvnm.vimusic.ui.screens.player.PlayerScaffold
 import it.vfsfitvnm.vimusic.ui.styling.AppTheme
 import it.vfsfitvnm.vimusic.utils.asMediaItem
 import it.vfsfitvnm.vimusic.utils.forcePlay
@@ -90,70 +103,105 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             val navController = rememberNavController()
-            var isPlayerOpen by rememberSaveable { mutableStateOf(false) }
+            val scope = rememberCoroutineScope()
+            val playerState = rememberStandardBottomSheetState(
+                initialValue = SheetValue.Hidden,
+                confirmValueChange = { value ->
+                    if (value == SheetValue.Hidden) {
+                        binder?.stopRadio()
+                        binder?.player?.clearMediaItems()
+                    }
+
+                    return@rememberStandardBottomSheetState true
+                },
+                skipHiddenState = false
+            )
 
             AppTheme {
                 Box(modifier = Modifier.fillMaxSize()) {
                     CompositionLocalProvider(value = LocalPlayerServiceBinder provides binder) {
+                        val layoutDirection = LocalLayoutDirection.current
                         val menuState = LocalMenuState.current
-                        val playerState =
-                            rememberModalBottomSheetState(skipPartiallyExpanded = true)
-                        val scope = rememberCoroutineScope()
+                        val navBackStackEntry by navController.currentBackStackEntryAsState()
+                        val currentDestination = navBackStackEntry?.destination
 
-                        val cornerRadius by animateDpAsState(
-                            targetValue = when (playerState.targetValue) {
-                                SheetValue.Expanded -> 0.dp
-                                else -> 28.dp
-                            },
-                            label = "radius"
+                        val homeScreens = listOf(
+                            Screen.Home,
+                            Screen.Songs,
+                            Screen.Artists,
+                            Screen.Albums,
+                            Screen.Playlists
                         )
 
-                        fun closePlayer() {
-                            scope.launch { playerState.hide() }.invokeOnCompletion {
-                                if (!playerState.isVisible) isPlayerOpen = false
-                            }
-                        }
+                        Scaffold(
+                            bottomBar = {
+                                AnimatedVisibility(
+                                    visible = playerState.targetValue != SheetValue.Expanded,
+                                    enter = slideInVertically(initialOffsetY = { it / 2 }),
+                                    exit = slideOutVertically(targetOffsetY = { it })
+                                ) {
+                                    NavigationBar {
+                                        homeScreens.forEach { screen ->
+                                            val selected =
+                                                currentDestination?.hierarchy?.any { it.route == screen.route } == true
 
-                        Surface(color = MaterialTheme.colorScheme.background) {
-                            Navigation(
+                                            NavigationBarItem(
+                                                selected = selected,
+                                                onClick = {
+                                                    navController.navigate(screen.route) {
+                                                        popUpTo(navController.graph.findStartDestination().id) {
+                                                            saveState = true
+                                                        }
+                                                        launchSingleTop = true
+                                                        restoreState = true
+                                                    }
+
+                                                },
+                                                icon = {
+                                                    Icon(
+                                                        imageVector = if (selected) screen.selectedIcon else screen.unselectedIcon,
+                                                        contentDescription = stringResource(id = screen.resourceId)
+                                                    )
+                                                },
+                                                label = {
+                                                    Text(
+                                                        text = stringResource(id = screen.resourceId),
+                                                        maxLines = 1,
+                                                        overflow = TextOverflow.Ellipsis
+                                                    )
+                                                }
+                                            )
+                                        }
+                                    }
+                                }
+                            }
+                        ) { paddingValues ->
+                            PlayerScaffold(
                                 navController = navController,
-                                player = { applyPadding ->
-                                    MiniPlayer(
-                                        openPlayer = { isPlayerOpen = true },
-                                        applyPadding = applyPadding
+                                sheetState = playerState,
+                                scaffoldPadding = paddingValues
+                            ) {
+                                Surface(
+                                    modifier = Modifier.windowInsetsPadding(
+                                        WindowInsets(
+                                            left = paddingValues.calculateLeftPadding(
+                                                layoutDirection
+                                            ),
+                                            right = paddingValues.calculateRightPadding(
+                                                layoutDirection
+                                            )
+                                        )
+                                    ),
+                                    color = MaterialTheme.colorScheme.background
+                                ) {
+                                    Navigation(
+                                        navController = navController,
+                                        sheetState = playerState
                                     )
                                 }
-                            )
-                        }
-
-                        if (isPlayerOpen) {
-                            ModalBottomSheet(
-                                onDismissRequest = { closePlayer() },
-                                modifier = Modifier.fillMaxWidth(),
-                                sheetState = playerState,
-                                shape = RoundedCornerShape(cornerRadius),
-                                dragHandle = {
-                                    Surface(
-                                        modifier = Modifier.padding(vertical = 12.dp),
-                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                        shape = MaterialTheme.shapes.extraLarge
-                                    ) {
-                                        Box(modifier = Modifier.size(width = 32.dp, height = 4.dp))
-                                    }
-                                }
-                            ) {
-                                Player(
-                                    onGoToAlbum = { browseId ->
-                                        closePlayer()
-                                        navController.navigate(route = "album/$browseId")
-                                    },
-                                    onGoToArtist = { browseId ->
-                                        closePlayer()
-                                        navController.navigate(route = "artist/$browseId")
-                                    }
-                                )
                             }
                         }
+
 
                         if (menuState.isDisplayed) {
                             ModalBottomSheet(
@@ -179,22 +227,19 @@ class MainActivity : ComponentActivity() {
             DisposableEffect(binder?.player) {
                 val player = binder?.player ?: return@DisposableEffect onDispose { }
 
-                if (player.currentMediaItem == null) {
-                    if (isPlayerOpen) isPlayerOpen = false
-                } else {
-                    if (!isPlayerOpen) {
-                        isPlayerOpen = if (launchedFromNotification) {
-                            intent.replaceExtras(Bundle())
-                            true
-                        } else false
-                    }
+                if (player.currentMediaItem == null) scope.launch { playerState.hide() }
+                else {
+                    if (launchedFromNotification) {
+                        intent.replaceExtras(Bundle())
+                        scope.launch { playerState.expand() }
+                    } else scope.launch { playerState.partialExpand() }
                 }
 
                 val listener = object : Player.Listener {
                     override fun onMediaItemTransition(mediaItem: MediaItem?, reason: Int) {
                         if (reason == Player.MEDIA_ITEM_TRANSITION_REASON_PLAYLIST_CHANGED && mediaItem != null)
-                            isPlayerOpen =
-                                mediaItem.mediaMetadata.extras?.getBoolean("isFromPersistentQueue") != true
+                            if (mediaItem.mediaMetadata.extras?.getBoolean("isFromPersistentQueue") != true) scope.launch { playerState.expand() }
+                            else scope.launch { playerState.partialExpand() }
                     }
                 }
 

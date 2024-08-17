@@ -38,9 +38,9 @@ fun SnapLayoutInfoProvider(
         get() = lazyGridState.layoutInfo
 
     // Single page snapping is the default
-    override fun calculateApproachOffset(initialVelocity: Float): Float = 0f
+    override fun calculateApproachOffset(velocity: Float, decayOffset: Float): Float = 0f
 
-    override fun calculateSnappingOffset(currentVelocity: Float): Float {
+    override fun calculateSnapOffset(velocity: Float): Float {
         var lowerBoundOffset = Float.NEGATIVE_INFINITY
         var upperBoundOffset = Float.POSITIVE_INFINITY
 

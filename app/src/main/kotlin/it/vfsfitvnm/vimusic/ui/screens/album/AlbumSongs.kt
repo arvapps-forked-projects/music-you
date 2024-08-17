@@ -133,9 +133,7 @@ fun AlbumSongs(
 
         if (songs.isEmpty()) {
             item(key = "loading") {
-                ShimmerHost(
-                    modifier = Modifier.fillParentMaxSize()
-                ) {
+                ShimmerHost {
                     repeat(4) {
                         ListItemPlaceholder()
                     }

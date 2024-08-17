@@ -1,6 +1,7 @@
 package it.vfsfitvnm.vimusic.ui.components
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -51,7 +52,7 @@ fun PlaylistThumbnail(
                 modifier = modifier
             )
         } else {
-            BoxWithConstraints(
+            Box(
                 modifier = modifier
                     .clip(MaterialTheme.shapes.large)
                     .background(MaterialTheme.colorScheme.surfaceVariant)

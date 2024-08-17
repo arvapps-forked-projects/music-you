@@ -1,12 +1,12 @@
 package it.vfsfitvnm.vimusic.ui.items
 
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
-import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.material3.BottomSheetDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
@@ -31,17 +31,15 @@ fun SongItem(
         subtitle = song.authors?.joinToString(separator = "") { it.name ?: "" },
         onClick = onClick,
         onLongClick = onLongClick,
-        thumbnail = {
-            BoxWithConstraints(modifier = Modifier.fillMaxWidth()) {
-                AsyncImage(
-                    model = song.thumbnail?.size(maxWidth.px),
-                    contentDescription = null,
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .clip(MaterialTheme.shapes.medium)
-                )
-            }
+        thumbnail = { size ->
+            AsyncImage(
+                model = song.thumbnail?.size(size.px),
+                contentDescription = null,
+                contentScale = ContentScale.Crop,
+                modifier = Modifier
+                    .fillMaxSize()
+                    .clip(MaterialTheme.shapes.medium)
+            )
         },
         trailingContent = trailingContent
     )
@@ -63,14 +61,11 @@ fun LocalSongItem(
         subtitle = "${song.artistsText} • ${song.durationText}",
         onClick = onClick,
         onLongClick = onLongClick,
-        thumbnail = {
-            BoxWithConstraints(
-                modifier = Modifier.fillMaxWidth(),
-                contentAlignment = Alignment.Center
-            ) {
+        thumbnail = { size ->
+            Box {
                 if (thumbnailContent == null) {
                     AsyncImage(
-                        model = song.thumbnailUrl?.thumbnail(maxWidth.px),
+                        model = song.thumbnailUrl?.thumbnail(size.px),
                         contentDescription = null,
                         contentScale = ContentScale.Crop,
                         modifier = Modifier
@@ -88,6 +83,7 @@ fun LocalSongItem(
     )
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MediaSongItem(
     modifier: Modifier = Modifier,
@@ -107,10 +103,11 @@ fun MediaSongItem(
         },
         onClick = onClick,
         onLongClick = onLongClick,
-        thumbnail = {
-            BoxWithConstraints(modifier = Modifier.fillMaxWidth()) {
+        containerColor = BottomSheetDefaults.ContainerColor,
+        thumbnail = { size ->
+            Box {
                 AsyncImage(
-                    model = song.mediaMetadata.artworkUri.thumbnail(maxWidth.px),
+                    model = song.mediaMetadata.artworkUri.thumbnail(size.px),
                     contentDescription = null,
                     contentScale = ContentScale.Crop,
                     modifier = Modifier

@@ -6,9 +6,11 @@ import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.BottomSheetDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItem
-import androidx.compose.material3.Surface
+import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -21,16 +23,15 @@ inline fun Menu(
     modifier: Modifier = Modifier,
     crossinline content: @Composable ColumnScope.() -> Unit
 ) {
-    Surface {
-        Column(
-            modifier = modifier
-                .verticalScroll(rememberScrollState())
-                .fillMaxWidth(),
-            content = content
-        )
-    }
+    Column(
+        modifier = modifier
+            .verticalScroll(rememberScrollState())
+            .fillMaxWidth(),
+        content = content
+    )
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MenuEntry(
     icon: ImageVector,
@@ -65,6 +66,9 @@ fun MenuEntry(
             if (trailingContent != null) {
                 trailingContent()
             }
-        }
+        },
+        colors = ListItemDefaults.colors(
+            containerColor = BottomSheetDefaults.ContainerColor
+        )
     )
 }

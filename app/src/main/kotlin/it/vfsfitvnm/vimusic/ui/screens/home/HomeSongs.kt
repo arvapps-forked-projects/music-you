@@ -198,7 +198,7 @@ fun HomeSongs(
                 key = { _, song -> song.id }
             ) { index, song ->
                 SwipeToActionBox(
-                    modifier = Modifier.animateItemPlacement(),
+                    modifier = Modifier.animateItem(),
                     primaryAction = ActionInfo(
                         onClick = { binder?.player?.enqueue(song.asMediaItem) },
                         icon = Icons.AutoMirrored.Outlined.PlaylistPlay,
@@ -206,7 +206,6 @@ fun HomeSongs(
                     )
                 ) {
                     LocalSongItem(
-                        modifier = Modifier.animateItemPlacement(),
                         song = song,
                         onClick = {
                             binder?.stopRadio()

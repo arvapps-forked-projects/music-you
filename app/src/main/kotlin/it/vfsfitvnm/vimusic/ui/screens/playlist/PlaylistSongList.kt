@@ -118,10 +118,7 @@ fun PlaylistSongList(
 
         if (playlistPage == null) {
             item(key = "loading") {
-                ShimmerHost(
-                    modifier = Modifier
-                        .fillParentMaxSize()
-                ) {
+                ShimmerHost {
                     repeat(4) {
                         ListItemPlaceholder()
                     }
