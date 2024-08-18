@@ -28,6 +28,7 @@ fun TooltipIconButton(
     onClick: () -> Unit,
     icon: ImageVector,
     modifier: Modifier = Modifier,
+    enabled: Boolean = true,
     inTopBar: Boolean = false
 ) {
     TooltipBox(
@@ -41,7 +42,8 @@ fun TooltipIconButton(
     ) {
         IconButton(
             onClick = onClick,
-            modifier = modifier
+            modifier = modifier,
+            enabled = enabled
         ) {
             Icon(
                 imageVector = icon,

@@ -29,6 +29,8 @@ import it.vfsfitvnm.vimusic.ui.screens.playlist.PlaylistScreen
 import it.vfsfitvnm.vimusic.ui.screens.search.SearchScreen
 import it.vfsfitvnm.vimusic.ui.screens.settings.SettingsPage
 import it.vfsfitvnm.vimusic.ui.screens.settings.SettingsScreen
+import it.vfsfitvnm.vimusic.utils.homeScreenTabIndexKey
+import it.vfsfitvnm.vimusic.utils.rememberPreference
 import kotlinx.coroutines.launch
 
 @OptIn(
@@ -42,6 +44,14 @@ fun Navigation(
     sheetState: SheetState
 ) {
     val scope = rememberCoroutineScope()
+    val (screenIndex, _) = rememberPreference(homeScreenTabIndexKey, defaultValue = 0)
+    val homeRoutes = listOf(
+        Screen.Home,
+        Screen.Songs,
+        Screen.Artists,
+        Screen.Albums,
+        Screen.Playlists
+    ).map { it.route }
 
     @Composable
     fun SheetBackHandler() {
@@ -52,7 +62,7 @@ fun Navigation(
 
     NavHost(
         navController = navController,
-        startDestination = "home",
+        startDestination = homeRoutes.getOrElse(screenIndex) { Screen.Home.route },
         enterTransition = { slideIntoContainer(AnimatedContentTransitionScope.SlideDirection.Left) + fadeIn() },
         exitTransition = { fadeOut() },
         popEnterTransition = { slideIntoContainer(AnimatedContentTransitionScope.SlideDirection.Right) + fadeIn() }
@@ -63,14 +73,6 @@ fun Navigation(
         val popDestination = {
             if (navController.currentBackStackEntry?.lifecycle?.currentState == Lifecycle.State.RESUMED) navController.popBackStack()
         }
-
-        val homeRoutes = listOf(
-            Screen.Home,
-            Screen.Songs,
-            Screen.Artists,
-            Screen.Albums,
-            Screen.Playlists
-        ).map { it.route }
 
         composable(
             route = "home",

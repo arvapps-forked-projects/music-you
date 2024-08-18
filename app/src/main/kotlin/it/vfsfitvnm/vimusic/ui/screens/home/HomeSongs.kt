@@ -1,5 +1,6 @@
 package it.vfsfitvnm.vimusic.ui.screens.home
 
+import androidx.annotation.OptIn
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.core.animateFloatAsState
@@ -25,6 +26,7 @@ import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.PlaylistPlay
 import androidx.compose.material.icons.outlined.ArrowDownward
+import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.Shuffle
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -52,6 +54,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.media3.common.util.UnstableApi
 import it.vfsfitvnm.vimusic.Database
 import it.vfsfitvnm.vimusic.LocalPlayerServiceBinder
 import it.vfsfitvnm.vimusic.R
@@ -60,6 +63,7 @@ import it.vfsfitvnm.vimusic.enums.SortOrder
 import it.vfsfitvnm.vimusic.models.ActionInfo
 import it.vfsfitvnm.vimusic.models.LocalMenuState
 import it.vfsfitvnm.vimusic.models.Song
+import it.vfsfitvnm.vimusic.query
 import it.vfsfitvnm.vimusic.ui.components.SwipeToActionBox
 import it.vfsfitvnm.vimusic.ui.components.themed.InHistoryMediaItemMenu
 import it.vfsfitvnm.vimusic.ui.items.LocalSongItem
@@ -73,6 +77,7 @@ import it.vfsfitvnm.vimusic.utils.rememberPreference
 import it.vfsfitvnm.vimusic.utils.songSortByKey
 import it.vfsfitvnm.vimusic.utils.songSortOrderKey
 
+@OptIn(UnstableApi::class)
 @ExperimentalFoundationApi
 @ExperimentalAnimationApi
 @Composable
@@ -203,6 +208,19 @@ fun HomeSongs(
                         onClick = { binder?.player?.enqueue(song.asMediaItem) },
                         icon = Icons.AutoMirrored.Outlined.PlaylistPlay,
                         description = R.string.enqueue
+                    ),
+                    destructiveAction = ActionInfo(
+                        onClick = {
+                            query {
+                                binder?.cache?.removeResource(song.id)
+                                Database.incrementTotalPlayTimeMs(
+                                    id = song.id,
+                                    addition = -song.totalPlayTimeMs
+                                )
+                            }
+                        },
+                        icon = Icons.Outlined.Delete,
+                        description = R.string.hide
                     )
                 ) {
                     LocalSongItem(

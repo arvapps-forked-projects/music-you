@@ -66,7 +66,9 @@ import it.vfsfitvnm.vimusic.ui.screens.player.PlayerScaffold
 import it.vfsfitvnm.vimusic.ui.styling.AppTheme
 import it.vfsfitvnm.vimusic.utils.asMediaItem
 import it.vfsfitvnm.vimusic.utils.forcePlay
+import it.vfsfitvnm.vimusic.utils.homeScreenTabIndexKey
 import it.vfsfitvnm.vimusic.utils.intent
+import it.vfsfitvnm.vimusic.utils.rememberPreference
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
@@ -124,6 +126,10 @@ class MainActivity : ComponentActivity() {
                         val menuState = LocalMenuState.current
                         val navBackStackEntry by navController.currentBackStackEntryAsState()
                         val currentDestination = navBackStackEntry?.destination
+                        val (_, onScreenChanged) = rememberPreference(
+                            homeScreenTabIndexKey,
+                            defaultValue = 0
+                        )
 
                         val homeScreens = listOf(
                             Screen.Home,
@@ -141,13 +147,14 @@ class MainActivity : ComponentActivity() {
                                     exit = slideOutVertically(targetOffsetY = { it })
                                 ) {
                                     NavigationBar {
-                                        homeScreens.forEach { screen ->
+                                        homeScreens.forEachIndexed { index, screen ->
                                             val selected =
                                                 currentDestination?.hierarchy?.any { it.route == screen.route } == true
 
                                             NavigationBarItem(
                                                 selected = selected,
                                                 onClick = {
+                                                    onScreenChanged(index)
                                                     navController.navigate(screen.route) {
                                                         popUpTo(navController.graph.findStartDestination().id) {
                                                             saveState = true
@@ -155,7 +162,6 @@ class MainActivity : ComponentActivity() {
                                                         launchSingleTop = true
                                                         restoreState = true
                                                     }
-
                                                 },
                                                 icon = {
                                                     Icon(

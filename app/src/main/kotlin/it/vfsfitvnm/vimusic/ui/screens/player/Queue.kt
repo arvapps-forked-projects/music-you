@@ -22,6 +22,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material.icons.outlined.ClearAll
 import androidx.compose.material.icons.outlined.DragHandle
 import androidx.compose.material.icons.outlined.PlaylistRemove
 import androidx.compose.material.icons.outlined.Repeat
@@ -269,6 +270,23 @@ fun Queue(
                     onClick = { queueLoopEnabled = !queueLoopEnabled },
                     icon = Icons.Outlined.Repeat,
                     modifier = Modifier.alpha(if (queueLoopEnabled) 1F else Dimensions.lowOpacity)
+                )
+
+                TooltipIconButton(
+                    description = R.string.clear_queue,
+                    onClick = {
+                        val mediaItems = windows.size
+                        when (mediaItemIndex) {
+                            0 -> player.removeMediaItems(1, mediaItems)
+                            mediaItems - 1 -> player.removeMediaItems(0, mediaItems - 1)
+                            else -> {
+                                player.removeMediaItems(0, mediaItemIndex)
+                                player.removeMediaItems(mediaItemIndex + 1, mediaItems)
+                            }
+                        }
+                    },
+                    icon = Icons.Outlined.ClearAll,
+                    enabled = windows.size >= 2
                 )
             }
         }

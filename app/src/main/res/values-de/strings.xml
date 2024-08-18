@@ -144,4 +144,5 @@
     <string name="queue_loop">Queue loop</string>
     <string name="sleep_timer_ended">Sleep timer ended</string>
     <string name="now_playing">Now playing</string>
+    <string name="clear_queue">Clear queue</string>
 </resources>
