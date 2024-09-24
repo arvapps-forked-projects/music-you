@@ -30,7 +30,8 @@ data class SectionListRenderer(
             val title: Runs?,
             val subtitle: Runs?,
             val secondSubtitle: Runs?,
-            val thumbnail: ThumbnailRenderer?
+            val thumbnail: ThumbnailRenderer?,
+            val straplineTextOne: Runs?
         )
     }
 }

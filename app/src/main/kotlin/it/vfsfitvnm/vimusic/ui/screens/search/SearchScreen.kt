@@ -115,12 +115,7 @@ fun SearchScreen(
                 SearchBarDefaults.InputField(
                     query = query,
                     onQueryChange = { query = it },
-                    onSearch = {
-                        if (query.isNotBlank()) {
-                            searchText = query
-                            expanded = false
-                        }
-                    },
+                    onSearch = { if (query.isNotBlank()) onSearch(query) },
                     expanded = expanded,
                     onExpandedChange = onExpandedChange,
                     placeholder = {
@@ -230,8 +225,7 @@ fun SearchScreen(
                 } ?: suggestionsResult?.exceptionOrNull()?.let {
                     item {
                         Box(
-                            modifier = Modifier
-                                .fillMaxSize()
+                            modifier = Modifier.fillMaxSize()
                         ) {
                             Text(
                                 text = "An error has occurred.",

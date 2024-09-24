@@ -16,7 +16,6 @@ import it.vfsfitvnm.innertube.utils.runCatchingNonCancellable
 suspend fun Innertube.playlistPage(body: BrowseBody) = runCatchingNonCancellable {
     val response = client.post(browse) {
         setBody(body)
-        mask("contents.twoColumnBrowseResultsRenderer(tabs.tabRenderer.content.sectionListRenderer.contents.musicResponsiveHeaderRenderer(title,subtitle,thumbnail),secondaryContents.sectionListRenderer.contents(musicPlaylistShelfRenderer(continuations,contents.$musicResponsiveListItemRendererMask),musicCarouselShelfRenderer.contents.$musicTwoRowItemRendererMask)),microformat")
     }.body<BrowseResponse>()
 
     val header = response
@@ -56,7 +55,11 @@ suspend fun Innertube.playlistPage(body: BrowseBody) = runCatchingNonCancellable
             ?.thumbnail
             ?.thumbnails
             ?.firstOrNull(),
-        authors = null, // TODO: Fix with strapline information
+        authors = header
+            ?.straplineTextOne
+            ?.splitBySeparator()
+            ?.getOrNull(0)
+            ?.map(Innertube::Info),
         year = header
             ?.subtitle
             ?.splitBySeparator()
