@@ -148,4 +148,8 @@
     <string name="sleep_timer_ended">Sleep timer ended</string>
     <string name="now_playing">Now playing</string>
     <string name="clear_queue">Clear queue</string>
+    <string name="song_deleted_queue">Song deleted from queue</string>
+    <string name="undo">Undo</string>
+    <string name="song_deleted_playlist">Song deleted from playlist</string>
+    <string name="song_deleted_library">Song deleted from library</string>
 </resources>

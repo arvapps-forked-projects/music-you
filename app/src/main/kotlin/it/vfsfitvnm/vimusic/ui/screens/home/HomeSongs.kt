@@ -36,6 +36,10 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -43,6 +47,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -76,6 +81,7 @@ import it.vfsfitvnm.vimusic.utils.forcePlayFromBeginning
 import it.vfsfitvnm.vimusic.utils.rememberPreference
 import it.vfsfitvnm.vimusic.utils.songSortByKey
 import it.vfsfitvnm.vimusic.utils.songSortOrderKey
+import kotlinx.coroutines.launch
 
 @OptIn(UnstableApi::class)
 @ExperimentalFoundationApi
@@ -97,11 +103,19 @@ fun HomeSongs(
         label = "rotation"
     )
 
+    val scope = rememberCoroutineScope()
+    val snackbarHostState = remember { SnackbarHostState() }
+    val snackbarMessage = stringResource(id = R.string.song_deleted_library)
+    val snackBarActionLabel = stringResource(id = R.string.undo)
+
     LaunchedEffect(sortBy, sortOrder) {
         Database.songs(sortBy, sortOrder).collect { items = it }
     }
 
     Scaffold(
+        snackbarHost = {
+            SnackbarHost(hostState = snackbarHostState)
+        },
         floatingActionButton = {
             AnimatedVisibility(
                 visible = items.isNotEmpty(),
@@ -217,6 +231,26 @@ fun HomeSongs(
                                     id = song.id,
                                     addition = -song.totalPlayTimeMs
                                 )
+                            }
+
+                            scope.launch {
+                                val result = snackbarHostState.showSnackbar(
+                                    message = snackbarMessage,
+                                    actionLabel = snackBarActionLabel,
+                                    withDismissAction = true,
+                                    duration = SnackbarDuration.Short
+                                )
+
+                                if (result == SnackbarResult.ActionPerformed) {
+                                    query {
+                                        Database.insert(song)
+
+                                        Database.incrementTotalPlayTimeMs(
+                                            id = song.id,
+                                            addition = song.totalPlayTimeMs
+                                        )
+                                    }
+                                }
                             }
                         },
                         icon = Icons.Outlined.Delete,

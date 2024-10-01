@@ -32,7 +32,8 @@ import it.vfsfitvnm.innertube.models.bodies.BrowseBody
 import it.vfsfitvnm.innertube.requests.playlistPage
 import it.vfsfitvnm.vimusic.Database
 import it.vfsfitvnm.vimusic.R
-import it.vfsfitvnm.vimusic.models.PlaylistWithSongs
+import it.vfsfitvnm.vimusic.models.Playlist
+import it.vfsfitvnm.vimusic.models.Song
 import it.vfsfitvnm.vimusic.models.SongPlaylistMap
 import it.vfsfitvnm.vimusic.query
 import it.vfsfitvnm.vimusic.transaction
@@ -57,13 +58,19 @@ fun LocalPlaylistScreen(
     onGoToAlbum: (String) -> Unit,
     onGoToArtist: (String) -> Unit
 ) {
-    var playlistWithSongs: PlaylistWithSongs? by remember { mutableStateOf(null) }
+    var playlist: Playlist? by remember { mutableStateOf(null) }
+    var playlistSongs: List<Song>? by remember { mutableStateOf(null) }
+    
     var isRenaming by rememberSaveable { mutableStateOf(false) }
     var isDeleting by rememberSaveable { mutableStateOf(false) }
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
 
     LaunchedEffect(Unit) {
-        Database.playlistWithSongs(playlistId).filterNotNull().collect { playlistWithSongs = it }
+        Database.playlist(playlistId).filterNotNull().collect { playlist = it }
+    }
+
+    LaunchedEffect(Unit) {
+        Database.playlistSongs(playlistId).filterNotNull().collect { playlistSongs = it }
     }
 
     Scaffold(
@@ -72,7 +79,7 @@ fun LocalPlaylistScreen(
             MediumTopAppBar(
                 title = {
                     Text(
-                        text = playlistWithSongs?.playlist?.name ?: "",
+                        text = playlist?.name ?: "",
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
                     )
@@ -86,11 +93,11 @@ fun LocalPlaylistScreen(
                     }
                 },
                 actions = {
-                    if (!playlistWithSongs?.playlist?.browseId.isNullOrEmpty()) {
+                    if (!playlist?.browseId.isNullOrEmpty()) {
                         TooltipIconButton(
                             description = R.string.sync_playlist,
                             onClick = {
-                                playlistWithSongs?.playlist?.browseId?.let { browseId ->
+                                playlist?.browseId?.let { browseId ->
                                     transaction {
                                         runBlocking(Dispatchers.IO) {
                                             withContext(Dispatchers.IO) {
@@ -147,7 +154,7 @@ fun LocalPlaylistScreen(
         ) {
             LocalPlaylistSongs(
                 playlistId = playlistId,
-                playlistWithSongs = playlistWithSongs,
+                playlistSongs = playlistSongs ?: emptyList(),
                 onGoToAlbum = onGoToAlbum,
                 onGoToArtist = onGoToArtist
             )
@@ -156,11 +163,11 @@ fun LocalPlaylistScreen(
                 TextFieldDialog(
                     title = stringResource(id = R.string.rename_playlist),
                     hintText = stringResource(id = R.string.playlist_name_hint),
-                    initialTextInput = playlistWithSongs?.playlist?.name ?: "",
+                    initialTextInput = playlist?.name ?: "",
                     onDismiss = { isRenaming = false },
                     onDone = { text ->
                         query {
-                            playlistWithSongs?.playlist?.copy(name = text)
+                            playlist?.copy(name = text)
                                 ?.let(Database::update)
                         }
                     }
@@ -173,7 +180,7 @@ fun LocalPlaylistScreen(
                     onDismiss = { isDeleting = false },
                     onConfirm = {
                         query {
-                            playlistWithSongs?.playlist?.let(Database::delete)
+                            playlist?.let(Database::delete)
                         }
                         pop()
                     }

@@ -232,6 +232,13 @@ interface Database {
     @Query("UPDATE Song SET totalPlayTimeMs = totalPlayTimeMs + :addition WHERE id = :id")
     fun incrementTotalPlayTimeMs(id: String, addition: Long)
 
+    @Query("SELECT * FROM Playlist WHERE id = :id")
+    fun playlist(id: Long): Flow<Playlist?>
+
+    @Transaction
+    @Query("SELECT Song.* FROM SongPlaylistMap JOIN Song on Song.id = SongPlaylistMap.songId WHERE playlistId = :id ORDER BY position")
+    fun playlistSongs(id: Long): Flow<List<Song>?>
+
     @Transaction
     @Query("SELECT * FROM Playlist WHERE id = :id")
     fun playlistWithSongs(id: Long): Flow<PlaylistWithSongs?>
