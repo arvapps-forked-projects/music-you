@@ -1,26 +1,26 @@
 [versions]
-agp = "8.6.1"
+activity = "1.9.3"
+agp = "8.7.1"
 brotli = "0.1.2"
 coil = "2.7.0"
-compose-activity = "1.9.2"
-compose-bom = "2024.09.02"
+compose-bom = "2024.10.00"
 compose-shimmer = "1.3.1"
 core-splashscreen = "1.0.1"
 desugaring = "2.1.2"
 junit = "4.13.2"
-kotlin = "2.0.20"
-kotlin-coroutines = "1.8.1"
-kotlin-ksp = "2.0.20-1.0.25"
+kotlin = "2.0.21"
+kotlin-coroutines = "1.9.0"
+kotlin-ksp = "2.0.21-1.0.25"
 lifecycle = "2.8.6"
-ktor = "2.3.12"
+ktor = "3.0.0"
 material3 = "1.3.0"
 media3 = "1.4.1"
-navigation = "2.8.1"
+navigation = "2.8.3"
 room = "2.6.1"
 
 [libraries]
 brotli = { group = "org.brotli", name = "dec", version.ref = "brotli" }
-compose-activity = { group = "androidx.activity", name = "activity-compose", version.ref = "compose-activity" }
+compose-activity = { group = "androidx.activity", name = "activity-compose", version.ref = "activity" }
 compose-bom = { group = "androidx.compose", name = "compose-bom", version.ref = "compose-bom" }
 compose-coil = { group = "io.coil-kt", name = "coil-compose", version.ref = "coil" }
 compose-foundation = { group = "androidx.compose.foundation", name = "foundation" }
