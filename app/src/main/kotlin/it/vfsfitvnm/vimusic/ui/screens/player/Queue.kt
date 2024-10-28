@@ -57,9 +57,6 @@ import androidx.media3.common.MediaItem
 import androidx.media3.common.Player
 import androidx.media3.common.Timeline
 import com.valentinilk.shimmer.shimmer
-import it.vfsfitvnm.compose.reordering.draggedItem
-import it.vfsfitvnm.compose.reordering.rememberReorderingState
-import it.vfsfitvnm.compose.reordering.reorder
 import it.vfsfitvnm.vimusic.LocalPlayerServiceBinder
 import it.vfsfitvnm.vimusic.R
 import it.vfsfitvnm.vimusic.models.ActionInfo
@@ -79,6 +76,8 @@ import it.vfsfitvnm.vimusic.utils.shouldBePlaying
 import it.vfsfitvnm.vimusic.utils.shuffleQueue
 import it.vfsfitvnm.vimusic.utils.windows
 import kotlinx.coroutines.launch
+import sh.calvin.reorderable.ReorderableItem
+import sh.calvin.reorderable.rememberReorderableLazyListState
 
 @OptIn(ExperimentalAnimationApi::class, ExperimentalMaterial3Api::class)
 @Composable
@@ -120,12 +119,10 @@ fun Queue(
         }
     }
 
-    val reorderingState = rememberReorderingState(
-        lazyListState = rememberLazyListState(initialFirstVisibleItemIndex = mediaItemIndex),
-        key = windows,
-        onDragEnd = player::moveMediaItem,
-        extraItemCount = 0
-    )
+    val lazyListState = rememberLazyListState(initialFirstVisibleItemIndex = mediaItemIndex)
+    val reorderableLazyListState = rememberReorderableLazyListState(lazyListState) { from, to ->
+        player.moveMediaItem(from.index, to.index)
+    }
 
     val musicBarsTransition = updateTransition(targetState = mediaItemIndex, label = "bars")
 
@@ -145,7 +142,7 @@ fun Queue(
                 .padding(bottom = paddingValues.calculateBottomPadding())
         ) {
             LazyColumn(
-                state = reorderingState.lazyListState,
+                state = lazyListState,
                 contentPadding = PaddingValues(bottom = 16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 modifier = Modifier.weight(1F)
@@ -157,107 +154,104 @@ fun Queue(
                     val isPlayingThisMediaItem = mediaItemIndex == window.firstPeriodIndex
                     val currentWindow by rememberUpdatedState(window)
 
-                    SwipeToActionBox(
-                        modifier = Modifier.draggedItem(
-                            reorderingState = reorderingState,
-                            index = window.firstPeriodIndex
-                        ),
-                        destructiveAction = ActionInfo(
-                            enabled = !isPlayingThisMediaItem,
-                            onClick = {
-                                val deletedMediaItem = window.mediaItem
-                                val itemIndex = currentWindow.firstPeriodIndex
-
-                                player.removeMediaItem(itemIndex)
-
-                                scope.launch {
-                                    val result = snackbarHostState.showSnackbar(
-                                        message = snackbarMessage,
-                                        actionLabel = snackbarActionLabel,
-                                        withDismissAction = true,
-                                        duration = SnackbarDuration.Short
-                                    )
-
-                                    if (result == SnackbarResult.ActionPerformed) player.addMediaItem(
-                                        itemIndex,
-                                        deletedMediaItem
-                                    )
-                                }
-                            },
-                            icon = Icons.Outlined.PlaylistRemove,
-                            description = R.string.remove_from_queue
-                        )
+                    ReorderableItem(
+                        state = reorderableLazyListState,
+                        key = window.uid.hashCode()
                     ) {
-                        MediaSongItem(
-                            song = window.mediaItem,
-                            onClick = {
-                                if (isPlayingThisMediaItem) {
-                                    if (shouldBePlaying) player.pause()
-                                    else player.play()
-                                } else {
-                                    player.seekToDefaultPosition(window.firstPeriodIndex)
-                                    player.playWhenReady = true
-                                }
-                            },
-                            onLongClick = {
-                                menuState.display {
-                                    QueuedMediaItemMenu(
-                                        mediaItem = window.mediaItem,
-                                        indexInQueue = if (isPlayingThisMediaItem) null else window.firstPeriodIndex,
-                                        onDismiss = menuState::hide,
-                                        onGoToAlbum = onGoToAlbum,
-                                        onGoToArtist = onGoToArtist
-                                    )
-                                }
-                            },
-                            onThumbnailContent = {
-                                musicBarsTransition.AnimatedVisibility(
-                                    visible = { it == window.firstPeriodIndex },
-                                    enter = fadeIn(tween(800)),
-                                    exit = fadeOut(tween(800)),
-                                ) {
-                                    Box(
-                                        contentAlignment = Alignment.Center,
-                                        modifier = Modifier
-                                            .fillMaxSize()
-                                            .background(
-                                                color = Color.Black.copy(alpha = 0.25F),
-                                                shape = MaterialTheme.shapes.medium
-                                            )
+                        SwipeToActionBox(
+                            destructiveAction = ActionInfo(
+                                enabled = !isPlayingThisMediaItem,
+                                onClick = {
+                                    val deletedMediaItem = window.mediaItem
+                                    val itemIndex = currentWindow.firstPeriodIndex
+
+                                    player.removeMediaItem(itemIndex)
+
+                                    scope.launch {
+                                        val result = snackbarHostState.showSnackbar(
+                                            message = snackbarMessage,
+                                            actionLabel = snackbarActionLabel,
+                                            withDismissAction = true,
+                                            duration = SnackbarDuration.Short
+                                        )
+
+                                        if (result == SnackbarResult.ActionPerformed) player.addMediaItem(
+                                            itemIndex,
+                                            deletedMediaItem
+                                        )
+                                    }
+                                },
+                                icon = Icons.Outlined.PlaylistRemove,
+                                description = R.string.remove_from_queue
+                            )
+                        ) {
+                            MediaSongItem(
+                                song = window.mediaItem,
+                                onClick = {
+                                    if (isPlayingThisMediaItem) {
+                                        if (shouldBePlaying) player.pause()
+                                        else player.play()
+                                    } else {
+                                        player.seekToDefaultPosition(window.firstPeriodIndex)
+                                        player.playWhenReady = true
+                                    }
+                                },
+                                onLongClick = {
+                                    menuState.display {
+                                        QueuedMediaItemMenu(
+                                            mediaItem = window.mediaItem,
+                                            indexInQueue = if (isPlayingThisMediaItem) null else window.firstPeriodIndex,
+                                            onDismiss = menuState::hide,
+                                            onGoToAlbum = onGoToAlbum,
+                                            onGoToArtist = onGoToArtist
+                                        )
+                                    }
+                                },
+                                onThumbnailContent = {
+                                    musicBarsTransition.AnimatedVisibility(
+                                        visible = { it == window.firstPeriodIndex },
+                                        enter = fadeIn(tween(800)),
+                                        exit = fadeOut(tween(800)),
                                     ) {
-                                        if (shouldBePlaying) {
-                                            MusicBars(
-                                                color = MaterialTheme.colorScheme.onOverlay,
-                                                modifier = Modifier
-                                                    .height(24.dp)
-                                            )
-                                        } else {
-                                            Icon(
-                                                imageVector = Icons.Filled.PlayArrow,
-                                                contentDescription = null,
-                                                modifier = Modifier.size(24.dp),
-                                                tint = MaterialTheme.colorScheme.onOverlay
-                                            )
+                                        Box(
+                                            contentAlignment = Alignment.Center,
+                                            modifier = Modifier
+                                                .fillMaxSize()
+                                                .background(
+                                                    color = Color.Black.copy(alpha = 0.25F),
+                                                    shape = MaterialTheme.shapes.medium
+                                                )
+                                        ) {
+                                            if (shouldBePlaying) {
+                                                MusicBars(
+                                                    color = MaterialTheme.colorScheme.onOverlay,
+                                                    modifier = Modifier
+                                                        .height(24.dp)
+                                                )
+                                            } else {
+                                                Icon(
+                                                    imageVector = Icons.Filled.PlayArrow,
+                                                    contentDescription = null,
+                                                    modifier = Modifier.size(24.dp),
+                                                    tint = MaterialTheme.colorScheme.onOverlay
+                                                )
+                                            }
                                         }
                                     }
-                                }
-                            },
-                            trailingContent = {
-                                IconButton(
-                                    onClick = {},
-                                    modifier = Modifier
-                                        .reorder(
-                                            reorderingState = reorderingState,
-                                            index = window.firstPeriodIndex
+                                },
+                                trailingContent = {
+                                    IconButton(
+                                        onClick = {},
+                                        modifier = Modifier.draggableHandle()
+                                    ) {
+                                        Icon(
+                                            imageVector = Icons.Outlined.DragHandle,
+                                            contentDescription = null
                                         )
-                                ) {
-                                    Icon(
-                                        imageVector = Icons.Outlined.DragHandle,
-                                        contentDescription = null
-                                    )
+                                    }
                                 }
-                            }
-                        )
+                            )
+                        }
                     }
                 }
 
@@ -296,11 +290,8 @@ fun Queue(
                     TooltipIconButton(
                         description = R.string.shuffle,
                         onClick = {
-                            reorderingState.coroutineScope.launch {
-                                reorderingState.lazyListState.animateScrollToItem(0)
-                            }.invokeOnCompletion {
-                                player.shuffleQueue()
-                            }
+                            scope.launch { lazyListState.animateScrollToItem(0) }
+                                .invokeOnCompletion { player.shuffleQueue() }
                         },
                         icon = Icons.Outlined.Shuffle
                     )

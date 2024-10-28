@@ -332,26 +332,35 @@ fun SearchResults(
                         items = items,
                         key = { _, song -> song.id }
                     ) { index, song ->
-                        LocalSongItem(
-                            song = song,
-                            onClick = {
-                                binder?.stopRadio()
-                                binder?.player?.forcePlayAtIndex(
-                                    items.map(Song::asMediaItem),
-                                    index
-                                )
-                            },
-                            onLongClick = {
-                                menuState.display {
-                                    InHistoryMediaItemMenu(
-                                        song = song,
-                                        onDismiss = menuState::hide,
-                                        onGoToAlbum = onAlbumClick,
-                                        onGoToArtist = onArtistClick
+                        SwipeToActionBox(
+                            modifier = Modifier.animateItem(),
+                            primaryAction = ActionInfo(
+                                onClick = { binder?.player?.enqueue(song.asMediaItem) },
+                                icon = Icons.AutoMirrored.Outlined.PlaylistPlay,
+                                description = R.string.enqueue
+                            )
+                        ) {
+                            LocalSongItem(
+                                song = song,
+                                onClick = {
+                                    binder?.stopRadio()
+                                    binder?.player?.forcePlayAtIndex(
+                                        items.map(Song::asMediaItem),
+                                        index
                                     )
+                                },
+                                onLongClick = {
+                                    menuState.display {
+                                        InHistoryMediaItemMenu(
+                                            song = song,
+                                            onDismiss = menuState::hide,
+                                            onGoToAlbum = onAlbumClick,
+                                            onGoToArtist = onArtistClick
+                                        )
+                                    }
                                 }
-                            }
-                        )
+                            )
+                        }
                     }
 
                     if (items.isEmpty()) {

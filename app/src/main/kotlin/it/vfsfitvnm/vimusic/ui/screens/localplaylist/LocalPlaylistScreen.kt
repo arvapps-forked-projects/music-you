@@ -33,7 +33,6 @@ import it.vfsfitvnm.innertube.requests.playlistPage
 import it.vfsfitvnm.vimusic.Database
 import it.vfsfitvnm.vimusic.R
 import it.vfsfitvnm.vimusic.models.Playlist
-import it.vfsfitvnm.vimusic.models.Song
 import it.vfsfitvnm.vimusic.models.SongPlaylistMap
 import it.vfsfitvnm.vimusic.query
 import it.vfsfitvnm.vimusic.transaction
@@ -59,7 +58,6 @@ fun LocalPlaylistScreen(
     onGoToArtist: (String) -> Unit
 ) {
     var playlist: Playlist? by remember { mutableStateOf(null) }
-    var playlistSongs: List<Song>? by remember { mutableStateOf(null) }
     
     var isRenaming by rememberSaveable { mutableStateOf(false) }
     var isDeleting by rememberSaveable { mutableStateOf(false) }
@@ -67,10 +65,6 @@ fun LocalPlaylistScreen(
 
     LaunchedEffect(Unit) {
         Database.playlist(playlistId).filterNotNull().collect { playlist = it }
-    }
-
-    LaunchedEffect(Unit) {
-        Database.playlistSongs(playlistId).filterNotNull().collect { playlistSongs = it }
     }
 
     Scaffold(
@@ -154,7 +148,6 @@ fun LocalPlaylistScreen(
         ) {
             LocalPlaylistSongs(
                 playlistId = playlistId,
-                playlistSongs = playlistSongs ?: emptyList(),
                 onGoToAlbum = onGoToAlbum,
                 onGoToArtist = onGoToArtist
             )

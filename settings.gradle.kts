@@ -20,7 +20,6 @@ dependencyResolutionManagement {
 
 rootProject.name = "MusicYou"
 include(":app")
-include(":compose-reordering")
 include(":innertube")
 include(":ktor-client-brotli")
 include(":kugou")

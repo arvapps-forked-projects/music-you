@@ -1,7 +1,6 @@
 package it.vfsfitvnm.vimusic
 
 import android.content.ComponentName
-import android.content.Context
 import android.content.Intent
 import android.content.ServiceConnection
 import android.net.Uri
@@ -91,7 +90,7 @@ class MainActivity : ComponentActivity() {
 
     override fun onStart() {
         super.onStart()
-        bindService(intent<PlayerService>(), serviceConnection, Context.BIND_AUTO_CREATE)
+        bindService(intent<PlayerService>(), serviceConnection, BIND_AUTO_CREATE)
     }
 
     @OptIn(ExperimentalMaterial3Api::class)
@@ -154,13 +153,12 @@ class MainActivity : ComponentActivity() {
                                             NavigationBarItem(
                                                 selected = selected,
                                                 onClick = {
-                                                    onScreenChanged(index)
-                                                    navController.navigate(screen.route) {
-                                                        popUpTo(navController.graph.findStartDestination().id) {
-                                                            saveState = true
+                                                    if (!selected) {
+                                                        onScreenChanged(index)
+                                                        navController.navigate(screen.route) {
+                                                            popUpTo(navController.graph.findStartDestination().id)
+                                                            launchSingleTop = true
                                                         }
-                                                        launchSingleTop = true
-                                                        restoreState = true
                                                     }
                                                 },
                                                 icon = {

@@ -13,8 +13,8 @@ android {
         applicationId = "com.github.musicyou"
         minSdk = 21
         targetSdk = 35
-        versionCode = 6
-        versionName = "0.6"
+        versionCode = 7
+        versionName = "0.7"
     }
 
     splits {
@@ -64,7 +64,6 @@ ksp {
 }
 
 dependencies {
-    implementation(projects.composeReordering)
     implementation(platform(libs.compose.bom))
     implementation(libs.compose.activity)
     implementation(libs.compose.coil)
@@ -77,6 +76,7 @@ dependencies {
     implementation(libs.core.splashscreen)
     implementation(libs.exoplayer)
     implementation(libs.lifecycle.viewmodel.compose)
+    implementation(libs.reorderable)
     implementation(libs.room)
     ksp(libs.room.compiler)
     implementation(projects.innertube)
