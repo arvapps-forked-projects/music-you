@@ -1,13 +1,16 @@
 package it.vfsfitvnm.vimusic.ui.screens.search
 
+import android.os.Build
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
@@ -42,6 +45,7 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
 import it.vfsfitvnm.innertube.Innertube
 import it.vfsfitvnm.innertube.models.bodies.SearchSuggestionsBody
 import it.vfsfitvnm.innertube.requests.searchSuggestions
@@ -108,6 +112,14 @@ fun SearchScreen(
         val onExpandedChange: (Boolean) -> Unit = { expandedState ->
             if (searchText.isNullOrEmpty() && !expandedState) pop()
             else expanded = expandedState
+        }
+
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.P) { // TODO: Workaround for API < 28 (https://issuetracker.google.com/issues/337191298)
+            Box(
+                modifier = Modifier
+                    .size(1.dp)
+                    .focusable()
+            )
         }
 
         SearchBar(
