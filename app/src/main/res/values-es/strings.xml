@@ -149,4 +149,5 @@
     <string name="undo">Deshacer</string>
     <string name="song_deleted_playlist">Canción eliminada de la lista</string>
     <string name="song_deleted_library">Canción eliminada de la biblioteca</string>
+    <string name="retry">Reintentar</string>
 </resources>

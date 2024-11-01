@@ -76,7 +76,8 @@ fun HomeScreen(
                 0 -> QuickPicks(
                     onAlbumClick = { browseId -> navController.navigate(route = "album/$browseId") },
                     onArtistClick = { browseId -> navController.navigate(route = "artist/$browseId") },
-                    onPlaylistClick = { browseId -> navController.navigate(route = "playlist/$browseId") }
+                    onPlaylistClick = { browseId -> navController.navigate(route = "playlist/$browseId") },
+                    onOfflinePlaylistClick = { navController.navigate(route = "builtInPlaylist/1") }
                 )
 
                 1 -> HomeSongs(

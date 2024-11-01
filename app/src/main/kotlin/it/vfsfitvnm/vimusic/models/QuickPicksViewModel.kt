@@ -25,7 +25,7 @@ class QuickPicksViewModel : ViewModel() {
         flow.distinctUntilChanged().collect { song ->
             if (quickPicksSource == QuickPicksSource.Random && song != null && trending != null) return@collect
 
-            if ((song == null && relatedPageResult == null) || trending?.id != song?.id) {
+            if ((song == null && relatedPageResult == null) || trending?.id != song?.id || relatedPageResult?.isSuccess != true) {
                 relatedPageResult =
                     Innertube.relatedPage(NextBody(videoId = (song?.id ?: "fJ9rUzIMcZQ")))
             }

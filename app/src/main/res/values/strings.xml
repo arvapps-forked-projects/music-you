@@ -152,4 +152,5 @@
     <string name="undo">Undo</string>
     <string name="song_deleted_playlist">Song deleted from playlist</string>
     <string name="song_deleted_library">Song deleted from library</string>
+    <string name="retry">Retry</string>
 </resources>
