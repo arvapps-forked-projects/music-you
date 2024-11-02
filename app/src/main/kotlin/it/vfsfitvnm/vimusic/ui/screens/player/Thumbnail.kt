@@ -219,11 +219,12 @@ fun Thumbnail(
                     durationProvider = player::getDuration,
                 )
 
-                StatsForNerds(
-                    mediaId = currentWindow.mediaItem.mediaId,
-                    isDisplayed = isShowingStatsForNerds && error == null,
-                    onDismiss = { onShowStatsForNerds(false) }
-                )
+                if (isShowingStatsForNerds && error == null) {
+                    StatsForNerds(
+                        mediaId = currentWindow.mediaItem.mediaId,
+                        onDismiss = { onShowStatsForNerds(false) }
+                    )
+                }
 
                 val networkErrorText = stringResource(id = R.string.network_error)
                 val playableFormatNotFoundText =

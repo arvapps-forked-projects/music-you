@@ -1,19 +1,14 @@
 package it.vfsfitvnm.vimusic.ui.screens.player
 
 import android.text.format.Formatter
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.foundation.background
-import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.annotation.OptIn
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -24,10 +19,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.media3.common.util.UnstableApi
 import androidx.media3.datasource.cache.Cache
 import androidx.media3.datasource.cache.CacheSpan
 import it.vfsfitvnm.innertube.Innertube
@@ -35,9 +31,8 @@ import it.vfsfitvnm.innertube.models.bodies.PlayerBody
 import it.vfsfitvnm.innertube.requests.player
 import it.vfsfitvnm.vimusic.Database
 import it.vfsfitvnm.vimusic.LocalPlayerServiceBinder
+import it.vfsfitvnm.vimusic.R
 import it.vfsfitvnm.vimusic.models.Format
-import it.vfsfitvnm.vimusic.ui.styling.onOverlay
-import it.vfsfitvnm.vimusic.ui.styling.overlay
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
@@ -45,167 +40,136 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.withContext
 import kotlin.math.roundToInt
 
-@androidx.annotation.OptIn(androidx.media3.common.util.UnstableApi::class)
+@OptIn(UnstableApi::class)
 @Composable
 fun StatsForNerds(
     mediaId: String,
-    isDisplayed: Boolean,
-    onDismiss: () -> Unit,
-    modifier: Modifier = Modifier
+    onDismiss: () -> Unit
 ) {
     val context = LocalContext.current
     val binder = LocalPlayerServiceBinder.current ?: return
 
-    AnimatedVisibility(
-        visible = isDisplayed,
-        enter = fadeIn(),
-        exit = fadeOut(),
-    ) {
-        var cachedBytes by remember(mediaId) {
-            mutableLongStateOf(binder.cache.getCachedBytes(mediaId, 0, -1))
-        }
+    var cachedBytes by remember(mediaId) {
+        mutableLongStateOf(binder.cache.getCachedBytes(mediaId, 0, -1))
+    }
 
-        var format by remember {
-            mutableStateOf<Format?>(null)
-        }
+    var format by remember {
+        mutableStateOf<Format?>(null)
+    }
 
-        LaunchedEffect(mediaId) {
-            Database.format(mediaId).distinctUntilChanged().collectLatest { currentFormat ->
-                if (currentFormat?.itag == null) {
-                    binder.player.currentMediaItem?.takeIf { it.mediaId == mediaId }?.let { mediaItem ->
-                        withContext(Dispatchers.IO) {
-                            delay(2000)
-                            Innertube.player(PlayerBody(videoId = mediaId))?.onSuccess { response ->
-                                response.streamingData?.highestQualityFormat?.let { format ->
-                                    Database.insert(mediaItem)
-                                    Database.insert(
-                                        Format(
-                                            songId = mediaId,
-                                            itag = format.itag,
-                                            mimeType = format.mimeType,
-                                            bitrate = format.bitrate,
-                                            loudnessDb = response.playerConfig?.audioConfig?.normalizedLoudnessDb,
-                                            contentLength = format.contentLength,
-                                            lastModified = format.lastModified
-                                        )
+    LaunchedEffect(mediaId) {
+        Database.format(mediaId).distinctUntilChanged().collectLatest { currentFormat ->
+            if (currentFormat?.itag == null) {
+                binder.player.currentMediaItem?.takeIf { it.mediaId == mediaId }?.let { mediaItem ->
+                    withContext(Dispatchers.IO) {
+                        delay(2000)
+                        Innertube.player(PlayerBody(videoId = mediaId))?.onSuccess { response ->
+                            response.streamingData?.highestQualityFormat?.let { format ->
+                                Database.insert(mediaItem)
+                                Database.insert(
+                                    Format(
+                                        songId = mediaId,
+                                        itag = format.itag,
+                                        mimeType = format.mimeType,
+                                        bitrate = format.bitrate,
+                                        loudnessDb = response.playerConfig?.audioConfig?.normalizedLoudnessDb,
+                                        contentLength = format.contentLength,
+                                        lastModified = format.lastModified
                                     )
-                                }
+                                )
                             }
                         }
                     }
-                } else {
-                    format = currentFormat
                 }
+            } else format = currentFormat
+        }
+    }
+
+    DisposableEffect(mediaId) {
+        val listener = object : Cache.Listener {
+            override fun onSpanAdded(cache: Cache, span: CacheSpan) {
+                cachedBytes += span.length
             }
+
+            override fun onSpanRemoved(cache: Cache, span: CacheSpan) {
+                cachedBytes -= span.length
+            }
+
+            override fun onSpanTouched(cache: Cache, oldSpan: CacheSpan, newSpan: CacheSpan) = Unit
         }
 
-        DisposableEffect(mediaId) {
-            val listener = object : Cache.Listener {
-                override fun onSpanAdded(cache: Cache, span: CacheSpan) {
-                    cachedBytes += span.length
-                }
+        binder.cache.addListener(mediaId, listener)
 
-                override fun onSpanRemoved(cache: Cache, span: CacheSpan) {
-                    cachedBytes -= span.length
-                }
-
-                override fun onSpanTouched(cache: Cache, oldSpan: CacheSpan, newSpan: CacheSpan) =
-                    Unit
-            }
-
-            binder.cache.addListener(mediaId, listener)
-
-            onDispose {
-                binder.cache.removeListener(mediaId, listener)
-            }
+        onDispose {
+            binder.cache.removeListener(mediaId, listener)
         }
+    }
 
-        Box(
-            modifier = modifier
-                .pointerInput(Unit) {
-                    detectTapGestures(
-                        onTap = {
-                            onDismiss()
-                        }
-                    )
-                }
-                .background(MaterialTheme.colorScheme.overlay)
-                .fillMaxSize()
-        ) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        confirmButton = {
+            TextButton(onClick = onDismiss) {
+                Text(text = stringResource(id = R.string.close))
+            }
+        },
+        title = {
+            Text(text = stringResource(id = R.string.information))
+        },
+        text = {
             Row(
-                horizontalArrangement = Arrangement.spacedBy(16.dp),
-                modifier = Modifier
-                    .align(Alignment.Center)
-                    .padding(all = 16.dp)
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(
+                    space = 16.dp,
+                    alignment = Alignment.CenterHorizontally
+                )
             ) {
                 Column(horizontalAlignment = Alignment.End) {
                     Text(
-                        text = "Id",
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onOverlay,
-                        textAlign = TextAlign.Center
+                        text = stringResource(id = R.string.id),
+                        fontWeight = FontWeight.Bold
                     )
                     Text(
-                        text = "Itag",
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onOverlay,
-                        textAlign = TextAlign.Center
+                        text = stringResource(id = R.string.itag),
+                        fontWeight = FontWeight.Bold
                     )
                     Text(
-                        text = "Bitrate",
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onOverlay,
-                        textAlign = TextAlign.Center
+                        text = stringResource(id = R.string.bitrate),
+                        fontWeight = FontWeight.Bold
                     )
                     Text(
-                        text = "Size",
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onOverlay,
-                        textAlign = TextAlign.Center
+                        text = stringResource(id = R.string.size),
+                        fontWeight = FontWeight.Bold
                     )
                     Text(
-                        text = "Cached",
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onOverlay,
-                        textAlign = TextAlign.Center
+                        text = stringResource(id = R.string.cached),
+                        fontWeight = FontWeight.Bold
                     )
                     Text(
-                        text = "Loudness",
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onOverlay,
-                        textAlign = TextAlign.Center
+                        text = stringResource(id = R.string.loudness),
+                        fontWeight = FontWeight.Bold
                     )
                 }
 
                 Column {
                     Text(
                         text = mediaId,
-                        maxLines = 1,
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onOverlay,
-                        textAlign = TextAlign.Center
+                        maxLines = 1
                     )
                     Text(
-                        text = format?.itag?.toString() ?: "Unknown",
-                        maxLines = 1,
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onOverlay,
-                        textAlign = TextAlign.Center
+                        text = format?.itag?.toString() ?: stringResource(id = R.string.unknown),
+                        maxLines = 1
                     )
                     Text(
-                        text = format?.bitrate?.let { "${it / 1000} kbps" } ?: "Unknown",
-                        maxLines = 1,
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onOverlay,
-                        textAlign = TextAlign.Center
+                        text = format?.bitrate?.let { "${it / 1000} kbps" }
+                            ?: stringResource(id = R.string.unknown),
+                        maxLines = 1
                     )
                     Text(
                         text = format?.contentLength
-                            ?.let { Formatter.formatShortFileSize(context, it) } ?: "Unknown",
-                        maxLines = 1,
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onOverlay,
-                        textAlign = TextAlign.Center
+                            ?.let { Formatter.formatShortFileSize(context, it) } ?: stringResource(
+                            id = R.string.unknown
+                        ),
+                        maxLines = 1
                     )
                     Text(
                         text = buildString {
@@ -215,20 +179,15 @@ fun StatsForNerds(
                                 append(" (${(cachedBytes.toFloat() / it * 100).roundToInt()}%)")
                             }
                         },
-                        maxLines = 1,
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onOverlay,
-                        textAlign = TextAlign.Center
+                        maxLines = 1
                     )
                     Text(
-                        text = format?.loudnessDb?.let { "%.2f dB".format(it) } ?: "Unknown",
-                        maxLines = 1,
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onOverlay,
-                        textAlign = TextAlign.Center
+                        text = format?.loudnessDb?.let { "%.2f dB".format(it) }
+                            ?: stringResource(id = R.string.unknown),
+                        maxLines = 1
                     )
                 }
             }
         }
-    }
+    )
 }
