@@ -239,24 +239,33 @@ fun SearchResults(
                     },
                     emptyItemsText = emptyItemsText,
                     itemContent = { video ->
-                        VideoItem(
-                            video = video,
-                            onClick = {
-                                binder?.stopRadio()
-                                binder?.player?.forcePlay(video.asMediaItem)
-                                binder?.setupRadio(video.info?.endpoint)
-                            },
-                            onLongClick = {
-                                menuState.display {
-                                    NonQueuedMediaItemMenu(
-                                        mediaItem = video.asMediaItem,
-                                        onDismiss = menuState::hide,
-                                        onGoToAlbum = onAlbumClick,
-                                        onGoToArtist = onArtistClick
-                                    )
+                        SwipeToActionBox(
+                            modifier = Modifier.animateItem(),
+                            primaryAction = ActionInfo(
+                                onClick = { binder?.player?.enqueue(video.asMediaItem) },
+                                icon = Icons.AutoMirrored.Outlined.PlaylistPlay,
+                                description = R.string.enqueue
+                            )
+                        ) {
+                            VideoItem(
+                                video = video,
+                                onClick = {
+                                    binder?.stopRadio()
+                                    binder?.player?.forcePlay(video.asMediaItem)
+                                    binder?.setupRadio(video.info?.endpoint)
+                                },
+                                onLongClick = {
+                                    menuState.display {
+                                        NonQueuedMediaItemMenu(
+                                            mediaItem = video.asMediaItem,
+                                            onDismiss = menuState::hide,
+                                            onGoToAlbum = onAlbumClick,
+                                            onGoToArtist = onArtistClick
+                                        )
+                                    }
                                 }
-                            }
-                        )
+                            )
+                        }
                     },
                     itemPlaceholderContent = {
                         ListItemPlaceholder(

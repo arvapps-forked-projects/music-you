@@ -5,8 +5,17 @@ import androidx.annotation.OptIn
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -116,76 +125,95 @@ fun StatsForNerds(
             Text(text = stringResource(id = R.string.information))
         },
         text = {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(
-                    space = 16.dp,
-                    alignment = Alignment.CenterHorizontally
-                )
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .verticalScroll(rememberScrollState()),
+                verticalArrangement = Arrangement.spacedBy(16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Column(horizontalAlignment = Alignment.End) {
-                    Text(
-                        text = stringResource(id = R.string.id),
-                        fontWeight = FontWeight.Bold
-                    )
-                    Text(
-                        text = stringResource(id = R.string.itag),
-                        fontWeight = FontWeight.Bold
-                    )
-                    Text(
-                        text = stringResource(id = R.string.bitrate),
-                        fontWeight = FontWeight.Bold
-                    )
-                    Text(
-                        text = stringResource(id = R.string.size),
-                        fontWeight = FontWeight.Bold
-                    )
-                    Text(
-                        text = stringResource(id = R.string.cached),
-                        fontWeight = FontWeight.Bold
-                    )
-                    Text(
-                        text = stringResource(id = R.string.loudness),
-                        fontWeight = FontWeight.Bold
-                    )
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
+                    Column(horizontalAlignment = Alignment.End) {
+                        Text(
+                            text = stringResource(id = R.string.id),
+                            fontWeight = FontWeight.Bold
+                        )
+                        Text(
+                            text = stringResource(id = R.string.itag),
+                            fontWeight = FontWeight.Bold
+                        )
+                        Text(
+                            text = stringResource(id = R.string.bitrate),
+                            fontWeight = FontWeight.Bold
+                        )
+                        Text(
+                            text = stringResource(id = R.string.size),
+                            fontWeight = FontWeight.Bold
+                        )
+                        Text(
+                            text = stringResource(id = R.string.cached),
+                            fontWeight = FontWeight.Bold
+                        )
+                        Text(
+                            text = stringResource(id = R.string.loudness),
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
+
+                    Column {
+                        Text(
+                            text = mediaId,
+                            maxLines = 1
+                        )
+                        Text(
+                            text = format?.itag?.toString()
+                                ?: stringResource(id = R.string.unknown),
+                            maxLines = 1
+                        )
+                        Text(
+                            text = format?.bitrate?.let { "${it / 1000} kbps" }
+                                ?: stringResource(id = R.string.unknown),
+                            maxLines = 1
+                        )
+                        Text(
+                            text = format?.contentLength
+                                ?.let { Formatter.formatShortFileSize(context, it) }
+                                ?: stringResource(
+                                    id = R.string.unknown
+                                ),
+                            maxLines = 1
+                        )
+                        Text(
+                            text = buildString {
+                                append(Formatter.formatShortFileSize(context, cachedBytes))
+
+                                format?.contentLength?.let {
+                                    append(" (${(cachedBytes.toFloat() / it * 100).roundToInt()}%)")
+                                }
+                            },
+                            maxLines = 1
+                        )
+                        Text(
+                            text = format?.loudnessDb?.let { "%.2f dB".format(it) }
+                                ?: stringResource(id = R.string.unknown),
+                            maxLines = 1
+                        )
+                    }
                 }
 
-                Column {
-                    Text(
-                        text = mediaId,
-                        maxLines = 1
+                Button(
+                    onClick = { binder.cache.removeResource(mediaId) }
+                ) {
+                    Icon(
+                        imageVector = Icons.Outlined.Delete,
+                        contentDescription = stringResource(id = R.string.clear_cache)
                     )
-                    Text(
-                        text = format?.itag?.toString() ?: stringResource(id = R.string.unknown),
-                        maxLines = 1
-                    )
-                    Text(
-                        text = format?.bitrate?.let { "${it / 1000} kbps" }
-                            ?: stringResource(id = R.string.unknown),
-                        maxLines = 1
-                    )
-                    Text(
-                        text = format?.contentLength
-                            ?.let { Formatter.formatShortFileSize(context, it) } ?: stringResource(
-                            id = R.string.unknown
-                        ),
-                        maxLines = 1
-                    )
-                    Text(
-                        text = buildString {
-                            append(Formatter.formatShortFileSize(context, cachedBytes))
 
-                            format?.contentLength?.let {
-                                append(" (${(cachedBytes.toFloat() / it * 100).roundToInt()}%)")
-                            }
-                        },
-                        maxLines = 1
-                    )
-                    Text(
-                        text = format?.loudnessDb?.let { "%.2f dB".format(it) }
-                            ?: stringResource(id = R.string.unknown),
-                        maxLines = 1
-                    )
+                    Spacer(Modifier.size(ButtonDefaults.IconSpacing))
+
+                    Text(text = stringResource(id = R.string.clear_cache))
                 }
             }
         }

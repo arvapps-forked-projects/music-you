@@ -157,4 +157,5 @@
     <string name="cached">Cached</string>
     <string name="loudness">Loudness</string>
     <string name="unknown">Unknown</string>
+    <string name="clear_cache">Clear cache</string>
 </resources>
