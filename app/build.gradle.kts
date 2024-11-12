@@ -66,7 +66,8 @@ ksp {
 dependencies {
     implementation(platform(libs.compose.bom))
     implementation(libs.compose.activity)
-    implementation(libs.compose.coil)
+    implementation(libs.coil.compose)
+    implementation(libs.coil.network)
     implementation(libs.compose.material.icons)
     implementation(libs.compose.material3)
     implementation(libs.compose.navigation)

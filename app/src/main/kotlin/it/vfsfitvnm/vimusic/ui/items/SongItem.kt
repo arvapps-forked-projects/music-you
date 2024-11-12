@@ -11,7 +11,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.media3.common.MediaItem
-import coil.compose.AsyncImage
+import coil3.compose.AsyncImage
 import it.vfsfitvnm.innertube.Innertube
 import it.vfsfitvnm.vimusic.models.Song
 import it.vfsfitvnm.vimusic.ui.styling.px

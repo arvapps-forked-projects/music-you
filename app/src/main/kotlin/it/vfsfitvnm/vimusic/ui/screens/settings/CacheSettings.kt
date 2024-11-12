@@ -23,8 +23,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import coil.Coil
-import coil.annotation.ExperimentalCoilApi
+import coil3.annotation.ExperimentalCoilApi
+import coil3.imageLoader
 import it.vfsfitvnm.vimusic.LocalPlayerServiceBinder
 import it.vfsfitvnm.vimusic.R
 import it.vfsfitvnm.vimusic.enums.CoilDiskCacheMaxSize
@@ -57,7 +57,7 @@ fun CacheSettings() {
             .verticalScroll(rememberScrollState())
             .padding(top = 8.dp, bottom = 16.dp)
     ) {
-        Coil.imageLoader(context).diskCache?.let { diskCache ->
+        context.imageLoader.diskCache?.let { diskCache ->
             val diskCacheSize = remember(diskCache) {
                 diskCache.size
             }

@@ -6,9 +6,10 @@ import android.graphics.Bitmap
 import android.graphics.drawable.BitmapDrawable
 import android.net.Uri
 import androidx.core.graphics.applyCanvas
-import coil.imageLoader
-import coil.request.Disposable
-import coil.request.ImageRequest
+import coil3.imageLoader
+import coil3.request.Disposable
+import coil3.request.ImageRequest
+import coil3.request.allowHardware
 import it.vfsfitvnm.vimusic.utils.thumbnail
 
 context(Context)
@@ -72,7 +73,7 @@ class BitmapProvider(
                         listener?.invoke(lastBitmap)
                     },
                     onSuccess = { _, result ->
-                        lastBitmap = (result.drawable as BitmapDrawable).bitmap
+                        lastBitmap = (result.image as BitmapDrawable).bitmap
                         onDone(bitmap)
                         listener?.invoke(lastBitmap)
                     }
