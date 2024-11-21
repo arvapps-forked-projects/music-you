@@ -3,13 +3,13 @@ package it.vfsfitvnm.vimusic.service
 import android.content.Context
 import android.content.res.Configuration
 import android.graphics.Bitmap
-import android.graphics.drawable.BitmapDrawable
 import android.net.Uri
 import androidx.core.graphics.applyCanvas
 import coil3.imageLoader
 import coil3.request.Disposable
 import coil3.request.ImageRequest
 import coil3.request.allowHardware
+import coil3.toBitmap
 import it.vfsfitvnm.vimusic.utils.thumbnail
 
 context(Context)
@@ -73,7 +73,7 @@ class BitmapProvider(
                         listener?.invoke(lastBitmap)
                     },
                     onSuccess = { _, result ->
-                        lastBitmap = (result.image as BitmapDrawable).bitmap
+                        lastBitmap = result.image.toBitmap()
                         onDone(bitmap)
                         listener?.invoke(lastBitmap)
                     }
