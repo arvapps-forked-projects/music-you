@@ -42,8 +42,10 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.media3.common.MediaItem
+import androidx.media3.common.ParserException
 import androidx.media3.common.PlaybackException
 import androidx.media3.common.Player
+import androidx.media3.common.util.UnstableApi
 import coil3.compose.AsyncImage
 import it.vfsfitvnm.vimusic.Database
 import it.vfsfitvnm.vimusic.LocalPlayerServiceBinder
@@ -97,12 +99,18 @@ fun Thumbnail(
                 error = player.playerError
             }
 
+            @androidx.annotation.OptIn(UnstableApi::class)
             override fun onPlayerError(playbackException: PlaybackException) {
                 error = playbackException
 
                 when (error?.cause?.cause) {
                     is PlayableFormatNotFoundException, is UnplayableException, is LoginRequiredException, is VideoIdMismatchException -> player.seekToNext()
-                    else -> player.prepare()
+                    else -> {
+                        if (error?.cause is ParserException) player.currentMediaItem?.let {
+                            binder.cache.removeResource(it.mediaId)
+                        }
+                        player.prepare()
+                    }
                 }
             }
         }
