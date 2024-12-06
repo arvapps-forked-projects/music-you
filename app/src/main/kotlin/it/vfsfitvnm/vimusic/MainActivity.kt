@@ -15,6 +15,7 @@ import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.windowInsetsPadding
@@ -57,6 +58,7 @@ import it.vfsfitvnm.innertube.Innertube
 import it.vfsfitvnm.innertube.models.bodies.BrowseBody
 import it.vfsfitvnm.innertube.requests.playlistPage
 import it.vfsfitvnm.innertube.requests.song
+import it.vfsfitvnm.vimusic.enums.NavigationLabelsVisibility
 import it.vfsfitvnm.vimusic.models.LocalMenuState
 import it.vfsfitvnm.vimusic.models.Screen
 import it.vfsfitvnm.vimusic.service.PlayerService
@@ -67,6 +69,7 @@ import it.vfsfitvnm.vimusic.utils.asMediaItem
 import it.vfsfitvnm.vimusic.utils.forcePlay
 import it.vfsfitvnm.vimusic.utils.homeScreenTabIndexKey
 import it.vfsfitvnm.vimusic.utils.intent
+import it.vfsfitvnm.vimusic.utils.navigationLabelsVisibilityKey
 import it.vfsfitvnm.vimusic.utils.rememberPreference
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.filterNotNull
@@ -125,6 +128,10 @@ class MainActivity : ComponentActivity() {
                         val menuState = LocalMenuState.current
                         val navBackStackEntry by navController.currentBackStackEntryAsState()
                         val currentDestination = navBackStackEntry?.destination
+                        var navigationLabelsVisibility by rememberPreference(
+                            navigationLabelsVisibilityKey,
+                            NavigationLabelsVisibility.Visible
+                        )
                         val (_, onScreenChanged) = rememberPreference(
                             homeScreenTabIndexKey,
                             defaultValue = 0
@@ -145,7 +152,11 @@ class MainActivity : ComponentActivity() {
                                     enter = slideInVertically(initialOffsetY = { it / 2 }),
                                     exit = slideOutVertically(targetOffsetY = { it })
                                 ) {
-                                    NavigationBar {
+                                    NavigationBar(
+                                        modifier = if (navigationLabelsVisibility == NavigationLabelsVisibility.Hidden) Modifier.heightIn(
+                                            max = 90.dp
+                                        ) else Modifier
+                                    ) {
                                         homeScreens.forEachIndexed { index, screen ->
                                             val selected =
                                                 currentDestination?.hierarchy?.any { it.route == screen.route } == true
@@ -168,12 +179,15 @@ class MainActivity : ComponentActivity() {
                                                     )
                                                 },
                                                 label = {
-                                                    Text(
-                                                        text = stringResource(id = screen.resourceId),
-                                                        maxLines = 1,
-                                                        overflow = TextOverflow.Ellipsis
-                                                    )
-                                                }
+                                                    if (navigationLabelsVisibility != NavigationLabelsVisibility.Hidden) {
+                                                        Text(
+                                                            text = stringResource(id = screen.resourceId),
+                                                            maxLines = 1,
+                                                            overflow = TextOverflow.Ellipsis
+                                                        )
+                                                    }
+                                                },
+                                                alwaysShowLabel = navigationLabelsVisibility != NavigationLabelsVisibility.VisibleWhenActive
                                             )
                                         }
                                     }

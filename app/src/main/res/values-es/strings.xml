@@ -158,4 +158,8 @@
     <string name="loudness">Volumen</string>
     <string name="unknown">Desconocido</string>
     <string name="clear_cache">Borrar caché</string>
+    <string name="navigation_bar_label_visibility">Visibilidad de las etiquetas de navegación</string>
+    <string name="visible">Visibles</string>
+    <string name="visible_when_active">Visibles cuando están seleccionadas</string>
+    <string name="hidden">Ocultas</string>
 </resources>

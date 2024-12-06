@@ -163,4 +163,8 @@
     <string name="loudness">Loudness</string>
     <string name="unknown">Unknown</string>
     <string name="clear_cache">Clear cache</string>
+    <string name="navigation_bar_label_visibility">Navigation bar label visibility</string>
+    <string name="visible">Visible</string>
+    <string name="visible_when_active">Visible when active</string>
+    <string name="hidden">Hidden</string>
 </resources>

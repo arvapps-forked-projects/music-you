@@ -14,6 +14,7 @@ import androidx.compose.material.icons.automirrored.outlined.List
 import androidx.compose.material.icons.outlined.AddLink
 import androidx.compose.material.icons.outlined.Image
 import androidx.compose.material.icons.outlined.Language
+import androidx.compose.material.icons.outlined.Visibility
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
@@ -22,10 +23,12 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import it.vfsfitvnm.vimusic.R
+import it.vfsfitvnm.vimusic.enums.NavigationLabelsVisibility
 import it.vfsfitvnm.vimusic.enums.QuickPicksSource
 import it.vfsfitvnm.vimusic.utils.isAtLeastAndroid12
 import it.vfsfitvnm.vimusic.utils.isAtLeastAndroid13
 import it.vfsfitvnm.vimusic.utils.isShowingThumbnailInLockscreenKey
+import it.vfsfitvnm.vimusic.utils.navigationLabelsVisibilityKey
 import it.vfsfitvnm.vimusic.utils.quickPicksSourceKey
 import it.vfsfitvnm.vimusic.utils.rememberPreference
 import it.vfsfitvnm.vimusic.utils.toast
@@ -33,6 +36,10 @@ import it.vfsfitvnm.vimusic.utils.toast
 @Composable
 fun GeneralSettings() {
     val context = LocalContext.current
+    var navigationLabelsVisibility by rememberPreference(
+        navigationLabelsVisibilityKey,
+        NavigationLabelsVisibility.Visible
+    )
     var quickPicksSource by rememberPreference(quickPicksSourceKey, QuickPicksSource.Trending)
     var isShowingThumbnailInLockscreen by rememberPreference(
         isShowingThumbnailInLockscreenKey,
@@ -45,6 +52,14 @@ fun GeneralSettings() {
             .verticalScroll(rememberScrollState())
             .padding(bottom = 16.dp)
     ) {
+        EnumValueSelectorSettingsEntry(
+            title = stringResource(id = R.string.navigation_bar_label_visibility),
+            selectedValue = navigationLabelsVisibility,
+            onValueSelected = { navigationLabelsVisibility = it },
+            icon = Icons.Outlined.Visibility,
+            valueText = { context.getString(it.resourceId) }
+        )
+
         EnumValueSelectorSettingsEntry(
             title = stringResource(id = R.string.quick_picks_source),
             selectedValue = quickPicksSource,
