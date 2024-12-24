@@ -51,13 +51,12 @@
     <string name="restore_information">L\'application se fermera automatiquement après la restauration de la base de données et les données existantes seront écrasées.</string>
     <string name="backup_description">Exporter la base de données vers le stockage externe</string>
     <string name="restore_description">Importer la base de données à partir du stockage externe</string>
-    <string name="android_auto" translatable="false">Android Auto</string>
     <string name="service_lifetime">Durée de Vie du Service</string>
     <string name="pause_search_history">Suspendre l\'historique de recherche</string>
     <string name="pause_search_history_description">Ne pas enregistrer les nouvelles recherches, ni afficher l\'historique</string>
     <string name="clear_search_history">Effacer l\'historique de recherche</string>
     <string name="android_auto_description">Activer la prise en charge d\'Android Auto</string>
-    <string name="android_auto_information">N\'oubliez pas d\'activer \"Sources inconnues\" dans les paramètres du développeur d'Android Auto.</string>
+    <string name="android_auto_information">N\'oubliez pas d\'activer \"Sources inconnues\" dans les paramètres du développeur d\'Android Auto.</string>
     <string name="ignore_battery_optimizations">Ignorer les optimisations de la batterie</string>
     <string name="service_lifetime_description">Lorsque la désactivation des optimisations de la batterie ne suffit pas</string>
     <string name="service_lifetime_information">Si des optimisations de batterie sont appliquées, la notification de lecture peut soudainement disparaître lors de la mise en pause.</string>
@@ -72,7 +71,6 @@
     <string name="hide">Masquer</string>
     <string name="remove_from_queue">Supprimer de la file d\'attente</string>
     <string name="remove_from_playlist">Supprimer de la file playlist</string>
-    <string name="github" translatable="false">GitHub</string>
     <string name="shuffle">Aléatoire</string>
     <string name="quick_picks">Sélection Rapide</string>
     <string name="view_all">Tout voir</string>

@@ -6,10 +6,8 @@ import android.content.Intent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
-import androidx.compose.animation.slideInVertically
-import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.background
-import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -42,7 +40,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalView
@@ -87,8 +84,7 @@ fun Lyrics(
     size: Dp,
     mediaMetadataProvider: () -> MediaMetadata,
     durationProvider: () -> Long,
-    ensureSongInserted: () -> Unit,
-    modifier: Modifier = Modifier
+    ensureSongInserted: () -> Unit
 ) {
     AnimatedVisibility(
         visible = isDisplayed,
@@ -200,21 +196,16 @@ fun Lyrics(
 
         Box(
             contentAlignment = Alignment.Center,
-            modifier = modifier
-                .pointerInput(Unit) {
-                    detectTapGestures(
-                        onTap = { onDismiss() }
-                    )
-                }
+            modifier = Modifier
+                .clickable(onClick = onDismiss)
                 .fillMaxSize()
                 .background(Color.Black.copy(0.8f))
         ) {
             AnimatedVisibility(
                 visible = isError && text == null,
-                enter = slideInVertically { -it },
-                exit = slideOutVertically { -it },
-                modifier = Modifier
-                    .align(Alignment.TopCenter)
+                enter = fadeIn(),
+                exit = fadeOut(),
+                modifier = Modifier.align(Alignment.Center)
             ) {
                 Text(
                     text = if (isShowingSynchronizedLyrics) {
@@ -226,18 +217,16 @@ fun Lyrics(
                     color = Color.White,
                     textAlign = TextAlign.Center,
                     modifier = Modifier
-                        .background(Color.Black.copy(0.4f))
-                        .padding(all = 8.dp)
+                        .padding(all = 16.dp)
                         .fillMaxWidth()
                 )
             }
 
             AnimatedVisibility(
-                visible = text?.let(String::isEmpty) ?: false,
-                enter = slideInVertically { -it },
-                exit = slideOutVertically { -it },
-                modifier = Modifier
-                    .align(Alignment.TopCenter)
+                visible = text?.let(String::isEmpty) == true,
+                enter = fadeIn(),
+                exit = fadeOut(),
+                modifier = Modifier.align(Alignment.Center)
             ) {
                 Text(
                     text = if (isShowingSynchronizedLyrics) {
@@ -249,8 +238,7 @@ fun Lyrics(
                     color = Color.White,
                     textAlign = TextAlign.Center,
                     modifier = Modifier
-                        .background(Color.Black.copy(0.4f))
-                        .padding(all = 8.dp)
+                        .padding(all = 16.dp)
                         .fillMaxWidth()
                 )
             }
@@ -290,13 +278,12 @@ fun Lyrics(
                         userScrollEnabled = false,
                         contentPadding = PaddingValues(vertical = size / 2),
                         horizontalAlignment = Alignment.CenterHorizontally,
-                        modifier = Modifier
-                            .verticalFadingEdge()
+                        modifier = Modifier.verticalFadingEdge()
                     ) {
                         itemsIndexed(items = synchronizedLyrics.sentences) { index, sentence ->
                             Text(
                                 text = sentence.second,
-                                style = MaterialTheme.typography.bodyLarge,
+                                style = MaterialTheme.typography.titleMedium,
                                 color = Color.White,
                                 textAlign = TextAlign.Center,
                                 modifier = Modifier
@@ -323,8 +310,7 @@ fun Lyrics(
             if (text == null && !isError) {
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally,
-                    modifier = Modifier
-                        .shimmer()
+                    modifier = Modifier.shimmer()
                 ) {
                     repeat(4) {
                         TextPlaceholder(
@@ -380,7 +366,7 @@ fun Lyrics(
                                                 )
                                             }
                                         )
-                                    } catch (e: ActivityNotFoundException) {
+                                    } catch (_: ActivityNotFoundException) {
                                         context.toast("Couldn't find an application to browse the Internet")
                                     }
                                 }
