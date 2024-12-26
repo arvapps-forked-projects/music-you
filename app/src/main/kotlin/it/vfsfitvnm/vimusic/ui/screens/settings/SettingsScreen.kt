@@ -38,6 +38,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import it.vfsfitvnm.vimusic.LocalPlayerPadding
 import it.vfsfitvnm.vimusic.R
 import it.vfsfitvnm.vimusic.enums.SettingsSection
 import it.vfsfitvnm.vimusic.ui.components.themed.ValueSelectorDialog
@@ -51,6 +52,8 @@ fun SettingsScreen(
     pop: () -> Unit,
     onGoToSettingsPage: (Int) -> Unit
 ) {
+    val playerPadding = LocalPlayerPadding.current
+
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
 
     Scaffold(
@@ -77,6 +80,7 @@ fun SettingsScreen(
                 .fillMaxSize()
                 .verticalScroll(rememberScrollState())
                 .padding(paddingValues)
+                .padding(bottom = playerPadding)
         ) {
             SettingsSection.entries.forEachIndexed { index, section ->
                 ListItem(

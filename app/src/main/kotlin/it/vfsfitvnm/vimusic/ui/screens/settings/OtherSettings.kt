@@ -33,6 +33,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import it.vfsfitvnm.vimusic.LocalPlayerPadding
 import it.vfsfitvnm.vimusic.R
 import it.vfsfitvnm.vimusic.service.PlayerMediaBrowserService
 import it.vfsfitvnm.vimusic.ui.styling.Dimensions
@@ -48,6 +49,7 @@ import it.vfsfitvnm.vimusic.utils.toast
 @Composable
 fun OtherSettings() {
     val context = LocalContext.current
+    val playerPadding = LocalPlayerPadding.current
 
     var isAndroidAutoEnabled by remember {
         val component = ComponentName(context, PlayerMediaBrowserService::class.java)
@@ -80,7 +82,7 @@ fun OtherSettings() {
         modifier = Modifier
             .fillMaxSize()
             .verticalScroll(rememberScrollState())
-            .padding(bottom = 16.dp)
+            .padding(bottom = 16.dp + playerPadding)
     ) {
         SwitchSettingEntry(
             title = stringResource(id = R.string.android_auto),
@@ -120,12 +122,12 @@ fun OtherSettings() {
                             data = Uri.parse("package:${context.packageName}")
                         }
                     )
-                } catch (e: ActivityNotFoundException) {
+                } catch (_: ActivityNotFoundException) {
                     try {
                         activityResultLauncher.launch(
                             Intent(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS)
                         )
-                    } catch (e: ActivityNotFoundException) {
+                    } catch (_: ActivityNotFoundException) {
                         context.toast("Couldn't find battery optimization settings, please whitelist ViMusic manually")
                     }
                 }

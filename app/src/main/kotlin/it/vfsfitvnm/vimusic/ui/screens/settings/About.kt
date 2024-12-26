@@ -25,6 +25,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import it.vfsfitvnm.vimusic.LocalPlayerPadding
 import it.vfsfitvnm.vimusic.R
 import it.vfsfitvnm.vimusic.ui.styling.Dimensions
 
@@ -33,12 +34,13 @@ import it.vfsfitvnm.vimusic.ui.styling.Dimensions
 fun About() {
     val uriHandler = LocalUriHandler.current
     val context = LocalContext.current
+    val playerPadding = LocalPlayerPadding.current
 
     Column(
         modifier = Modifier
             .fillMaxSize()
             .verticalScroll(rememberScrollState())
-            .padding(top = 8.dp, bottom = 16.dp)
+            .padding(top = 8.dp, bottom = 16.dp + playerPadding)
     ) {
         val packageManager = context.packageManager
         val packageName = context.packageName

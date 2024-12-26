@@ -30,6 +30,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import it.vfsfitvnm.innertube.Innertube
 import it.vfsfitvnm.innertube.models.NavigationEndpoint
+import it.vfsfitvnm.vimusic.LocalPlayerPadding
 import it.vfsfitvnm.vimusic.LocalPlayerServiceBinder
 import it.vfsfitvnm.vimusic.R
 import it.vfsfitvnm.vimusic.models.ActionInfo
@@ -59,13 +60,15 @@ fun ArtistOverview(
 ) {
     val binder = LocalPlayerServiceBinder.current
     val menuState = LocalMenuState.current
+    val playerPadding = LocalPlayerPadding.current
+
     val itemSize = 140.dp
 
     Column(
         modifier = Modifier
             .fillMaxSize()
             .verticalScroll(rememberScrollState())
-            .padding(vertical = 16.dp),
+            .padding(top = 16.dp, bottom = 16.dp + playerPadding),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         val radioEndpoint = youtubeArtistPage?.radioEndpoint

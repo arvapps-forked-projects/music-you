@@ -15,10 +15,12 @@ import androidx.compose.material3.SheetValue
 import androidx.compose.material3.Surface
 import androidx.compose.material3.rememberBottomSheetScaffoldState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import it.vfsfitvnm.vimusic.LocalPlayerPadding
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -87,10 +89,11 @@ fun PlayerScaffold(
             label = "padding"
         )
 
-        Surface(
-            modifier = Modifier.padding(bottom = bottomPadding.value),
-            color = MaterialTheme.colorScheme.background,
-            content = content
-        )
+        CompositionLocalProvider(value = LocalPlayerPadding provides bottomPadding.value) {
+            Surface(
+                color = MaterialTheme.colorScheme.background,
+                content = content
+            )
+        }
     }
 }

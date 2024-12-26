@@ -22,6 +22,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import it.vfsfitvnm.vimusic.LocalPlayerPadding
 import it.vfsfitvnm.vimusic.R
 import it.vfsfitvnm.vimusic.enums.NavigationLabelsVisibility
 import it.vfsfitvnm.vimusic.enums.QuickPicksSource
@@ -35,6 +36,8 @@ import it.vfsfitvnm.vimusic.utils.toast
 
 @Composable
 fun GeneralSettings() {
+    val playerPadding = LocalPlayerPadding.current
+
     val context = LocalContext.current
     var navigationLabelsVisibility by rememberPreference(
         navigationLabelsVisibilityKey,
@@ -50,7 +53,7 @@ fun GeneralSettings() {
         modifier = Modifier
             .fillMaxSize()
             .verticalScroll(rememberScrollState())
-            .padding(bottom = 16.dp)
+            .padding(bottom = 16.dp + playerPadding)
     ) {
         EnumValueSelectorSettingsEntry(
             title = stringResource(id = R.string.navigation_bar_label_visibility),
@@ -81,7 +84,7 @@ fun GeneralSettings() {
                 onClick = {
                     try {
                         context.startActivity(intent)
-                    } catch (e: ActivityNotFoundException) {
+                    } catch (_: ActivityNotFoundException) {
                         context.toast("Couldn't find app language settings, please configure them manually")
                     }
                 }
@@ -101,7 +104,7 @@ fun GeneralSettings() {
                 onClick = {
                     try {
                         context.startActivity(intent)
-                    } catch (e: Exception) {
+                    } catch (_: Exception) {
                         context.toast("Couldn't find supported links settings, please configure them manually")
                     }
                 }

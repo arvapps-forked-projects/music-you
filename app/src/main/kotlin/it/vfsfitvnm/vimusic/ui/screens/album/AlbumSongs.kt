@@ -27,6 +27,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import it.vfsfitvnm.vimusic.Database
+import it.vfsfitvnm.vimusic.LocalPlayerPadding
 import it.vfsfitvnm.vimusic.LocalPlayerServiceBinder
 import it.vfsfitvnm.vimusic.R
 import it.vfsfitvnm.vimusic.models.ActionInfo
@@ -53,6 +54,7 @@ fun AlbumSongs(
 ) {
     val binder = LocalPlayerServiceBinder.current
     val menuState = LocalMenuState.current
+    val playerPadding = LocalPlayerPadding.current
 
     var songs: List<Song> by remember { mutableStateOf(emptyList()) }
 
@@ -61,7 +63,7 @@ fun AlbumSongs(
     }
 
     LazyColumn(
-        contentPadding = PaddingValues(vertical = 16.dp),
+        contentPadding = PaddingValues(top = 16.dp, bottom = 16.dp + playerPadding),
         modifier = Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {

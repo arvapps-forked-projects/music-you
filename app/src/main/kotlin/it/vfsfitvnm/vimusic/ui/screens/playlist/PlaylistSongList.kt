@@ -16,6 +16,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import it.vfsfitvnm.innertube.Innertube
+import it.vfsfitvnm.vimusic.LocalPlayerPadding
 import it.vfsfitvnm.vimusic.LocalPlayerServiceBinder
 import it.vfsfitvnm.vimusic.R
 import it.vfsfitvnm.vimusic.models.ActionInfo
@@ -42,12 +43,13 @@ fun PlaylistSongList(
 ) {
     val binder = LocalPlayerServiceBinder.current
     val menuState = LocalMenuState.current
+    val playerPadding = LocalPlayerPadding.current
 
     val thumbnailContent =
         adaptiveThumbnailContent(playlistPage == null, playlistPage?.thumbnail?.url)
 
     LazyColumn(
-        contentPadding = PaddingValues(vertical = 16.dp),
+        contentPadding = PaddingValues(top = 16.dp, bottom = 16.dp + playerPadding),
         modifier = Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {

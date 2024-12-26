@@ -7,6 +7,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -50,6 +51,7 @@ import it.vfsfitvnm.innertube.Innertube
 import it.vfsfitvnm.innertube.models.bodies.SearchSuggestionsBody
 import it.vfsfitvnm.innertube.requests.searchSuggestions
 import it.vfsfitvnm.vimusic.Database
+import it.vfsfitvnm.vimusic.LocalPlayerPadding
 import it.vfsfitvnm.vimusic.R
 import it.vfsfitvnm.vimusic.models.SearchQuery
 import it.vfsfitvnm.vimusic.query
@@ -69,6 +71,8 @@ fun SearchScreen(
     onArtistClick: (String) -> Unit,
     onPlaylistClick: (String) -> Unit
 ) {
+    val playerPadding = LocalPlayerPadding.current
+
     val context = LocalContext.current
     var history: List<SearchQuery> by remember { mutableStateOf(emptyList()) }
     var suggestionsResult: Result<List<String>?>? by remember { mutableStateOf(null) }
@@ -157,7 +161,9 @@ fun SearchScreen(
             onExpandedChange = onExpandedChange,
             modifier = Modifier.focusRequester(focusRequester)
         ) {
-            LazyColumn {
+            LazyColumn(
+                contentPadding = PaddingValues(bottom = playerPadding)
+            ) {
                 items(
                     items = history,
                     key = SearchQuery::id

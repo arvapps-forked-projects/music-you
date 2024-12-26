@@ -30,6 +30,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import it.vfsfitvnm.vimusic.Database
+import it.vfsfitvnm.vimusic.LocalPlayerPadding
 import it.vfsfitvnm.vimusic.R
 import it.vfsfitvnm.vimusic.internal
 import it.vfsfitvnm.vimusic.path
@@ -51,6 +52,7 @@ import kotlin.system.exitProcess
 @Composable
 fun DatabaseSettings() {
     val context = LocalContext.current
+    val playerPadding = LocalPlayerPadding.current
 
     var pauseSearchHistory by rememberPreference(pauseSearchHistoryKey, false)
 
@@ -102,7 +104,7 @@ fun DatabaseSettings() {
         modifier = Modifier
             .fillMaxSize()
             .verticalScroll(rememberScrollState())
-            .padding(top = 8.dp, bottom = 16.dp)
+            .padding(top = 8.dp, bottom = 16.dp + playerPadding)
     ) {
         Text(
             text = stringResource(id = R.string.history),
@@ -166,7 +168,7 @@ fun DatabaseSettings() {
 
                 try {
                     backupLauncher.launch("musicyou_${dateFormat.format(Date())}.db")
-                } catch (e: ActivityNotFoundException) {
+                } catch (_: ActivityNotFoundException) {
                     context.toast("Couldn't find an application to create documents")
                 }
             }
@@ -185,7 +187,7 @@ fun DatabaseSettings() {
                             "application/octet-stream"
                         )
                     )
-                } catch (e: ActivityNotFoundException) {
+                } catch (_: ActivityNotFoundException) {
                     context.toast("Couldn't find an application to open documents")
                 }
             }

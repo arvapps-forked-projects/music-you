@@ -61,6 +61,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.media3.common.util.UnstableApi
 import it.vfsfitvnm.vimusic.Database
+import it.vfsfitvnm.vimusic.LocalPlayerPadding
 import it.vfsfitvnm.vimusic.LocalPlayerServiceBinder
 import it.vfsfitvnm.vimusic.R
 import it.vfsfitvnm.vimusic.enums.SongSortBy
@@ -93,6 +94,7 @@ fun HomeSongs(
 ) {
     val binder = LocalPlayerServiceBinder.current
     val menuState = LocalMenuState.current
+    val playerPadding = LocalPlayerPadding.current
 
     var sortBy by rememberPreference(songSortByKey, SongSortBy.Title)
     var sortOrder by rememberPreference(songSortOrderKey, SortOrder.Ascending)
@@ -128,7 +130,8 @@ fun HomeSongs(
                         binder?.player?.forcePlayFromBeginning(
                             items.shuffled().map(Song::asMediaItem)
                         )
-                    }
+                    },
+                    modifier = Modifier.padding(bottom = playerPadding)
                 ) {
                     Icon(
                         imageVector = Icons.Outlined.Shuffle,
@@ -141,7 +144,7 @@ fun HomeSongs(
     ) { paddingValues ->
         LazyVerticalGrid(
             columns = GridCells.Adaptive(minSize = 400.dp),
-            contentPadding = PaddingValues(bottom = if (items.isNotEmpty()) 16.dp + 72.dp else 16.dp),
+            contentPadding = PaddingValues(bottom = if (items.isNotEmpty()) 16.dp + 72.dp + playerPadding else 16.dp + playerPadding),
             modifier = Modifier
                 .fillMaxSize()
                 .consumeWindowInsets(paddingValues)

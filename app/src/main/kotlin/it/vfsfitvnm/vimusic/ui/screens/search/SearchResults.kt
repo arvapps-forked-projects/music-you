@@ -37,6 +37,7 @@ import it.vfsfitvnm.innertube.models.bodies.SearchBody
 import it.vfsfitvnm.innertube.requests.searchPage
 import it.vfsfitvnm.innertube.utils.from
 import it.vfsfitvnm.vimusic.Database
+import it.vfsfitvnm.vimusic.LocalPlayerPadding
 import it.vfsfitvnm.vimusic.LocalPlayerServiceBinder
 import it.vfsfitvnm.vimusic.R
 import it.vfsfitvnm.vimusic.enums.SongSortBy
@@ -74,6 +75,8 @@ fun SearchResults(
     onArtistClick: (String) -> Unit,
     onPlaylistClick: (String) -> Unit
 ) {
+    val playerPadding = LocalPlayerPadding.current
+
     val emptyItemsText = stringResource(id = R.string.no_results_found)
     val (tabIndex, onTabIndexChanges) = rememberPreference(searchResultScreenTabIndexKey, 0)
     val sections = listOf(
@@ -333,7 +336,7 @@ fun SearchResults(
                         start = 0.dp,
                         top = 8.dp,
                         end = 0.dp,
-                        bottom = 16.dp
+                        bottom = 16.dp + playerPadding
                     ),
                     modifier = Modifier.fillMaxSize()
                 ) {

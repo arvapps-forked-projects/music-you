@@ -18,9 +18,11 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.SkipNext
 import androidx.compose.material.icons.outlined.SkipPrevious
@@ -70,6 +72,8 @@ import java.nio.channels.UnresolvedAddressException
 fun Thumbnail(
     isShowingLyrics: Boolean,
     onShowLyrics: (Boolean) -> Unit,
+    fullScreenLyrics: Boolean,
+    toggleFullScreenLyrics: () -> Unit,
     isShowingStatsForNerds: Boolean,
     onShowStatsForNerds: (Boolean) -> Unit,
     modifier: Modifier = Modifier
@@ -199,9 +203,14 @@ fun Thumbnail(
         ) {
             Box(
                 modifier = Modifier
-                    .aspectRatio(1f)
                     .clip(MaterialTheme.shapes.large)
-                    .size(thumbnailSizeDp)
+                    .then(
+                        if (fullScreenLyrics) Modifier
+                            .width(thumbnailSizeDp)
+                            .fillMaxHeight() else Modifier
+                            .aspectRatio(1f)
+                            .size(thumbnailSizeDp)
+                    )
             ) {
                 AsyncImage(
                     model = currentWindow.mediaItem.mediaMetadata.artworkUri.thumbnail(
@@ -220,11 +229,16 @@ fun Thumbnail(
                 Lyrics(
                     mediaId = currentWindow.mediaItem.mediaId,
                     isDisplayed = isShowingLyrics && error == null,
-                    onDismiss = { onShowLyrics(false) },
+                    onDismiss = {
+                        onShowLyrics(false)
+                        if (fullScreenLyrics) toggleFullScreenLyrics()
+                    },
                     ensureSongInserted = { Database.insert(currentWindow.mediaItem) },
                     size = thumbnailSizeDp,
                     mediaMetadataProvider = currentWindow.mediaItem::mediaMetadata,
                     durationProvider = player::getDuration,
+                    fullScreenLyrics = fullScreenLyrics,
+                    toggleFullScreenLyrics = toggleFullScreenLyrics
                 )
 
                 if (isShowingStatsForNerds && error == null) {

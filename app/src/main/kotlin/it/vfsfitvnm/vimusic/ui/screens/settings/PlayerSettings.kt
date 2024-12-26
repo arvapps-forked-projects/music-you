@@ -24,6 +24,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import it.vfsfitvnm.vimusic.LocalPlayerPadding
 import it.vfsfitvnm.vimusic.LocalPlayerServiceBinder
 import it.vfsfitvnm.vimusic.R
 import it.vfsfitvnm.vimusic.utils.isAtLeastAndroid6
@@ -40,6 +41,7 @@ import it.vfsfitvnm.vimusic.utils.volumeNormalizationKey
 fun PlayerSettings() {
     val context = LocalContext.current
     val binder = LocalPlayerServiceBinder.current
+    val playerPadding = LocalPlayerPadding.current
 
     var persistentQueue by rememberPreference(persistentQueueKey, false)
     var resumePlaybackWhenDeviceConnected by rememberPreference(
@@ -55,7 +57,7 @@ fun PlayerSettings() {
         modifier = Modifier
             .fillMaxSize()
             .verticalScroll(rememberScrollState())
-            .padding(bottom = 16.dp)
+            .padding(bottom = 16.dp + playerPadding)
     ) {
         SwitchSettingEntry(
             title = stringResource(id = R.string.persistent_queue),
@@ -112,7 +114,7 @@ fun PlayerSettings() {
 
                 try {
                     activityResultLauncher.launch(intent)
-                } catch (e: ActivityNotFoundException) {
+                } catch (_: ActivityNotFoundException) {
                     context.toast("Couldn't find an application to equalize audio")
                 }
             }

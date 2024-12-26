@@ -1,5 +1,6 @@
 package it.vfsfitvnm.vimusic.ui.screens.home
 
+import android.annotation.SuppressLint
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.gestures.snapping.rememberSnapFlingBehavior
@@ -50,6 +51,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import it.vfsfitvnm.innertube.Innertube
 import it.vfsfitvnm.innertube.models.NavigationEndpoint
 import it.vfsfitvnm.vimusic.Database
+import it.vfsfitvnm.vimusic.LocalPlayerPadding
 import it.vfsfitvnm.vimusic.LocalPlayerServiceBinder
 import it.vfsfitvnm.vimusic.R
 import it.vfsfitvnm.vimusic.enums.QuickPicksSource
@@ -75,6 +77,7 @@ import it.vfsfitvnm.vimusic.utils.quickPicksSourceKey
 import it.vfsfitvnm.vimusic.utils.rememberPreference
 import kotlinx.coroutines.launch
 
+@SuppressLint("UnusedBoxWithConstraintsScope")
 @ExperimentalFoundationApi
 @ExperimentalAnimationApi
 @Composable
@@ -86,6 +89,7 @@ fun QuickPicks(
 ) {
     val binder = LocalPlayerServiceBinder.current
     val menuState = LocalMenuState.current
+    val playerPadding = LocalPlayerPadding.current
 
     val viewModel: QuickPicksViewModel = viewModel()
     val quickPicksSource by rememberPreference(quickPicksSourceKey, QuickPicksSource.Trending)
@@ -125,7 +129,7 @@ fun QuickPicks(
             modifier = Modifier
                 .fillMaxSize()
                 .verticalScroll(rememberScrollState())
-                .padding(top = 4.dp, bottom = 16.dp)
+                .padding(top = 4.dp, bottom = 16.dp + playerPadding)
         ) {
             viewModel.relatedPageResult?.getOrNull()?.let { related ->
                 Text(

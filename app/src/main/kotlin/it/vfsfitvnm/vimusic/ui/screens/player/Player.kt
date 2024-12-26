@@ -133,6 +133,7 @@ fun Player(
     }
 
     var isShowingLyrics by rememberSaveable { mutableStateOf(false) }
+    var fullScreenLyrics by remember { mutableStateOf(false) }
     var isShowingStatsForNerds by rememberSaveable { mutableStateOf(false) }
     var isQueueOpen by rememberSaveable { mutableStateOf(false) }
     var isShowingSleepTimerDialog by rememberSaveable { mutableStateOf(false) }
@@ -155,6 +156,8 @@ fun Player(
         Thumbnail(
             isShowingLyrics = isShowingLyrics,
             onShowLyrics = { isShowingLyrics = it },
+            fullScreenLyrics = fullScreenLyrics,
+            toggleFullScreenLyrics = { fullScreenLyrics = !fullScreenLyrics },
             isShowingStatsForNerds = isShowingStatsForNerds,
             onShowStatsForNerds = { isShowingStatsForNerds = it },
             modifier = modifier
@@ -219,12 +222,14 @@ fun Player(
                         )
                     }
 
-                    controlsContent(
-                        Modifier
-                            .padding(vertical = 8.dp)
-                            .fillMaxWidth()
-                            .weight(1f)
-                    )
+                    if (!fullScreenLyrics) {
+                        controlsContent(
+                            Modifier
+                                .padding(vertical = 8.dp)
+                                .fillMaxWidth()
+                                .weight(1f)
+                        )
+                    }
                 }
             }
         }

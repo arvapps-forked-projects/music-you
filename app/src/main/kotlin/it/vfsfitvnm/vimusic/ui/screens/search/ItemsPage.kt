@@ -30,6 +30,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import it.vfsfitvnm.innertube.Innertube
 import it.vfsfitvnm.innertube.utils.plus
+import it.vfsfitvnm.vimusic.LocalPlayerPadding
 import it.vfsfitvnm.vimusic.R
 import it.vfsfitvnm.vimusic.models.ItemsPageViewModel
 import it.vfsfitvnm.vimusic.ui.components.ShimmerHost
@@ -49,6 +50,8 @@ inline fun <T : Innertube.Item> ItemsPage(
     emptyItemsText: String = stringResource(id = R.string.no_items_found),
     noinline itemsPageProvider: (suspend (String?) -> Result<Innertube.ItemsPage<T>?>?)? = null,
 ) {
+    val playerPadding = LocalPlayerPadding.current
+
     val updatedItemsPageProvider by rememberUpdatedState(itemsPageProvider)
     val lazyGridState = rememberLazyGridState()
     val viewModel: ItemsPageViewModel<T> = viewModel()
@@ -96,7 +99,7 @@ inline fun <T : Innertube.Item> ItemsPage(
             start = if (listLayout) 0.dp else 8.dp,
             top = 8.dp,
             end = if (listLayout) 0.dp else 8.dp,
-            bottom = 16.dp
+            bottom = 16.dp + playerPadding
         ),
         verticalArrangement = Arrangement.spacedBy(if (listLayout) 0.dp else 4.dp),
         modifier = modifier.fillMaxSize()

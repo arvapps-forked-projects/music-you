@@ -37,6 +37,7 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import it.vfsfitvnm.vimusic.Database
+import it.vfsfitvnm.vimusic.LocalPlayerPadding
 import it.vfsfitvnm.vimusic.R
 import it.vfsfitvnm.vimusic.enums.ArtistSortBy
 import it.vfsfitvnm.vimusic.enums.SortOrder
@@ -52,6 +53,8 @@ import it.vfsfitvnm.vimusic.utils.rememberPreference
 fun HomeArtistList(
     onArtistClick: (Artist) -> Unit
 ) {
+    val playerPadding = LocalPlayerPadding.current
+
     var sortBy by rememberPreference(artistSortByKey, ArtistSortBy.Name)
     var sortOrder by rememberPreference(artistSortOrderKey, SortOrder.Ascending)
 
@@ -68,7 +71,7 @@ fun HomeArtistList(
 
     LazyVerticalGrid(
         columns = GridCells.Adaptive(minSize = 100.dp),
-        contentPadding = PaddingValues(start = 8.dp, end = 8.dp, bottom = 16.dp),
+        contentPadding = PaddingValues(start = 8.dp, end = 8.dp, bottom = 16.dp + playerPadding),
         verticalArrangement = Arrangement.spacedBy(4.dp),
         modifier = Modifier.fillMaxSize()
     ) {

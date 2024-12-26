@@ -22,6 +22,8 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Download
 import androidx.compose.material.icons.outlined.Edit
+import androidx.compose.material.icons.outlined.Fullscreen
+import androidx.compose.material.icons.outlined.FullscreenExit
 import androidx.compose.material.icons.outlined.MoreHoriz
 import androidx.compose.material.icons.outlined.Schedule
 import androidx.compose.material.icons.outlined.Search
@@ -67,6 +69,7 @@ import it.vfsfitvnm.vimusic.ui.components.themed.TextPlaceholder
 import it.vfsfitvnm.vimusic.ui.styling.Dimensions
 import it.vfsfitvnm.vimusic.ui.styling.onOverlay
 import it.vfsfitvnm.vimusic.utils.SynchronizedLyrics
+import it.vfsfitvnm.vimusic.utils.isLandscape
 import it.vfsfitvnm.vimusic.utils.isShowingSynchronizedLyricsKey
 import it.vfsfitvnm.vimusic.utils.rememberPreference
 import it.vfsfitvnm.vimusic.utils.toast
@@ -84,12 +87,14 @@ fun Lyrics(
     size: Dp,
     mediaMetadataProvider: () -> MediaMetadata,
     durationProvider: () -> Long,
-    ensureSongInserted: () -> Unit
+    ensureSongInserted: () -> Unit,
+    fullScreenLyrics: Boolean,
+    toggleFullScreenLyrics: () -> Unit
 ) {
     AnimatedVisibility(
         visible = isDisplayed,
         enter = fadeIn(),
-        exit = fadeOut(),
+        exit = fadeOut()
     ) {
         val context = LocalContext.current
         val menuState = LocalMenuState.current
@@ -317,6 +322,19 @@ fun Lyrics(
                             modifier = Modifier.alpha(1f - it * 0.2f)
                         )
                     }
+                }
+            }
+
+            if (!isLandscape) {
+                IconButton(
+                    onClick = toggleFullScreenLyrics,
+                    modifier = Modifier.align(Alignment.BottomStart)
+                ) {
+                    Icon(
+                        imageVector = if (fullScreenLyrics) Icons.Outlined.FullscreenExit else Icons.Outlined.Fullscreen,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.onOverlay
+                    )
                 }
             }
 
