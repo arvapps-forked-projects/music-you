@@ -80,15 +80,28 @@
     <string name="name">Name</string>
     <string name="year">Jahr</string>
     <string name="song_count">Anzahl der Lieder</string>
+    <string name="artist">Künstler</string>
     <string name="show_unsynchronized_lyrics">Unsynchronisierten Songtext anzeigen</string>
     <string name="show_synchronized_lyrics">Synchronisierten Songtext anzeigen</string>
     <string name="provided_by_kugou">Bereitgestellt von kugou.com</string>
     <string name="edit_lyrics">Songtext bearbeiten</string>
     <string name="search_lyrics_online">Songtexte online suchen</string>
-    <string name="song">Song</string>
-    <string name="artist">Künstler</string>
-    <string name="album">Alben</string>
-    <string name="playlist">Wiedergabeliste</string>
+    <plurals name="number_of_songs">
+        <item quantity="one">%d song</item>
+        <item quantity="other">%d songs</item>
+    </plurals>
+    <plurals name="number_of_artists">
+        <item quantity="one">%d künstler</item>
+        <item quantity="other">%d künstler</item>
+    </plurals>
+    <plurals name="number_of_albums">
+        <item quantity="one">%d alben</item>
+        <item quantity="other">%d alben</item>
+    </plurals>
+    <plurals name="number_of_playlists">
+        <item quantity="one">%d wiedergabeliste</item>
+        <item quantity="other">%d wiedergabelisten</item>
+    </plurals>
     <string name="hide_from_quick_picks">Empfehlungen löschen</string>
     <string name="more_from">Mehr von</string>
     <string name="no">Nein</string>

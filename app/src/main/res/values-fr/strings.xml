@@ -80,15 +80,32 @@
     <string name="name">Nom</string>
     <string name="year">Année</string>
     <string name="song_count">Nombre de titres</string>
+    <string name="artist">Artiste</string>
     <string name="show_unsynchronized_lyrics">Afficher les paroles non synchronisées</string>
     <string name="show_synchronized_lyrics">Afficher les paroles synchronisées</string>
     <string name="provided_by_kugou">Fourni par kugou.com</string>
     <string name="edit_lyrics">Modifier les paroles</string>
     <string name="search_lyrics_online">Rechercher des paroles en ligne</string>
-    <string name="song">Titre</string>
-    <string name="artist">Artiste</string>
-    <string name="album">Album</string>
-    <string name="playlist">Playlist</string>
+    <plurals name="number_of_songs">
+        <item quantity="one">%d titre</item>
+        <item quantity="many">%d titres</item>
+        <item quantity="other">%d titres</item>
+    </plurals>
+    <plurals name="number_of_artists">
+        <item quantity="one">%d artiste</item>
+        <item quantity="many">%d artistes</item>
+        <item quantity="other">%d artistes</item>
+    </plurals>
+    <plurals name="number_of_albums">
+        <item quantity="one">%d album</item>
+        <item quantity="many">%d albums</item>
+        <item quantity="other">%d albums</item>
+    </plurals>
+    <plurals name="number_of_playlists">
+        <item quantity="one">%d playlist</item>
+        <item quantity="many">%d listas</item>
+        <item quantity="other">%d playlists</item>
+    </plurals>
     <string name="hide_from_quick_picks">Masquer de la Sélection Rapide</string>
     <string name="more_from">Plus de</string>
     <string name="no">Non</string>

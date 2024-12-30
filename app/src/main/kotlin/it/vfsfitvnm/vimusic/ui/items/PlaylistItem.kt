@@ -1,5 +1,6 @@
 package it.vfsfitvnm.vimusic.ui.items
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -15,7 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.pluralStringResource
 import coil3.compose.AsyncImage
 import it.vfsfitvnm.innertube.Innertube
 import it.vfsfitvnm.vimusic.Database
@@ -27,6 +28,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 
+@SuppressLint("UnusedBoxWithConstraintsScope")
 @Composable
 fun PlaylistItem(
     modifier: Modifier = Modifier,
@@ -72,6 +74,7 @@ fun BuiltInPlaylistItem(
     }
 }
 
+@SuppressLint("UnusedBoxWithConstraintsScope")
 @Composable
 fun LocalPlaylistItem(
     modifier: Modifier = Modifier,
@@ -81,11 +84,11 @@ fun LocalPlaylistItem(
     ItemContainer(
         modifier = modifier,
         title = playlist.playlist.name,
-        subtitle = if (playlist.songCount == 1) {
-            "1 ${stringResource(id = R.string.song).lowercase()}"
-        } else {
-            "${playlist.songCount} ${stringResource(id = R.string.songs).lowercase()}"
-        },
+        subtitle = pluralStringResource(
+            id = R.plurals.number_of_songs,
+            count = playlist.songCount,
+            playlist.songCount
+        ),
         onClick = onClick
     ) {
         BoxWithConstraints(

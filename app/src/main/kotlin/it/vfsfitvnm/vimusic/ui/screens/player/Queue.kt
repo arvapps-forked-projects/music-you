@@ -51,6 +51,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.media3.common.MediaItem
@@ -279,9 +280,11 @@ fun Queue(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text =
-                    if (windows.size == 1) "1 ${stringResource(id = R.string.song).lowercase()}"
-                    else "${windows.size} ${stringResource(id = R.string.songs).lowercase()}",
+                    text = pluralStringResource(
+                        id = R.plurals.number_of_songs,
+                        count = windows.size,
+                        windows.size
+                    ),
                     style = MaterialTheme.typography.labelLarge,
                     modifier = Modifier.padding(start = 8.dp)
                 )
@@ -290,7 +293,8 @@ fun Queue(
                     TooltipIconButton(
                         description = R.string.shuffle,
                         onClick = {
-                            scope.launch { lazyListState.animateScrollToItem(0) }
+                            scope
+                                .launch { lazyListState.animateScrollToItem(0) }
                                 .invokeOnCompletion { player.shuffleQueue() }
                         },
                         icon = Icons.Outlined.Shuffle

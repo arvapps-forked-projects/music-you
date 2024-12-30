@@ -3,7 +3,6 @@ package it.vfsfitvnm.vimusic.ui.screens.home
 import androidx.annotation.OptIn
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
-import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
@@ -11,50 +10,39 @@ import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.PlaylistPlay
-import androidx.compose.material.icons.outlined.ArrowDownward
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.Shuffle
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -70,6 +58,7 @@ import it.vfsfitvnm.vimusic.models.ActionInfo
 import it.vfsfitvnm.vimusic.models.LocalMenuState
 import it.vfsfitvnm.vimusic.models.Song
 import it.vfsfitvnm.vimusic.query
+import it.vfsfitvnm.vimusic.ui.components.SortingHeader
 import it.vfsfitvnm.vimusic.ui.components.SwipeToActionBox
 import it.vfsfitvnm.vimusic.ui.components.themed.InHistoryMediaItemMenu
 import it.vfsfitvnm.vimusic.ui.items.LocalSongItem
@@ -99,11 +88,6 @@ fun HomeSongs(
     var sortBy by rememberPreference(songSortByKey, SongSortBy.Title)
     var sortOrder by rememberPreference(songSortOrderKey, SortOrder.Ascending)
     var items: List<Song> by remember { mutableStateOf(emptyList()) }
-    var isSorting by rememberSaveable { mutableStateOf(false) }
-    val sortOrderIconRotation by animateFloatAsState(
-        targetValue = if (sortOrder == SortOrder.Ascending) 0f else 180f,
-        label = "rotation"
-    )
 
     val scope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
@@ -153,66 +137,15 @@ fun HomeSongs(
                 key = "header",
                 span = { GridItemSpan(maxLineSpan) }
             ) {
-                Row(
-                    modifier = Modifier.padding(horizontal = 16.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    TextButton(
-                        onClick = { isSorting = true }
-                    ) {
-                        Text(text = stringResource(id = sortBy.text))
-                    }
-
-                    IconButton(
-                        onClick = { sortOrder = !sortOrder },
-                        modifier = Modifier.graphicsLayer { rotationZ = sortOrderIconRotation }
-                    ) {
-                        Icon(
-                            imageVector = Icons.Outlined.ArrowDownward,
-                            contentDescription = null,
-                            modifier = Modifier.size(16.dp),
-                            tint = MaterialTheme.colorScheme.primary
-                        )
-                    }
-
-                    Spacer(modifier = Modifier.weight(1F))
-
-                    Text(
-                        text =
-                        if (items.size == 1) "1 ${stringResource(id = R.string.song).lowercase()}"
-                        else "${items.size} ${stringResource(id = R.string.songs).lowercase()}",
-                        style = MaterialTheme.typography.labelLarge
-                    )
-
-                    DropdownMenu(
-                        expanded = isSorting,
-                        onDismissRequest = { isSorting = false }
-                    ) {
-                        SongSortBy.entries.forEach { entry ->
-                            DropdownMenuItem(
-                                text = {
-                                    Text(text = stringResource(id = entry.text))
-                                },
-                                onClick = {
-                                    isSorting = false
-                                    sortBy = entry
-                                },
-                                leadingIcon = {
-                                    Icon(
-                                        imageVector = entry.icon,
-                                        contentDescription = entry.name
-                                    )
-                                },
-                                trailingIcon = {
-                                    RadioButton(
-                                        selected = sortBy == entry,
-                                        onClick = { sortBy = entry }
-                                    )
-                                }
-                            )
-                        }
-                    }
-                }
+                SortingHeader(
+                    sortBy = sortBy,
+                    changeSortBy = { sortBy = it },
+                    sortByEntries = SongSortBy.entries.toList(),
+                    sortOrder = sortOrder,
+                    toggleSortOrder = { sortOrder = !sortOrder },
+                    size = items.size,
+                    itemCountText = R.plurals.number_of_songs
+                )
             }
 
             itemsIndexed(

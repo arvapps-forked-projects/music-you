@@ -8,11 +8,12 @@ import androidx.compose.material.icons.outlined.Schedule
 import androidx.compose.material.icons.outlined.SortByAlpha
 import androidx.compose.ui.graphics.vector.ImageVector
 import it.vfsfitvnm.vimusic.R
+import it.vfsfitvnm.vimusic.models.SortBy
 
 enum class SongSortBy(
-    @StringRes val text: Int,
-    val icon: ImageVector
-) {
+    @StringRes override val text: Int,
+    override val icon: ImageVector
+) : SortBy {
     PlayTime(
         text = R.string.play_time,
         icon = Icons.AutoMirrored.Outlined.TrendingUp

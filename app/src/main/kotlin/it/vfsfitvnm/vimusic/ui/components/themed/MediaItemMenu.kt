@@ -45,6 +45,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.onPlaced
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
@@ -392,9 +393,11 @@ fun MediaItemMenu(
                         MenuEntry(
                             icon = Icons.AutoMirrored.Outlined.QueueMusic,
                             text = playlistPreview.playlist.name,
-                            secondaryText =
-                            if (playlistPreview.songCount == 1) "1 ${stringResource(id = R.string.song).lowercase()}"
-                            else "${playlistPreview.songCount} ${stringResource(id = R.string.songs).lowercase()}",
+                            secondaryText = pluralStringResource(
+                                id = R.plurals.number_of_songs,
+                                count = playlistPreview.songCount,
+                                playlistPreview.songCount
+                            ),
                             onClick = {
                                 onDismiss()
                                 onAddToPlaylist(playlistPreview.playlist, playlistPreview.songCount)
