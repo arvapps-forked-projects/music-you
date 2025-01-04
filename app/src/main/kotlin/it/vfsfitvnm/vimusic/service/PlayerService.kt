@@ -24,6 +24,7 @@ import android.media.session.MediaSession
 import android.media.session.PlaybackState
 import android.net.Uri
 import android.os.Handler
+import android.support.v4.media.session.MediaSessionCompat
 import android.text.format.DateUtils
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -64,9 +65,7 @@ import androidx.media3.exoplayer.audio.SilenceSkippingAudioProcessor
 import androidx.media3.exoplayer.mediacodec.MediaCodecSelector
 import androidx.media3.exoplayer.source.DefaultMediaSourceFactory
 import androidx.media3.exoplayer.source.MediaSource
-import androidx.media3.extractor.ExtractorsFactory
-import androidx.media3.extractor.mkv.MatroskaExtractor
-import androidx.media3.extractor.mp4.FragmentedMp4Extractor
+import androidx.media3.extractor.DefaultExtractorsFactory
 import it.vfsfitvnm.innertube.Innertube
 import it.vfsfitvnm.innertube.models.NavigationEndpoint
 import it.vfsfitvnm.innertube.models.bodies.PlayerBody
@@ -119,7 +118,6 @@ import kotlin.math.roundToInt
 import kotlin.system.exitProcess
 import android.os.Binder as AndroidBinder
 
-@Suppress("DEPRECATION")
 @androidx.annotation.OptIn(androidx.media3.common.util.UnstableApi::class)
 class PlayerService : InvincibleService(), Player.Listener, PlaybackStatsListener.Callback,
     SharedPreferences.OnSharedPreferenceChangeListener {
@@ -168,7 +166,7 @@ class PlayerService : InvincibleService(), Player.Listener, PlaybackStatsListene
     private var isNotificationStarted = false
 
     override val notificationId: Int
-        get() = NotificationId
+        get() = NOTIFICATION_ID
 
     private lateinit var notificationActionReceiver: NotificationActionReceiver
 
@@ -303,7 +301,7 @@ class PlayerService : InvincibleService(), Player.Listener, PlaybackStatsListene
 
     override fun onConfigurationChanged(newConfig: Configuration) {
         if (bitmapProvider.setDefaultBitmap() && player.currentMediaItem != null) {
-            notificationManager?.notify(NotificationId, notification())
+            notificationManager?.notify(NOTIFICATION_ID, notification())
         }
         super.onConfigurationChanged(newConfig)
     }
@@ -369,9 +367,7 @@ class PlayerService : InvincibleService(), Player.Listener, PlaybackStatsListene
         var startIndex = currentMediaItemIndex - 7
         var endIndex = currentMediaItemIndex + 7
 
-        if (startIndex < 0) {
-            endIndex -= startIndex
-        }
+        if (startIndex < 0) endIndex -= startIndex
 
         if (endIndex > lastIndex) {
             startIndex -= (endIndex - lastIndex)
@@ -397,9 +393,7 @@ class PlayerService : InvincibleService(), Player.Listener, PlaybackStatsListene
     }
 
     private fun maybeRecoverPlaybackError() {
-        if (player.playerError != null) {
-            player.prepare()
-        }
+        if (player.playerError != null) player.prepare()
     }
 
     private fun maybeProcessRadio() {
@@ -460,7 +454,7 @@ class PlayerService : InvincibleService(), Player.Listener, PlaybackStatsListene
 
                 isNotificationStarted = true
                 startForegroundService(this@PlayerService, intent<PlayerService>())
-                startForeground(NotificationId, notification())
+                startForeground(NOTIFICATION_ID, notification())
             }
         }
     }
@@ -486,7 +480,8 @@ class PlayerService : InvincibleService(), Player.Listener, PlaybackStatsListene
                     try {
                         loudnessEnhancer?.setTargetGain(-((loudnessDb ?: 0f) * 100).toInt() + 500)
                         loudnessEnhancer?.enabled = true
-                    } catch (_: Exception) { }
+                    } catch (_: Exception) {
+                    }
                 }
             }
         }
@@ -571,6 +566,7 @@ class PlayerService : InvincibleService(), Player.Listener, PlaybackStatsListene
             else -> PlaybackState.STATE_NONE
         }
 
+    @Suppress("DEPRECATION")
     override fun onEvents(player: Player, events: Player.Events) {
         if (player.duration != C.TIME_UNSET) {
             mediaSession.setMetadata(
@@ -603,14 +599,14 @@ class PlayerService : InvincibleService(), Player.Listener, PlaybackStatsListene
                 makeInvincible(false)
                 stopForeground(false)
                 sendCloseEqualizerIntent()
-                notificationManager?.cancel(NotificationId)
+                notificationManager?.cancel(NOTIFICATION_ID)
                 return
             }
 
             if (player.shouldBePlaying && !isNotificationStarted) {
                 isNotificationStarted = true
                 startForegroundService(this@PlayerService, intent<PlayerService>())
-                startForeground(NotificationId, notification)
+                startForeground(NOTIFICATION_ID, notification)
                 makeInvincible(false)
                 sendOpenEqualizerIntent()
             } else {
@@ -620,7 +616,7 @@ class PlayerService : InvincibleService(), Player.Listener, PlaybackStatsListene
                     makeInvincible(true)
                     sendCloseEqualizerIntent()
                 }
-                notificationManager?.notify(NotificationId, notification)
+                notificationManager?.notify(NOTIFICATION_ID, notification)
             }
         }
     }
@@ -672,11 +668,7 @@ class PlayerService : InvincibleService(), Player.Listener, PlaybackStatsListene
 
         val mediaMetadata = player.mediaMetadata
 
-        val builder = if (isAtLeastAndroid8) {
-            Notification.Builder(applicationContext, NotificationChannelId)
-        } else {
-            Notification.Builder(applicationContext)
-        }
+        val builder = NotificationCompat.Builder(applicationContext, NOTIFICATION_CHANNEL_ID)
             .setContentTitle(mediaMetadata.title)
             .setContentText(mediaMetadata.artist)
             .setSubText(player.playerError?.message)
@@ -689,16 +681,14 @@ class PlayerService : InvincibleService(), Player.Listener, PlaybackStatsListene
             .setOngoing(false)
             .setContentIntent(activityPendingIntent<MainActivity>(
                 flags = PendingIntent.FLAG_UPDATE_CURRENT
-            ) {
-                putExtra("expandPlayerBottomSheet", true)
-            })
+            ) { putExtra("expandPlayerBottomSheet", true) })
             .setDeleteIntent(broadCastPendingIntent<NotificationDismissReceiver>())
-            .setVisibility(Notification.VISIBILITY_PUBLIC)
+            .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
             .setCategory(NotificationCompat.CATEGORY_TRANSPORT)
             .setStyle(
-                Notification.MediaStyle()
+                androidx.media.app.NotificationCompat.MediaStyle()
                     .setShowActionsInCompactView(0, 1, 2)
-                    .setMediaSession(mediaSession.sessionToken)
+                    .setMediaSession(MediaSessionCompat.Token.fromToken(mediaSession.sessionToken))
             )
             .addAction(R.drawable.play_skip_back, "Skip back", prevIntent)
             .addAction(
@@ -710,7 +700,7 @@ class PlayerService : InvincibleService(), Player.Listener, PlaybackStatsListene
 
         bitmapProvider.load(mediaMetadata.artworkUri) { bitmap ->
             maybeShowSongCoverInLockScreen()
-            notificationManager?.notify(NotificationId, builder.setLargeIcon(bitmap).build())
+            notificationManager?.notify(NOTIFICATION_ID, builder.setLargeIcon(bitmap).build())
         }
 
         return builder.build()
@@ -722,10 +712,10 @@ class PlayerService : InvincibleService(), Player.Listener, PlaybackStatsListene
         if (!isAtLeastAndroid8) return
 
         notificationManager?.run {
-            if (getNotificationChannel(NotificationChannelId) == null) {
+            if (getNotificationChannel(NOTIFICATION_CHANNEL_ID) == null) {
                 createNotificationChannel(
                     NotificationChannel(
-                        NotificationChannelId,
+                        NOTIFICATION_CHANNEL_ID,
                         getString(R.string.now_playing),
                         NotificationManager.IMPORTANCE_LOW
                     ).apply {
@@ -736,10 +726,10 @@ class PlayerService : InvincibleService(), Player.Listener, PlaybackStatsListene
                 )
             }
 
-            if (getNotificationChannel(SleepTimerNotificationChannelId) == null) {
+            if (getNotificationChannel(SLEEP_TIMER_NOTIFICATION_CHANNEL_ID) == null) {
                 createNotificationChannel(
                     NotificationChannel(
-                        SleepTimerNotificationChannelId,
+                        SLEEP_TIMER_NOTIFICATION_CHANNEL_ID,
                         getString(R.string.sleep_timer),
                         NotificationManager.IMPORTANCE_LOW
                     ).apply {
@@ -847,13 +837,7 @@ class PlayerService : InvincibleService(), Player.Listener, PlaybackStatsListene
     }
 
     private fun createMediaSourceFactory(): MediaSource.Factory {
-        return DefaultMediaSourceFactory(createDataSourceFactory(), createExtractorsFactory())
-    }
-
-    private fun createExtractorsFactory(): ExtractorsFactory {
-        return ExtractorsFactory {
-            arrayOf(MatroskaExtractor(), FragmentedMp4Extractor())
-        }
+        return DefaultMediaSourceFactory(createDataSourceFactory(), DefaultExtractorsFactory())
     }
 
     private fun createRendersFactory(): RenderersFactory {
@@ -864,7 +848,7 @@ class PlayerService : InvincibleService(), Player.Listener, PlaybackStatsListene
             .setAudioProcessorChain(
                 DefaultAudioProcessorChain(
                     emptyArray(),
-                    SilenceSkippingAudioProcessor(2_000_000, 20_000, 256),
+                    SilenceSkippingAudioProcessor(2_000_000, 0.01f, 2_000_000, 0, 256),
                     SonicAudioProcessor()
                 )
             )
@@ -906,7 +890,7 @@ class PlayerService : InvincibleService(), Player.Listener, PlaybackStatsListene
 
             timerJob = coroutineScope.timer(delayMillis) {
                 val notification = NotificationCompat
-                    .Builder(this@PlayerService, SleepTimerNotificationChannelId)
+                    .Builder(this@PlayerService, SLEEP_TIMER_NOTIFICATION_CHANNEL_ID)
                     .setContentTitle(getString(R.string.sleep_timer_ended))
                     .setPriority(NotificationCompat.PRIORITY_DEFAULT)
                     .setAutoCancel(true)
@@ -915,7 +899,7 @@ class PlayerService : InvincibleService(), Player.Listener, PlaybackStatsListene
                     .setSmallIcon(R.drawable.app_icon)
                     .build()
 
-                notificationManager?.notify(SleepTimerNotificationId, notification)
+                notificationManager?.notify(SLEEP_TIMER_NOTIFICATION_ID, notification)
 
                 stopSelf()
                 exitProcess(0)
@@ -970,7 +954,8 @@ class PlayerService : InvincibleService(), Player.Listener, PlaybackStatsListene
         override fun onSeekTo(pos: Long) = player.seekTo(pos)
         override fun onStop() = player.pause()
         override fun onRewind() = player.seekToDefaultPosition()
-        override fun onSkipToQueueItem(id: Long) = runCatching { player.seekToDefaultPosition(id.toInt()) }.let { }
+        override fun onSkipToQueueItem(id: Long) =
+            runCatching { player.seekToDefaultPosition(id.toInt()) }.let { }
     }
 
     private class NotificationActionReceiver(private val player: Player) : BroadcastReceiver() {
@@ -1010,10 +995,10 @@ class PlayerService : InvincibleService(), Player.Listener, PlaybackStatsListene
     }
 
     private companion object {
-        const val NotificationId = 1001
-        const val NotificationChannelId = "default_channel_id"
+        const val NOTIFICATION_ID = 1001
+        const val NOTIFICATION_CHANNEL_ID = "default_channel_id"
 
-        const val SleepTimerNotificationId = 1002
-        const val SleepTimerNotificationChannelId = "sleep_timer_channel_id"
+        const val SLEEP_TIMER_NOTIFICATION_ID = 1002
+        const val SLEEP_TIMER_NOTIFICATION_CHANNEL_ID = "sleep_timer_channel_id"
     }
 }
