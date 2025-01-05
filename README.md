@@ -19,27 +19,27 @@ An Android application for streaming music from YouTube Music.
 
 ### 🗒️ New features
 
-- Material You
+- Material You redesign
 - Multilingual support
 - Quick picks selection customization
-- Settings redesign
+- Swipe to enqueue and delete songs
 
 ## 🌐 Available languages
 
 - English
 - Spanish
-- German (thanks to [@siggi1984](https://github.com/siggi1984))
-- French (thanks to [@patxixi](https://github.com/patxixi))
+- German ([@siggi1984](https://github.com/siggi1984))
+- French ([@patxixi](https://github.com/patxixi) and [@Mickael81](https://github.com/Mickael81))
 
 ## 📸 Screenshots
 
-<div style="text-align: center">
-    <img src="./screenshots/screenshot_player.png" alt="Player" style="width: 30%; border-radius: 10px">
-    <img src="./screenshots/screenshot_home.png" alt="Home" style="width: 30%; border-radius: 10px">
-    <img src="./screenshots/screenshot_artist.png" alt="Artist" style="width: 30%; border-radius: 10px">
-    <img src="./screenshots/screenshot_songs.png" alt="Songs" style="width: 30%; border-radius: 10px">
-    <img src="./screenshots/screenshot_artists.png" alt="Artists" style="width: 30%; border-radius: 10px">
-    <img src="./screenshots/screenshot_albums.png" alt="Albums" style="width: 30%; border-radius: 10px">
+<div>
+    <img src="./screenshots/screenshot_player.png" alt="Player" style="width: 30%;">
+    <img src="./screenshots/screenshot_home.png" alt="Home" style="width: 30%;">
+    <img src="./screenshots/screenshot_artist.png" alt="Artist" style="width: 30%;">
+    <img src="./screenshots/screenshot_songs.png" alt="Songs" style="width: 30%;">
+    <img src="./screenshots/screenshot_artists.png" alt="Artists" style="width: 30%;">
+    <img src="./screenshots/screenshot_albums.png" alt="Albums" style="width: 30%;">
 </div>
 
 ## 📲 Installation

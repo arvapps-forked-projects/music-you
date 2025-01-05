@@ -1,4 +1,4 @@
-package it.vfsfitvnm.vimusic.models
+package it.vfsfitvnm.vimusic.viewmodels
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -9,6 +9,7 @@ import it.vfsfitvnm.innertube.Innertube
 import it.vfsfitvnm.innertube.models.bodies.BrowseBody
 import it.vfsfitvnm.innertube.requests.artistPage
 import it.vfsfitvnm.vimusic.Database
+import it.vfsfitvnm.vimusic.models.Artist
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -18,6 +19,7 @@ import kotlinx.coroutines.withContext
 class ArtistViewModel : ViewModel() {
     var artist: Artist? by mutableStateOf(null)
     var artistPage: Innertube.ArtistPage? by mutableStateOf(null)
+
     suspend fun loadArtist(browseId: String, tabIndex: Int) {
         Database
             .artist(browseId)
@@ -32,7 +34,7 @@ class ArtistViewModel : ViewModel() {
                             ?.onSuccess { currentArtistPage ->
                                 artistPage = currentArtistPage
 
-                                Database.upsert(
+                                Database.Companion.upsert(
                                     Artist(
                                         id = browseId,
                                         name = currentArtistPage.name,

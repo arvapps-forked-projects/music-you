@@ -35,7 +35,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
@@ -47,6 +46,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.media3.common.util.UnstableApi
 import it.vfsfitvnm.vimusic.Database
 import it.vfsfitvnm.vimusic.LocalPlayerPadding
@@ -71,6 +71,7 @@ import it.vfsfitvnm.vimusic.utils.forcePlayFromBeginning
 import it.vfsfitvnm.vimusic.utils.rememberPreference
 import it.vfsfitvnm.vimusic.utils.songSortByKey
 import it.vfsfitvnm.vimusic.utils.songSortOrderKey
+import it.vfsfitvnm.vimusic.viewmodels.HomeSongsViewModel
 import kotlinx.coroutines.launch
 
 @OptIn(UnstableApi::class)
@@ -87,15 +88,18 @@ fun HomeSongs(
 
     var sortBy by rememberPreference(songSortByKey, SongSortBy.Title)
     var sortOrder by rememberPreference(songSortOrderKey, SortOrder.Ascending)
-    var items: List<Song> by remember { mutableStateOf(emptyList()) }
 
+    val viewModel: HomeSongsViewModel = viewModel()
     val scope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
     val snackbarMessage = stringResource(id = R.string.song_deleted_library)
     val snackBarActionLabel = stringResource(id = R.string.undo)
 
     LaunchedEffect(sortBy, sortOrder) {
-        Database.songs(sortBy, sortOrder).collect { items = it }
+        viewModel.loadSongs(
+            sortBy = sortBy,
+            sortOrder = sortOrder
+        )
     }
 
     Scaffold(
@@ -104,7 +108,7 @@ fun HomeSongs(
         },
         floatingActionButton = {
             AnimatedVisibility(
-                visible = items.isNotEmpty(),
+                visible = viewModel.items.isNotEmpty(),
                 enter = fadeIn() + scaleIn(),
                 exit = scaleOut() + fadeOut()
             ) {
@@ -112,7 +116,7 @@ fun HomeSongs(
                     onClick = {
                         binder?.stopRadio()
                         binder?.player?.forcePlayFromBeginning(
-                            items.shuffled().map(Song::asMediaItem)
+                            viewModel.items.shuffled().map(Song::asMediaItem)
                         )
                     },
                     modifier = Modifier.padding(bottom = playerPadding)
@@ -128,7 +132,7 @@ fun HomeSongs(
     ) { paddingValues ->
         LazyVerticalGrid(
             columns = GridCells.Adaptive(minSize = 400.dp),
-            contentPadding = PaddingValues(bottom = if (items.isNotEmpty()) 16.dp + 72.dp + playerPadding else 16.dp + playerPadding),
+            contentPadding = PaddingValues(bottom = if (viewModel.items.isNotEmpty()) 16.dp + 72.dp + playerPadding else 16.dp + playerPadding),
             modifier = Modifier
                 .fillMaxSize()
                 .consumeWindowInsets(paddingValues)
@@ -143,13 +147,13 @@ fun HomeSongs(
                     sortByEntries = SongSortBy.entries.toList(),
                     sortOrder = sortOrder,
                     toggleSortOrder = { sortOrder = !sortOrder },
-                    size = items.size,
+                    size = viewModel.items.size,
                     itemCountText = R.plurals.number_of_songs
                 )
             }
 
             itemsIndexed(
-                items = items,
+                items = viewModel.items,
                 key = { _, song -> song.id }
             ) { index, song ->
                 SwipeToActionBox(
@@ -198,7 +202,7 @@ fun HomeSongs(
                         onClick = {
                             binder?.stopRadio()
                             binder?.player?.forcePlayAtIndex(
-                                items.map(Song::asMediaItem),
+                                viewModel.items.map(Song::asMediaItem),
                                 index
                             )
                         },

@@ -32,9 +32,9 @@ import it.vfsfitvnm.innertube.Innertube
 import it.vfsfitvnm.innertube.utils.plus
 import it.vfsfitvnm.vimusic.LocalPlayerPadding
 import it.vfsfitvnm.vimusic.R
-import it.vfsfitvnm.vimusic.models.ItemsPageViewModel
 import it.vfsfitvnm.vimusic.ui.components.ShimmerHost
 import it.vfsfitvnm.vimusic.ui.styling.Dimensions
+import it.vfsfitvnm.vimusic.viewmodels.ItemsPageViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 

@@ -1,4 +1,4 @@
-package it.vfsfitvnm.vimusic.models
+package it.vfsfitvnm.vimusic.viewmodels
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -9,6 +9,7 @@ import it.vfsfitvnm.innertube.models.bodies.NextBody
 import it.vfsfitvnm.innertube.requests.relatedPage
 import it.vfsfitvnm.vimusic.Database
 import it.vfsfitvnm.vimusic.enums.QuickPicksSource
+import it.vfsfitvnm.vimusic.models.Song
 import kotlinx.coroutines.flow.distinctUntilChanged
 
 class QuickPicksViewModel : ViewModel() {

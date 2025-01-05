@@ -17,12 +17,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import it.vfsfitvnm.vimusic.Database
 import it.vfsfitvnm.vimusic.LocalPlayerPadding
 import it.vfsfitvnm.vimusic.R
@@ -30,7 +30,6 @@ import it.vfsfitvnm.vimusic.enums.BuiltInPlaylist
 import it.vfsfitvnm.vimusic.enums.PlaylistSortBy
 import it.vfsfitvnm.vimusic.enums.SortOrder
 import it.vfsfitvnm.vimusic.models.Playlist
-import it.vfsfitvnm.vimusic.models.PlaylistPreview
 import it.vfsfitvnm.vimusic.query
 import it.vfsfitvnm.vimusic.ui.components.SortingHeader
 import it.vfsfitvnm.vimusic.ui.components.themed.TextFieldDialog
@@ -39,6 +38,7 @@ import it.vfsfitvnm.vimusic.ui.items.LocalPlaylistItem
 import it.vfsfitvnm.vimusic.utils.playlistSortByKey
 import it.vfsfitvnm.vimusic.utils.playlistSortOrderKey
 import it.vfsfitvnm.vimusic.utils.rememberPreference
+import it.vfsfitvnm.vimusic.viewmodels.HomePlaylistsViewModel
 
 @ExperimentalAnimationApi
 @ExperimentalFoundationApi
@@ -52,10 +52,14 @@ fun HomePlaylists(
     var isCreatingANewPlaylist by rememberSaveable { mutableStateOf(false) }
     var sortBy by rememberPreference(playlistSortByKey, PlaylistSortBy.Name)
     var sortOrder by rememberPreference(playlistSortOrderKey, SortOrder.Ascending)
-    var items: List<PlaylistPreview> by remember { mutableStateOf(emptyList()) }
+
+    val viewModel: HomePlaylistsViewModel = viewModel()
 
     LaunchedEffect(sortBy, sortOrder) {
-        Database.playlistPreviews(sortBy, sortOrder).collect { items = it }
+        viewModel.loadArtists(
+            sortBy = sortBy,
+            sortOrder = sortOrder
+        )
     }
 
     if (isCreatingANewPlaylist) {
@@ -89,7 +93,7 @@ fun HomePlaylists(
                 sortByEntries = PlaylistSortBy.entries.toList(),
                 sortOrder = sortOrder,
                 toggleSortOrder = { sortOrder = !sortOrder },
-                size = items.size,
+                size = viewModel.items.size,
                 itemCountText = R.plurals.number_of_playlists
             )
         }
@@ -118,7 +122,10 @@ fun HomePlaylists(
             )
         }
 
-        items(items = items, key = { it.playlist.id }) { playlistPreview ->
+        items(
+            items = viewModel.items,
+            key = { it.playlist.id }
+        ) { playlistPreview ->
             LocalPlaylistItem(
                 modifier = Modifier.animateItem(),
                 playlist = playlistPreview,

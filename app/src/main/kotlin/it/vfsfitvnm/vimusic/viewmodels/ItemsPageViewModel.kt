@@ -1,4 +1,4 @@
-package it.vfsfitvnm.vimusic.models
+package it.vfsfitvnm.vimusic.viewmodels
 
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.lifecycle.ViewModel

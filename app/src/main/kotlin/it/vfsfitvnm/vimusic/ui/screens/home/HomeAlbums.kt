@@ -12,12 +12,10 @@ import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import it.vfsfitvnm.vimusic.Database
+import androidx.lifecycle.viewmodel.compose.viewModel
 import it.vfsfitvnm.vimusic.LocalPlayerPadding
 import it.vfsfitvnm.vimusic.R
 import it.vfsfitvnm.vimusic.enums.AlbumSortBy
@@ -28,6 +26,7 @@ import it.vfsfitvnm.vimusic.ui.items.LocalAlbumItem
 import it.vfsfitvnm.vimusic.utils.albumSortByKey
 import it.vfsfitvnm.vimusic.utils.albumSortOrderKey
 import it.vfsfitvnm.vimusic.utils.rememberPreference
+import it.vfsfitvnm.vimusic.viewmodels.HomeAlbumsViewModel
 
 @ExperimentalFoundationApi
 @ExperimentalAnimationApi
@@ -35,12 +34,16 @@ import it.vfsfitvnm.vimusic.utils.rememberPreference
 fun HomeAlbums(onAlbumClick: (Album) -> Unit) {
     val playerPadding = LocalPlayerPadding.current
 
-    var items: List<Album> by remember { mutableStateOf(emptyList()) }
     var sortBy by rememberPreference(albumSortByKey, AlbumSortBy.Title)
     var sortOrder by rememberPreference(albumSortOrderKey, SortOrder.Ascending)
 
+    val viewModel: HomeAlbumsViewModel = viewModel()
+
     LaunchedEffect(sortBy, sortOrder) {
-        Database.albums(sortBy, sortOrder).collect { items = it }
+        viewModel.loadAlbums(
+            sortBy = sortBy,
+            sortOrder = sortOrder
+        )
     }
 
     LazyVerticalGrid(
@@ -59,13 +62,13 @@ fun HomeAlbums(onAlbumClick: (Album) -> Unit) {
                 sortByEntries = AlbumSortBy.entries.toList(),
                 sortOrder = sortOrder,
                 toggleSortOrder = { sortOrder = !sortOrder },
-                size = items.size,
+                size = viewModel.items.size,
                 itemCountText = R.plurals.number_of_albums
             )
         }
 
         items(
-            items = items,
+            items = viewModel.items,
             key = Album::id
         ) { album ->
             LocalAlbumItem(

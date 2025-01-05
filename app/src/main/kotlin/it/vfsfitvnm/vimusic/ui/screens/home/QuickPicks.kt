@@ -56,7 +56,6 @@ import it.vfsfitvnm.vimusic.LocalPlayerServiceBinder
 import it.vfsfitvnm.vimusic.R
 import it.vfsfitvnm.vimusic.enums.QuickPicksSource
 import it.vfsfitvnm.vimusic.models.LocalMenuState
-import it.vfsfitvnm.vimusic.models.QuickPicksViewModel
 import it.vfsfitvnm.vimusic.query
 import it.vfsfitvnm.vimusic.ui.components.ShimmerHost
 import it.vfsfitvnm.vimusic.ui.components.themed.NonQueuedMediaItemMenu
@@ -75,6 +74,7 @@ import it.vfsfitvnm.vimusic.utils.forcePlay
 import it.vfsfitvnm.vimusic.utils.isLandscape
 import it.vfsfitvnm.vimusic.utils.quickPicksSourceKey
 import it.vfsfitvnm.vimusic.utils.rememberPreference
+import it.vfsfitvnm.vimusic.viewmodels.QuickPicksViewModel
 import kotlinx.coroutines.launch
 
 @SuppressLint("UnusedBoxWithConstraintsScope")
@@ -103,7 +103,7 @@ fun QuickPicks(
         .padding(bottom = 8.dp)
 
     LaunchedEffect(quickPicksSource) {
-        viewModel.loadQuickPicks(quickPicksSource)
+        viewModel.loadQuickPicks(quickPicksSource = quickPicksSource)
     }
 
     BoxWithConstraints {

@@ -30,7 +30,6 @@ import it.vfsfitvnm.innertube.utils.from
 import it.vfsfitvnm.vimusic.Database
 import it.vfsfitvnm.vimusic.LocalPlayerServiceBinder
 import it.vfsfitvnm.vimusic.R
-import it.vfsfitvnm.vimusic.models.ArtistViewModel
 import it.vfsfitvnm.vimusic.models.LocalMenuState
 import it.vfsfitvnm.vimusic.models.Section
 import it.vfsfitvnm.vimusic.query
@@ -47,6 +46,7 @@ import it.vfsfitvnm.vimusic.utils.artistScreenTabIndexKey
 import it.vfsfitvnm.vimusic.utils.asMediaItem
 import it.vfsfitvnm.vimusic.utils.forcePlay
 import it.vfsfitvnm.vimusic.utils.rememberPreference
+import it.vfsfitvnm.vimusic.viewmodels.ArtistViewModel
 import kotlinx.coroutines.launch
 
 @ExperimentalFoundationApi

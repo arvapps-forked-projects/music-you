@@ -12,12 +12,10 @@ import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import it.vfsfitvnm.vimusic.Database
+import androidx.lifecycle.viewmodel.compose.viewModel
 import it.vfsfitvnm.vimusic.LocalPlayerPadding
 import it.vfsfitvnm.vimusic.R
 import it.vfsfitvnm.vimusic.enums.ArtistSortBy
@@ -28,6 +26,7 @@ import it.vfsfitvnm.vimusic.ui.items.LocalArtistItem
 import it.vfsfitvnm.vimusic.utils.artistSortByKey
 import it.vfsfitvnm.vimusic.utils.artistSortOrderKey
 import it.vfsfitvnm.vimusic.utils.rememberPreference
+import it.vfsfitvnm.vimusic.viewmodels.HomeArtistsViewModel
 
 @ExperimentalFoundationApi
 @ExperimentalAnimationApi
@@ -37,10 +36,14 @@ fun HomeArtistList(onArtistClick: (Artist) -> Unit) {
 
     var sortBy by rememberPreference(artistSortByKey, ArtistSortBy.Name)
     var sortOrder by rememberPreference(artistSortOrderKey, SortOrder.Ascending)
-    var items: List<Artist> by remember { mutableStateOf(emptyList()) }
+
+    val viewModel: HomeArtistsViewModel = viewModel()
 
     LaunchedEffect(sortBy, sortOrder) {
-        Database.artists(sortBy, sortOrder).collect { items = it }
+        viewModel.loadArtists(
+            sortBy = sortBy,
+            sortOrder = sortOrder
+        )
     }
 
     LazyVerticalGrid(
@@ -59,12 +62,12 @@ fun HomeArtistList(onArtistClick: (Artist) -> Unit) {
                 sortByEntries = ArtistSortBy.entries.toList(),
                 sortOrder = sortOrder,
                 toggleSortOrder = { sortOrder = !sortOrder },
-                size = items.size,
+                size = viewModel.items.size,
                 itemCountText = R.plurals.number_of_artists
             )
         }
 
-        items(items = items, key = Artist::id) { artist ->
+        items(items = viewModel.items, key = Artist::id) { artist ->
             LocalArtistItem(
                 modifier = Modifier.animateItem(),
                 artist = artist,

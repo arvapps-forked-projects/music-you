@@ -15,20 +15,15 @@ import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
-import androidx.compose.material3.NavigationBar
-import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SheetValue
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.material3.rememberStandardBottomSheetState
 import androidx.compose.runtime.CompositionLocalProvider
@@ -43,8 +38,6 @@ import androidx.compose.runtime.snapshotFlow
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalLayoutDirection
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
@@ -52,27 +45,20 @@ import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.lifecycleScope
 import androidx.media3.common.MediaItem
 import androidx.media3.common.Player
-import androidx.navigation.NavDestination.Companion.hierarchy
-import androidx.navigation.NavGraph.Companion.findStartDestination
-import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import it.vfsfitvnm.innertube.Innertube
 import it.vfsfitvnm.innertube.models.bodies.BrowseBody
 import it.vfsfitvnm.innertube.requests.playlistPage
 import it.vfsfitvnm.innertube.requests.song
-import it.vfsfitvnm.vimusic.enums.NavigationLabelsVisibility
 import it.vfsfitvnm.vimusic.models.LocalMenuState
-import it.vfsfitvnm.vimusic.models.Screen
 import it.vfsfitvnm.vimusic.service.PlayerService
+import it.vfsfitvnm.vimusic.ui.components.BottomNavigation
 import it.vfsfitvnm.vimusic.ui.screens.Navigation
 import it.vfsfitvnm.vimusic.ui.screens.player.PlayerScaffold
 import it.vfsfitvnm.vimusic.ui.styling.AppTheme
 import it.vfsfitvnm.vimusic.utils.asMediaItem
 import it.vfsfitvnm.vimusic.utils.forcePlay
-import it.vfsfitvnm.vimusic.utils.homeScreenTabIndexKey
 import it.vfsfitvnm.vimusic.utils.intent
-import it.vfsfitvnm.vimusic.utils.navigationLabelsVisibilityKey
-import it.vfsfitvnm.vimusic.utils.rememberPreference
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
@@ -128,24 +114,6 @@ class MainActivity : ComponentActivity() {
                     CompositionLocalProvider(value = LocalPlayerServiceBinder provides binder) {
                         val layoutDirection = LocalLayoutDirection.current
                         val menuState = LocalMenuState.current
-                        val navBackStackEntry by navController.currentBackStackEntryAsState()
-                        val currentDestination = navBackStackEntry?.destination
-                        var navigationLabelsVisibility by rememberPreference(
-                            navigationLabelsVisibilityKey,
-                            NavigationLabelsVisibility.Visible
-                        )
-                        val (_, onScreenChanged) = rememberPreference(
-                            homeScreenTabIndexKey,
-                            defaultValue = 0
-                        )
-
-                        val homeScreens = listOf(
-                            Screen.Home,
-                            Screen.Songs,
-                            Screen.Artists,
-                            Screen.Albums,
-                            Screen.Playlists
-                        )
 
                         Scaffold(
                             bottomBar = {
@@ -154,45 +122,7 @@ class MainActivity : ComponentActivity() {
                                     enter = slideInVertically(initialOffsetY = { it / 2 }),
                                     exit = slideOutVertically(targetOffsetY = { it })
                                 ) {
-                                    NavigationBar(
-                                        modifier = if (navigationLabelsVisibility == NavigationLabelsVisibility.Hidden) Modifier.heightIn(
-                                            max = 90.dp
-                                        ) else Modifier
-                                    ) {
-                                        homeScreens.forEachIndexed { index, screen ->
-                                            val selected =
-                                                currentDestination?.hierarchy?.any { it.route == screen.route } == true
-
-                                            NavigationBarItem(
-                                                selected = selected,
-                                                onClick = {
-                                                    if (!selected) {
-                                                        onScreenChanged(index)
-                                                        navController.navigate(screen.route) {
-                                                            popUpTo(navController.graph.findStartDestination().id)
-                                                            launchSingleTop = true
-                                                        }
-                                                    }
-                                                },
-                                                icon = {
-                                                    Icon(
-                                                        imageVector = if (selected) screen.selectedIcon else screen.unselectedIcon,
-                                                        contentDescription = stringResource(id = screen.resourceId)
-                                                    )
-                                                },
-                                                label = {
-                                                    if (navigationLabelsVisibility != NavigationLabelsVisibility.Hidden) {
-                                                        Text(
-                                                            text = stringResource(id = screen.resourceId),
-                                                            maxLines = 1,
-                                                            overflow = TextOverflow.Ellipsis
-                                                        )
-                                                    }
-                                                },
-                                                alwaysShowLabel = navigationLabelsVisibility != NavigationLabelsVisibility.VisibleWhenActive
-                                            )
-                                        }
-                                    }
+                                    BottomNavigation(navController = navController)
                                 }
                             }
                         ) { paddingValues ->
@@ -221,7 +151,6 @@ class MainActivity : ComponentActivity() {
                                 }
                             }
                         }
-
 
                         if (menuState.isDisplayed) {
                             ModalBottomSheet(
