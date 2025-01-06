@@ -13,11 +13,9 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
@@ -37,7 +35,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
@@ -112,7 +109,6 @@ class MainActivity : ComponentActivity() {
             AppTheme {
                 Box(modifier = Modifier.fillMaxSize()) {
                     CompositionLocalProvider(value = LocalPlayerServiceBinder provides binder) {
-                        val layoutDirection = LocalLayoutDirection.current
                         val menuState = LocalMenuState.current
 
                         Scaffold(
@@ -131,24 +127,10 @@ class MainActivity : ComponentActivity() {
                                 sheetState = playerState,
                                 scaffoldPadding = paddingValues
                             ) {
-                                Surface(
-                                    modifier = Modifier.windowInsetsPadding(
-                                        WindowInsets(
-                                            left = paddingValues.calculateLeftPadding(
-                                                layoutDirection
-                                            ),
-                                            right = paddingValues.calculateRightPadding(
-                                                layoutDirection
-                                            )
-                                        )
-                                    ),
-                                    color = MaterialTheme.colorScheme.background
-                                ) {
-                                    Navigation(
-                                        navController = navController,
-                                        sheetState = playerState
-                                    )
-                                }
+                                Navigation(
+                                    navController = navController,
+                                    sheetState = playerState
+                                )
                             }
                         }
 
