@@ -30,6 +30,7 @@ An Android application for streaming music from YouTube Music.
 - Spanish
 - German ([@siggi1984](https://github.com/siggi1984))
 - French ([@patxixi](https://github.com/patxixi) and [@Mickael81](https://github.com/Mickael81))
+- Italian ([@F3FFO](https://github.com/F3FFO))
 
 ## 📸 Screenshots
 
