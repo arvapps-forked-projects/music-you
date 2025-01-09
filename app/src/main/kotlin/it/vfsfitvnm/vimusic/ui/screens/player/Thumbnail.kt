@@ -63,6 +63,7 @@ import it.vfsfitvnm.vimusic.utils.currentWindow
 import it.vfsfitvnm.vimusic.utils.forceSeekToNext
 import it.vfsfitvnm.vimusic.utils.forceSeekToPrevious
 import it.vfsfitvnm.vimusic.utils.thumbnail
+import java.io.EOFException
 import java.net.UnknownHostException
 import java.nio.channels.UnresolvedAddressException
 
@@ -110,9 +111,12 @@ fun Thumbnail(
                 when (error?.cause?.cause) {
                     is PlayableFormatNotFoundException, is UnplayableException, is LoginRequiredException, is VideoIdMismatchException -> player.seekToNext()
                     else -> {
-                        if (error?.cause is ParserException) player.currentMediaItem?.let {
-                            binder.cache.removeResource(it.mediaId)
+                        when (error?.cause) {
+                            is ParserException, is IllegalStateException, is EOFException -> player.currentMediaItem?.let {
+                                binder.cache.removeResource(it.mediaId)
+                            }
                         }
+
                         player.prepare()
                     }
                 }

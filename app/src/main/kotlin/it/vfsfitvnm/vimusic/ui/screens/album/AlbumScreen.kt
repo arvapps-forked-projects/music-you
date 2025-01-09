@@ -36,6 +36,7 @@ import it.vfsfitvnm.vimusic.ui.items.AlbumItem
 import it.vfsfitvnm.vimusic.ui.items.ItemPlaceholder
 import it.vfsfitvnm.vimusic.ui.screens.search.ItemsPage
 import it.vfsfitvnm.vimusic.utils.asMediaItem
+import it.vfsfitvnm.vimusic.utils.completed
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.withContext
@@ -68,6 +69,7 @@ fun AlbumScreen(
                 if (albumPage == null && (currentAlbum?.timestamp == null || tabIndex == 1)) {
                     withContext(Dispatchers.IO) {
                         Innertube.albumPage(BrowseBody(browseId = browseId))
+                            ?.completed()
                             ?.onSuccess { currentAlbumPage ->
                                 albumPage = currentAlbumPage
 
