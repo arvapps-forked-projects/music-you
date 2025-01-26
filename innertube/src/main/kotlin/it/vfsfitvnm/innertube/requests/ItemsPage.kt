@@ -19,7 +19,7 @@ suspend fun <T : Innertube.Item> Innertube.itemsPage(
     fromMusicResponsiveListItemRenderer: (MusicResponsiveListItemRenderer) -> T? = { null },
     fromMusicTwoRowItemRenderer: (MusicTwoRowItemRenderer) -> T? = { null },
 ) = runCatchingNonCancellable {
-    val response = client.post(browse) {
+    val response = client.post(BROWSE) {
         setBody(body)
 //        mask("contents.singleColumnBrowseResultsRenderer.tabs.tabRenderer.content.sectionListRenderer.contents(musicPlaylistShelfRenderer(continuations,contents.$musicResponsiveListItemRendererMask),gridRenderer(continuations,items.$musicTwoRowItemRendererMask))")
     }.body<BrowseResponse>()
@@ -50,7 +50,7 @@ suspend fun <T : Innertube.Item> Innertube.itemsPage(
     fromMusicResponsiveListItemRenderer: (MusicResponsiveListItemRenderer) -> T? = { null },
     fromMusicTwoRowItemRenderer: (MusicTwoRowItemRenderer) -> T? = { null },
 ) = runCatchingNonCancellable {
-    val response = client.post(browse) {
+    val response = client.post(BROWSE) {
         setBody(body)
 //        mask("contents.singleColumnBrowseResultsRenderer.tabs.tabRenderer.content.sectionListRenderer.contents(musicPlaylistShelfRenderer(continuations,contents.$musicResponsiveListItemRendererMask),gridRenderer(continuations,items.$musicTwoRowItemRendererMask))")
     }.body<ContinuationResponse>()

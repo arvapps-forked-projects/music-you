@@ -46,16 +46,19 @@ object Innertube {
         }
     }
 
-    internal const val browse = "/youtubei/v1/browse"
-    internal const val next = "/youtubei/v1/next"
-    internal const val player = "/youtubei/v1/player"
-    internal const val queue = "/youtubei/v1/music/get_queue"
-    internal const val search = "/youtubei/v1/search"
-    internal const val searchSuggestions = "/youtubei/v1/music/get_search_suggestions"
+    internal const val BROWSE = "/youtubei/v1/browse"
+    internal const val NEXT = "/youtubei/v1/next"
+    internal const val PLAYER = "/youtubei/v1/player"
+    internal const val QUEUE = "/youtubei/v1/music/get_queue"
+    internal const val SEARCH = "/youtubei/v1/search"
+    internal const val SEARCH_SUGGESTIONS = "/youtubei/v1/music/get_search_suggestions"
 
-    internal const val musicResponsiveListItemRendererMask = "musicResponsiveListItemRenderer(flexColumns,fixedColumns,thumbnail,navigationEndpoint)"
-    internal const val musicTwoRowItemRendererMask = "musicTwoRowItemRenderer(thumbnailRenderer,title,subtitle,navigationEndpoint)"
-    const val playlistPanelVideoRendererMask = "playlistPanelVideoRenderer(title,navigationEndpoint,longBylineText,shortBylineText,thumbnail,lengthText)"
+    internal const val MUSIC_RESPONSIVE_LIST_ITEM_RENDERER_MASK =
+        "musicResponsiveListItemRenderer(flexColumns,fixedColumns,thumbnail,navigationEndpoint)"
+    internal const val MUSIC_TWO_ROW_ITEM_RENDERER_MASK =
+        "musicTwoRowItemRenderer(thumbnailRenderer,title,subtitle,navigationEndpoint)"
+    const val PLAYLIST_PANEL_VIDEO_RENDERER_MASK =
+        "playlistPanelVideoRenderer(title,navigationEndpoint,longBylineText,shortBylineText,thumbnail,lengthText)"
 
     internal fun HttpRequestBuilder.mask(value: String = "*") =
         header("X-Goog-FieldMask", value)
@@ -115,13 +118,6 @@ object Innertube {
                 ?.watchEndpointMusicSupportedConfigs
                 ?.watchEndpointMusicConfig
                 ?.musicVideoType == "MUSIC_VIDEO_TYPE_OMV"
-
-        val isUserGeneratedContent: Boolean
-            get() = info
-                ?.endpoint
-                ?.watchEndpointMusicSupportedConfigs
-                ?.watchEndpointMusicConfig
-                ?.musicVideoType == "MUSIC_VIDEO_TYPE_UGC"
 
         companion object
     }

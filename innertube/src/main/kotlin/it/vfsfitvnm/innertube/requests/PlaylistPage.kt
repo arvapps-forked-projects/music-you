@@ -14,7 +14,7 @@ import it.vfsfitvnm.innertube.utils.from
 import it.vfsfitvnm.innertube.utils.runCatchingNonCancellable
 
 suspend fun Innertube.playlistPage(body: BrowseBody) = runCatchingNonCancellable {
-    val response = client.post(browse) {
+    val response = client.post(BROWSE) {
         setBody(body)
     }.body<BrowseResponse>()
 
@@ -80,9 +80,9 @@ suspend fun Innertube.playlistPage(body: BrowseBody) = runCatchingNonCancellable
 }
 
 suspend fun Innertube.playlistPage(body: ContinuationBody) = runCatchingNonCancellable {
-    val response = client.post(browse) {
+    val response = client.post(BROWSE) {
         setBody(body)
-        mask("continuationContents.musicPlaylistShelfContinuation(continuations,contents.$musicResponsiveListItemRendererMask)")
+        mask("continuationContents.musicPlaylistShelfContinuation(continuations,contents.$MUSIC_RESPONSIVE_LIST_ITEM_RENDERER_MASK)")
     }.body<ContinuationResponse>()
 
     response

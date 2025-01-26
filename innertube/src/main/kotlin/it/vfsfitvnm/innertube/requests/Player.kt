@@ -14,7 +14,7 @@ import it.vfsfitvnm.innertube.utils.runCatchingNonCancellable
 import kotlinx.serialization.Serializable
 
 suspend fun Innertube.player(body: PlayerBody) = runCatchingNonCancellable {
-    val response = client.post(player) {
+    val response = client.post(PLAYER) {
         setBody(
             body.copy(context = Context.DefaultIOS)
         )
@@ -35,7 +35,7 @@ suspend fun Innertube.player(body: PlayerBody) = runCatchingNonCancellable {
             val audioStreams: List<AudioStream>
         )
 
-        val safePlayerResponse = client.post(player) {
+        val safePlayerResponse = client.post(PLAYER) {
             setBody(
                 body.copy(
                     context = Context.DefaultAgeRestrictionBypass.copy(
