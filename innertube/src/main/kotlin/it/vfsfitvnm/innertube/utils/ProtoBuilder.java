@@ -3,6 +3,7 @@ package it.vfsfitvnm.innertube.utils;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.UncheckedIOException;
+import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
@@ -18,10 +19,13 @@ public class ProtoBuilder {
         return byteBuffer.toByteArray();
     }
 
-    @SuppressWarnings("NewApi")
     public String toUrlencodedBase64() {
         final String b64 = Base64.getUrlEncoder().encodeToString(toBytes());
-        return URLEncoder.encode(b64, StandardCharsets.UTF_8);
+        try {
+            return URLEncoder.encode(b64, StandardCharsets.UTF_8.toString());
+        } catch (UnsupportedEncodingException e) {
+            throw new RuntimeException("UTF-8 encoding not supported", e);
+        }
     }
 
     private void writeVarint(final long val) {

@@ -43,8 +43,12 @@ class BitmapProvider(
     fun setDefaultBitmap(): Boolean {
         val isSystemInDarkMode = resources.configuration.uiMode and
                 Configuration.UI_MODE_NIGHT_MASK == Configuration.UI_MODE_NIGHT_YES
+        var previousBitmap: Bitmap? = null
 
-        if (::defaultBitmap.isInitialized && isSystemInDarkMode == lastIsSystemInDarkMode) return false
+        if (::defaultBitmap.isInitialized) {
+            if (isSystemInDarkMode == lastIsSystemInDarkMode) return false
+            previousBitmap = defaultBitmap
+        }
 
         lastIsSystemInDarkMode = isSystemInDarkMode
 
@@ -52,6 +56,7 @@ class BitmapProvider(
             Bitmap.createBitmap(bitmapSize, bitmapSize, Bitmap.Config.ARGB_8888).applyCanvas {
                 drawColor(colorProvider(isSystemInDarkMode))
             }
+        previousBitmap?.recycle()
 
         return lastBitmap == null
     }
