@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -140,7 +141,7 @@ fun Queue(
         Column(
             modifier = Modifier
                 .background(BottomSheetDefaults.ContainerColor)
-                .padding(bottom = paddingValues.calculateBottomPadding())
+                .consumeWindowInsets(paddingValues)
         ) {
             LazyColumn(
                 state = lazyListState,
@@ -169,6 +170,8 @@ fun Queue(
                                     player.removeMediaItem(itemIndex)
 
                                     scope.launch {
+                                        snackbarHostState.currentSnackbarData?.dismiss()
+
                                         val result = snackbarHostState.showSnackbar(
                                             message = snackbarMessage,
                                             actionLabel = snackbarActionLabel,

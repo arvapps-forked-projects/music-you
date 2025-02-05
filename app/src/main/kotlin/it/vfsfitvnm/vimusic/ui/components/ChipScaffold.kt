@@ -59,7 +59,7 @@ fun ChipScaffold(
         Surface(
             modifier = Modifier
                 .fillMaxSize()
-                .consumeCustomWindowInsets(paddingValues)
+                .padding(top = paddingValues.calculateTopPadding())
         ) {
             AnimatedContent(
                 targetState = tabIndex,

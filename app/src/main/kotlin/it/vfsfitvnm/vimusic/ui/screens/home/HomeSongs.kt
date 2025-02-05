@@ -174,6 +174,8 @@ fun HomeSongs(
                             }
 
                             scope.launch {
+                                snackbarHostState.currentSnackbarData?.dismiss()
+
                                 val result = snackbarHostState.showSnackbar(
                                     message = snackbarMessage,
                                     actionLabel = snackBarActionLabel,

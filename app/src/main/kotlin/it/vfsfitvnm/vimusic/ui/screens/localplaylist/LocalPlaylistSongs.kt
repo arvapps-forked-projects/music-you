@@ -4,6 +4,7 @@ import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -97,7 +98,10 @@ fun LocalPlaylistSongs(
 
     Scaffold(
         snackbarHost = {
-            SnackbarHost(hostState = snackbarHostState)
+            SnackbarHost(
+                hostState = snackbarHostState,
+                modifier = Modifier.padding(bottom = playerPadding - 16.dp)
+            )
         }
     ) { paddingValues ->
         LazyColumn(
@@ -105,7 +109,7 @@ fun LocalPlaylistSongs(
             contentPadding = PaddingValues(top = 16.dp, bottom = 16.dp + playerPadding),
             modifier = Modifier
                 .fillMaxSize()
-                .padding(bottom = paddingValues.calculateBottomPadding()),
+                .consumeWindowInsets(paddingValues),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             item(key = "thumbnail") {
@@ -173,6 +177,8 @@ fun LocalPlaylistSongs(
                                 }
 
                                 scope.launch {
+                                    snackbarHostState.currentSnackbarData?.dismiss()
+
                                     val result = snackbarHostState.showSnackbar(
                                         message = snackbarMessage,
                                         actionLabel = snackBarActionLabel,
