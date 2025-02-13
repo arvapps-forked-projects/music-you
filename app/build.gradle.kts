@@ -81,6 +81,7 @@ dependencies {
     implementation(libs.reorderable)
     implementation(libs.room)
     ksp(libs.room.compiler)
+    implementation(projects.github)
     implementation(projects.innertube)
     implementation(projects.kugou)
     coreLibraryDesugaring(libs.desugaring)

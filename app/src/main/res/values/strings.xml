@@ -180,4 +180,10 @@
     <string name="visible">Visible</string>
     <string name="visible_when_active">Visible when active</string>
     <string name="hidden">Hidden</string>
+    <string name="check_for_updates">Check for updates</string>
+    <string name="checking_for_updates">Checking for updates</string>
+    <string name="new_version_available">New version available</string>
+    <string name="no_updates_available">No updates available</string>
+    <string name="version">Version %s</string>
+    <string name="open_in_github">Open in GitHub</string>
 </resources>

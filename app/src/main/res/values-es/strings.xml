@@ -179,4 +179,10 @@
     <string name="visible">Visibles</string>
     <string name="visible_when_active">Visibles cuando están seleccionadas</string>
     <string name="hidden">Ocultas</string>
+    <string name="check_for_updates">Comprobar actualizaciones</string>
+    <string name="checking_for_updates">Buscando actualizaciones</string>
+    <string name="new_version_available">Nueva versión disponible</string>
+    <string name="no_updates_available">No hay actualizaciones disponibles</string>
+    <string name="version">Versión %s</string>
+    <string name="open_in_github">Abrir en GitHub</string>
 </resources>
