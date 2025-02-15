@@ -51,7 +51,9 @@ import it.vfsfitvnm.vimusic.ui.styling.px
 import it.vfsfitvnm.vimusic.utils.DisposableListener
 import it.vfsfitvnm.vimusic.utils.forceSeekToNext
 import it.vfsfitvnm.vimusic.utils.forceSeekToPrevious
+import it.vfsfitvnm.vimusic.utils.miniplayerGesturesEnabledKey
 import it.vfsfitvnm.vimusic.utils.positionAndDurationState
+import it.vfsfitvnm.vimusic.utils.rememberPreference
 import it.vfsfitvnm.vimusic.utils.shouldBePlaying
 import it.vfsfitvnm.vimusic.utils.thumbnail
 import kotlin.math.absoluteValue
@@ -65,13 +67,12 @@ fun MiniPlayer(
     val binder = LocalPlayerServiceBinder.current
     binder?.player ?: return
 
-    var nullableMediaItem by remember {
-        mutableStateOf(
-            binder.player.currentMediaItem,
-            neverEqualPolicy()
-        )
-    }
+    var miniplayerGesturesEnabled by rememberPreference(miniplayerGesturesEnabledKey, true)
     var shouldBePlaying by remember { mutableStateOf(binder.player.shouldBePlaying) }
+
+    var nullableMediaItem by remember {
+        mutableStateOf(binder.player.currentMediaItem, neverEqualPolicy())
+    }
 
     binder.player.DisposableListener {
         object : Player.Listener {
@@ -126,7 +127,8 @@ fun MiniPlayer(
                     )
                 }
             }
-        }
+        },
+        gesturesEnabled = miniplayerGesturesEnabled
     ) {
         Column(modifier = Modifier.clickable(onClick = openPlayer)) {
             ListItem(

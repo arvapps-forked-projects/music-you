@@ -49,6 +49,7 @@ fun SettingsPage(
             when (section) {
                 SettingsSection.General -> GeneralSettings()
                 SettingsSection.Player -> PlayerSettings()
+                SettingsSection.Gestures -> GestureSettings()
                 SettingsSection.Cache -> CacheSettings()
                 SettingsSection.Database -> DatabaseSettings()
                 SettingsSection.Other -> OtherSettings()

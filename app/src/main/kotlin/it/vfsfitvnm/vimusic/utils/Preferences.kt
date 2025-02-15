@@ -35,6 +35,9 @@ const val artistScreenTabIndexKey = "artistScreenTabIndex"
 const val pauseSearchHistoryKey = "pauseSearchHistory"
 const val quickPicksSourceKey = "quickPicksSource"
 const val navigationLabelsVisibilityKey = "navigationLabelsVisibility"
+const val listGesturesEnabledKey = "listGesturesEnabled"
+const val playerGesturesEnabledKey = "songGesturesEnabled"
+const val miniplayerGesturesEnabledKey = "miniplayerGesturesEnabled"
 
 inline fun <reified T : Enum<T>> SharedPreferences.getEnum(
     key: String,
@@ -43,7 +46,7 @@ inline fun <reified T : Enum<T>> SharedPreferences.getEnum(
     getString(key, null)?.let {
         try {
             enumValueOf<T>(it)
-        } catch (e: IllegalArgumentException) {
+        } catch (_: IllegalArgumentException) {
             null
         }
     } ?: defaultValue

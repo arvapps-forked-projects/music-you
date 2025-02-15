@@ -62,6 +62,8 @@ import it.vfsfitvnm.vimusic.utils.DisposableListener
 import it.vfsfitvnm.vimusic.utils.currentWindow
 import it.vfsfitvnm.vimusic.utils.forceSeekToNext
 import it.vfsfitvnm.vimusic.utils.forceSeekToPrevious
+import it.vfsfitvnm.vimusic.utils.playerGesturesEnabledKey
+import it.vfsfitvnm.vimusic.utils.rememberPreference
 import it.vfsfitvnm.vimusic.utils.thumbnail
 import java.io.EOFException
 import java.net.UnknownHostException
@@ -82,16 +84,12 @@ fun Thumbnail(
     val binder = LocalPlayerServiceBinder.current
     val player = binder?.player ?: return
 
+    var playerGesturesEnabled by rememberPreference(playerGesturesEnabledKey, true)
+    var nullableWindow by remember { mutableStateOf(player.currentWindow) }
+    var error by remember { mutableStateOf<PlaybackException?>(player.playerError) }
+
     val (thumbnailSizeDp, thumbnailSizePx) = Dimensions.thumbnails.player.song.let {
         it to (it - 64.dp).px
-    }
-
-    var nullableWindow by remember {
-        mutableStateOf(player.currentWindow)
-    }
-
-    var error by remember {
-        mutableStateOf<PlaybackException?>(player.playerError)
     }
 
     player.DisposableListener {
@@ -203,7 +201,8 @@ fun Thumbnail(
                     }
                 }
             },
-            modifier = modifier.clip(MaterialTheme.shapes.large)
+            modifier = modifier.clip(MaterialTheme.shapes.large),
+            gesturesEnabled = playerGesturesEnabled
         ) {
             Box(
                 modifier = Modifier

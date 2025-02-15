@@ -3,6 +3,7 @@ package it.vfsfitvnm.vimusic.enums
 import androidx.annotation.StringRes
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.More
+import androidx.compose.material.icons.outlined.Gesture
 import androidx.compose.material.icons.outlined.History
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.PlayArrow
@@ -22,6 +23,10 @@ enum class SettingsSection(
     Player(
         resourceId = R.string.player,
         icon = Icons.Outlined.PlayArrow
+    ),
+    Gestures(
+        resourceId = R.string.gestures,
+        icon = Icons.Outlined.Gesture
     ),
     Cache(
         resourceId = R.string.cache,
