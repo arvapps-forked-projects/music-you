@@ -191,4 +191,6 @@
     <string name="list_gestures">List gestures</string>
     <string name="player_gestures_description">Enable gestures to skip to the next or previous song</string>
     <string name="list_gestures_description">Enable gestures to enqueue or delete songs</string>
+    <string name="copy">Copy</string>
+    <string name="error_log">Error log</string>
 </resources>

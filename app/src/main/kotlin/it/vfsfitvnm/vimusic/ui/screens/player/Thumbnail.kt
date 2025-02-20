@@ -41,7 +41,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.media3.common.MediaItem
 import androidx.media3.common.ParserException
@@ -51,7 +50,6 @@ import androidx.media3.common.util.UnstableApi
 import coil3.compose.AsyncImage
 import it.vfsfitvnm.vimusic.Database
 import it.vfsfitvnm.vimusic.LocalPlayerServiceBinder
-import it.vfsfitvnm.vimusic.R
 import it.vfsfitvnm.vimusic.service.LoginRequiredException
 import it.vfsfitvnm.vimusic.service.PlayableFormatNotFoundException
 import it.vfsfitvnm.vimusic.service.UnplayableException
@@ -66,8 +64,6 @@ import it.vfsfitvnm.vimusic.utils.playerGesturesEnabledKey
 import it.vfsfitvnm.vimusic.utils.rememberPreference
 import it.vfsfitvnm.vimusic.utils.thumbnail
 import java.io.EOFException
-import java.net.UnknownHostException
-import java.nio.channels.UnresolvedAddressException
 
 @OptIn(ExperimentalFoundationApi::class)
 @ExperimentalAnimationApi
@@ -244,34 +240,15 @@ fun Thumbnail(
                     toggleFullScreenLyrics = toggleFullScreenLyrics
                 )
 
-                if (isShowingStatsForNerds && error == null) {
+                if (isShowingStatsForNerds) {
                     StatsForNerds(
                         mediaId = currentWindow.mediaItem.mediaId,
                         onDismiss = { onShowStatsForNerds(false) }
                     )
                 }
 
-                val networkErrorText = stringResource(id = R.string.network_error)
-                val playableFormatNotFoundText =
-                    stringResource(id = R.string.playable_format_not_found_error)
-                val videoSourceDeletedText =
-                    stringResource(id = R.string.video_source_deleted_error)
-                val serverRestrictionsText = stringResource(id = R.string.server_restrictions_error)
-                val idMismatchText = stringResource(id = R.string.id_mismatch_error)
-                val unkownPlayBackErrorText = stringResource(id = R.string.unknown_playback_error)
-
                 PlaybackError(
-                    isDisplayed = error != null,
-                    messageProvider = {
-                        when (error?.cause?.cause) {
-                            is UnresolvedAddressException, is UnknownHostException -> networkErrorText
-                            is PlayableFormatNotFoundException -> playableFormatNotFoundText
-                            is UnplayableException -> videoSourceDeletedText
-                            is LoginRequiredException -> serverRestrictionsText
-                            is VideoIdMismatchException -> idMismatchText
-                            else -> unkownPlayBackErrorText
-                        }
-                    },
+                    error = error,
                     onDismiss = player::prepare
                 )
             }
