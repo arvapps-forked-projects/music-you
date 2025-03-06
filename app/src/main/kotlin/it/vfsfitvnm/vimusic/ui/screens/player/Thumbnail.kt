@@ -33,6 +33,7 @@ import androidx.compose.material3.SwipeToDismissBoxValue
 import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -43,17 +44,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import androidx.media3.common.MediaItem
-import androidx.media3.common.ParserException
 import androidx.media3.common.PlaybackException
 import androidx.media3.common.Player
 import androidx.media3.common.util.UnstableApi
 import coil3.compose.AsyncImage
 import it.vfsfitvnm.vimusic.Database
 import it.vfsfitvnm.vimusic.LocalPlayerServiceBinder
-import it.vfsfitvnm.vimusic.service.LoginRequiredException
-import it.vfsfitvnm.vimusic.service.PlayableFormatNotFoundException
-import it.vfsfitvnm.vimusic.service.UnplayableException
-import it.vfsfitvnm.vimusic.service.VideoIdMismatchException
 import it.vfsfitvnm.vimusic.ui.styling.Dimensions
 import it.vfsfitvnm.vimusic.ui.styling.px
 import it.vfsfitvnm.vimusic.utils.DisposableListener
@@ -63,7 +59,6 @@ import it.vfsfitvnm.vimusic.utils.forceSeekToPrevious
 import it.vfsfitvnm.vimusic.utils.playerGesturesEnabledKey
 import it.vfsfitvnm.vimusic.utils.rememberPreference
 import it.vfsfitvnm.vimusic.utils.thumbnail
-import java.io.EOFException
 
 @OptIn(ExperimentalFoundationApi::class)
 @ExperimentalAnimationApi
@@ -83,6 +78,7 @@ fun Thumbnail(
     var playerGesturesEnabled by rememberPreference(playerGesturesEnabledKey, true)
     var nullableWindow by remember { mutableStateOf(player.currentWindow) }
     var error by remember { mutableStateOf<PlaybackException?>(player.playerError) }
+    var errorCounter by remember(error) { mutableIntStateOf(0) }
 
     val (thumbnailSizeDp, thumbnailSizePx) = Dimensions.thumbnails.player.song.let {
         it to (it - 64.dp).px
@@ -102,17 +98,9 @@ fun Thumbnail(
             override fun onPlayerError(playbackException: PlaybackException) {
                 error = playbackException
 
-                when (error?.cause?.cause) {
-                    is PlayableFormatNotFoundException, is UnplayableException, is LoginRequiredException, is VideoIdMismatchException -> player.seekToNext()
-                    else -> {
-                        when (error?.cause) {
-                            is ParserException, is IllegalStateException, is EOFException -> player.currentMediaItem?.let {
-                                binder.cache.removeResource(it.mediaId)
-                            }
-                        }
-
-                        player.prepare()
-                    }
+                if (errorCounter == 0) {
+                    player.prepare()
+                    errorCounter += 1
                 }
             }
         }

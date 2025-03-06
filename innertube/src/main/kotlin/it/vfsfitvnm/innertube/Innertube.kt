@@ -2,7 +2,6 @@ package it.vfsfitvnm.innertube
 
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.okhttp.OkHttp
-import io.ktor.client.plugins.BrowserUserAgent
 import io.ktor.client.plugins.compression.ContentEncoding
 import io.ktor.client.plugins.compression.brotli
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
@@ -10,22 +9,18 @@ import io.ktor.client.plugins.defaultRequest
 import io.ktor.client.request.HttpRequestBuilder
 import io.ktor.client.request.header
 import io.ktor.http.ContentType
-import io.ktor.http.HttpHeaders
+import io.ktor.http.contentType
 import io.ktor.serialization.kotlinx.json.json
 import it.vfsfitvnm.innertube.models.NavigationEndpoint
 import it.vfsfitvnm.innertube.models.Runs
 import it.vfsfitvnm.innertube.models.Thumbnail
-import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
 
 object Innertube {
     val client = HttpClient(OkHttp) {
-        BrowserUserAgent()
-
         expectSuccess = true
 
         install(ContentNegotiation) {
-            @OptIn(ExperimentalSerializationApi::class)
             json(Json {
                 ignoreUnknownKeys = true
                 explicitNulls = false
@@ -39,12 +34,16 @@ object Innertube {
 
         defaultRequest {
             url(scheme = "https", host ="music.youtube.com") {
-                headers.append(HttpHeaders.ContentType, ContentType.Application.Json.toString())
+                contentType(ContentType.Application.Json)
                 headers.append("X-Goog-Api-Key", "AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8")
                 parameters.append("prettyPrint", "false")
             }
         }
     }
+
+    var visitorData: String? = null
+
+    const val VISITOR_DATA_PREFIX = "Cgt"
 
     internal const val BROWSE = "/youtubei/v1/browse"
     internal const val NEXT = "/youtubei/v1/next"

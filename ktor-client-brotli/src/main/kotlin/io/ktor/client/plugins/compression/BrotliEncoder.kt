@@ -15,14 +15,14 @@ internal object BrotliEncoder : ContentEncoder {
         source: ByteReadChannel,
         coroutineContext: CoroutineContext
     ): ByteReadChannel {
-        TODO("BrotliOutputStream not available (https://github.com/google/brotli/issues/715)")
+        error("BrotliOutputStream not available (https://github.com/google/brotli/issues/715)")
     }
 
     override fun encode(
         source: ByteWriteChannel,
         coroutineContext: CoroutineContext
     ): ByteWriteChannel {
-        TODO("BrotliOutputStream not available (https://github.com/google/brotli/issues/715)")
+        error("BrotliOutputStream not available (https://github.com/google/brotli/issues/715)")
     }
 
     override fun decode(
