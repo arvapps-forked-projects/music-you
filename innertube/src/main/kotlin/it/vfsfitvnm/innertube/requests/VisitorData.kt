@@ -14,6 +14,6 @@ suspend fun Innertube.visitorData(): Result<String> = runCatching {
     Json.parseToJsonElement(getSwJsData().bodyAsText().substring(5))
         .jsonArray[0]
         .jsonArray[2]
-        .jsonArray.first { (it as? JsonPrimitive)?.content?.startsWith(VISITOR_DATA_PREFIX) == true }
+        .jsonArray.first { (it as? JsonPrimitive)?.content?.startsWith("Cgt") == true }
         .jsonPrimitive.content
 }

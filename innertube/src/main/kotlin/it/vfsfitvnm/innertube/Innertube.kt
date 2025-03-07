@@ -43,8 +43,6 @@ object Innertube {
 
     var visitorData: String? = null
 
-    const val VISITOR_DATA_PREFIX = "Cgt"
-
     internal const val BROWSE = "/youtubei/v1/browse"
     internal const val NEXT = "/youtubei/v1/next"
     internal const val PLAYER = "/youtubei/v1/player"
