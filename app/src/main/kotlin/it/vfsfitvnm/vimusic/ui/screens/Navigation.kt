@@ -1,10 +1,8 @@
 package it.vfsfitvnm.vimusic.ui.screens
 
 import androidx.activity.compose.BackHandler
-import androidx.compose.animation.AnimatedContentTransitionScope
+import androidx.compose.animation.AnimatedContentScope
 import androidx.compose.animation.ExperimentalAnimationApi
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.SheetState
@@ -12,6 +10,9 @@ import androidx.compose.material3.SheetValue
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.lifecycle.Lifecycle
+import androidx.navigation.NamedNavArgument
+import androidx.navigation.NavBackStackEntry
+import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -32,6 +33,11 @@ import it.vfsfitvnm.vimusic.ui.screens.settings.SettingsScreen
 import it.vfsfitvnm.vimusic.utils.homeScreenTabIndexKey
 import it.vfsfitvnm.vimusic.utils.rememberPreference
 import kotlinx.coroutines.launch
+import soup.compose.material.motion.animation.materialFadeThroughIn
+import soup.compose.material.motion.animation.materialFadeThroughOut
+import soup.compose.material.motion.animation.materialSharedAxisXIn
+import soup.compose.material.motion.animation.materialSharedAxisXOut
+import soup.compose.material.motion.animation.rememberSlideDistance
 
 @OptIn(
     ExperimentalFoundationApi::class,
@@ -44,6 +50,7 @@ fun Navigation(
     sheetState: SheetState
 ) {
     val scope = rememberCoroutineScope()
+    val slideDistance = rememberSlideDistance()
     val (screenIndex, _) = rememberPreference(homeScreenTabIndexKey, defaultValue = 0)
     val homeRoutes = listOf(
         Screen.Home,
@@ -53,143 +60,106 @@ fun Navigation(
         Screen.Playlists
     ).map { it.route }
 
-    @Composable
-    fun SheetBackHandler() {
-        BackHandler(enabled = sheetState.currentValue == SheetValue.Expanded) {
-            scope.launch { sheetState.partialExpand() }
-        }
-    }
-
     NavHost(
         navController = navController,
         startDestination = homeRoutes.getOrElse(screenIndex) { Screen.Home.route },
-        enterTransition = { slideIntoContainer(AnimatedContentTransitionScope.SlideDirection.Left) + fadeIn() },
-        exitTransition = { fadeOut() },
-        popEnterTransition = { slideIntoContainer(AnimatedContentTransitionScope.SlideDirection.Right) + fadeIn() }
+        enterTransition = {
+            if (homeRoutes.contains(targetState.destination.route)) materialFadeThroughIn()
+            else materialSharedAxisXIn(
+                forward = true,
+                slideDistance = slideDistance
+            )
+        },
+        exitTransition = {
+            if (homeRoutes.contains(targetState.destination.route)) materialFadeThroughOut()
+            else materialSharedAxisXOut(
+                forward = true,
+                slideDistance = slideDistance
+            )
+        },
+        popEnterTransition = {
+            if (
+                homeRoutes.contains(initialState.destination.route) &&
+                homeRoutes.contains(targetState.destination.route)
+            ) materialFadeThroughIn()
+            else materialSharedAxisXIn(
+                forward = false,
+                slideDistance = slideDistance
+            )
+        },
+        popExitTransition = {
+            if (
+                homeRoutes.contains(initialState.destination.route) &&
+                homeRoutes.contains(targetState.destination.route)
+            ) materialFadeThroughOut()
+            else materialSharedAxisXOut(
+                forward = false,
+                slideDistance = slideDistance
+            )
+        }
     ) {
         val navigateToAlbum =
             { browseId: String -> navController.navigate(route = "album/$browseId") }
-        val navigateToArtist = { browseId: String -> navController.navigate("artist/$browseId") }
+        val navigateToArtist =
+            { browseId: String -> navController.navigate("artist/$browseId") }
         val popDestination = {
-            if (navController.currentBackStackEntry?.lifecycle?.currentState == Lifecycle.State.RESUMED) navController.popBackStack()
+            if (navController.currentBackStackEntry?.lifecycle?.currentState == Lifecycle.State.RESUMED)
+                navController.popBackStack()
         }
 
-        composable(
-            route = "home",
-            enterTransition = {
-                if (homeRoutes.contains(initialState.destination.route)) slideIntoContainer(
-                    AnimatedContentTransitionScope.SlideDirection.Up
-                ) + fadeIn()
-                else slideIntoContainer(AnimatedContentTransitionScope.SlideDirection.Left) + fadeIn()
-            },
-            popEnterTransition = {
-                if (homeRoutes.contains(initialState.destination.route)) slideIntoContainer(
-                    AnimatedContentTransitionScope.SlideDirection.Up
-                ) + fadeIn()
-                else slideIntoContainer(AnimatedContentTransitionScope.SlideDirection.Right) + fadeIn()
-            }
+        fun NavGraphBuilder.playerComposable(
+            route: String,
+            arguments: List<NamedNavArgument> = emptyList(),
+            content: @Composable AnimatedContentScope.(NavBackStackEntry) -> Unit
         ) {
+            composable(
+                route = route,
+                arguments = arguments
+            ) { navBackStackEntry ->
+                content(navBackStackEntry)
+
+                BackHandler(enabled = sheetState.currentValue == SheetValue.Expanded) {
+                    scope.launch { sheetState.partialExpand() }
+                }
+            }
+        }
+
+        playerComposable(route = "home") {
             HomeScreen(
                 navController = navController,
                 screenIndex = 0
             )
-
-            SheetBackHandler()
         }
 
-        composable(
-            route = "songs",
-            enterTransition = {
-                if (homeRoutes.contains(initialState.destination.route)) slideIntoContainer(
-                    AnimatedContentTransitionScope.SlideDirection.Up
-                ) + fadeIn()
-                else slideIntoContainer(AnimatedContentTransitionScope.SlideDirection.Left) + fadeIn()
-            },
-            popEnterTransition = {
-                if (homeRoutes.contains(initialState.destination.route)) slideIntoContainer(
-                    AnimatedContentTransitionScope.SlideDirection.Up
-                ) + fadeIn()
-                else slideIntoContainer(AnimatedContentTransitionScope.SlideDirection.Right) + fadeIn()
-            }
-        ) {
+        playerComposable(route = "songs") {
             HomeScreen(
                 navController = navController,
                 screenIndex = 1
             )
-
-            SheetBackHandler()
         }
 
-        composable(
-            route = "artists",
-            enterTransition = {
-                if (homeRoutes.contains(initialState.destination.route)) slideIntoContainer(
-                    AnimatedContentTransitionScope.SlideDirection.Up
-                ) + fadeIn()
-                else slideIntoContainer(AnimatedContentTransitionScope.SlideDirection.Left) + fadeIn()
-            },
-            popEnterTransition = {
-                if (homeRoutes.contains(initialState.destination.route)) slideIntoContainer(
-                    AnimatedContentTransitionScope.SlideDirection.Up
-                ) + fadeIn()
-                else slideIntoContainer(AnimatedContentTransitionScope.SlideDirection.Right) + fadeIn()
-            }
-        ) {
+        playerComposable(route = "artists") {
             HomeScreen(
                 navController = navController,
                 screenIndex = 2
             )
-
-            SheetBackHandler()
         }
 
-        composable(
-            route = "albums",
-            enterTransition = {
-                if (homeRoutes.contains(initialState.destination.route)) slideIntoContainer(
-                    AnimatedContentTransitionScope.SlideDirection.Up
-                ) + fadeIn()
-                else slideIntoContainer(AnimatedContentTransitionScope.SlideDirection.Left) + fadeIn()
-            },
-            popEnterTransition = {
-                if (homeRoutes.contains(initialState.destination.route)) slideIntoContainer(
-                    AnimatedContentTransitionScope.SlideDirection.Up
-                ) + fadeIn()
-                else slideIntoContainer(AnimatedContentTransitionScope.SlideDirection.Right) + fadeIn()
-            }
-        ) {
+        playerComposable(route = "albums") {
             HomeScreen(
                 navController = navController,
                 screenIndex = 3
             )
-
-            SheetBackHandler()
         }
 
-        composable(
-            route = "playlists",
-            enterTransition = {
-                if (homeRoutes.contains(initialState.destination.route)) slideIntoContainer(
-                    AnimatedContentTransitionScope.SlideDirection.Up
-                ) + fadeIn()
-                else slideIntoContainer(AnimatedContentTransitionScope.SlideDirection.Left) + fadeIn()
-            },
-            popEnterTransition = {
-                if (homeRoutes.contains(initialState.destination.route)) slideIntoContainer(
-                    AnimatedContentTransitionScope.SlideDirection.Up
-                ) + fadeIn()
-                else slideIntoContainer(AnimatedContentTransitionScope.SlideDirection.Right) + fadeIn()
-            }
-        ) {
+        playerComposable(route = "playlists") {
             HomeScreen(
                 navController = navController,
                 screenIndex = 4
             )
-
-            SheetBackHandler()
         }
 
-        composable(
+        playerComposable(
             route = "artist/{id}",
             arguments = listOf(
                 navArgument(
@@ -205,11 +175,9 @@ fun Navigation(
                 pop = popDestination,
                 onAlbumClick = navigateToAlbum
             )
-
-            SheetBackHandler()
         }
 
-        composable(
+        playerComposable(
             route = "album/{id}",
             arguments = listOf(
                 navArgument(
@@ -226,11 +194,9 @@ fun Navigation(
                 onAlbumClick = navigateToAlbum,
                 onGoToArtist = navigateToArtist
             )
-
-            SheetBackHandler()
         }
 
-        composable(
+        playerComposable(
             route = "playlist/{id}",
             arguments = listOf(
                 navArgument(
@@ -247,20 +213,16 @@ fun Navigation(
                 onGoToAlbum = navigateToAlbum,
                 onGoToArtist = navigateToArtist
             )
-
-            SheetBackHandler()
         }
 
-        composable(route = "settings") {
+        playerComposable(route = "settings") {
             SettingsScreen(
                 pop = popDestination,
                 onGoToSettingsPage = { index -> navController.navigate("settingsPage/$index") }
             )
-
-            SheetBackHandler()
         }
 
-        composable(
+        playerComposable(
             route = "settingsPage/{index}",
             arguments = listOf(
                 navArgument(
@@ -275,22 +237,18 @@ fun Navigation(
                 section = SettingsSection.entries[index],
                 pop = popDestination
             )
-
-            SheetBackHandler()
         }
 
-        composable(route = "search") {
+        playerComposable(route = "search") {
             SearchScreen(
                 pop = popDestination,
                 onAlbumClick = navigateToAlbum,
                 onArtistClick = navigateToArtist,
                 onPlaylistClick = { browseId -> navController.navigate("playlist/$browseId") }
             )
-
-            SheetBackHandler()
         }
 
-        composable(
+        playerComposable(
             route = "builtInPlaylist/{index}",
             arguments = listOf(
                 navArgument(
@@ -307,11 +265,9 @@ fun Navigation(
                 onGoToAlbum = navigateToAlbum,
                 onGoToArtist = navigateToArtist
             )
-
-            SheetBackHandler()
         }
 
-        composable(
+        playerComposable(
             route = "localPlaylist/{id}",
             arguments = listOf(
                 navArgument(
@@ -328,8 +284,6 @@ fun Navigation(
                 onGoToAlbum = navigateToAlbum,
                 onGoToArtist = navigateToArtist
             )
-
-            SheetBackHandler()
         }
     }
 }

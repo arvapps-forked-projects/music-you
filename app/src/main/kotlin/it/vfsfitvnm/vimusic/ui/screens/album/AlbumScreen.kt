@@ -21,7 +21,6 @@ import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import it.vfsfitvnm.innertube.Innertube
-import it.vfsfitvnm.innertube.models.bodies.BrowseBody
 import it.vfsfitvnm.innertube.requests.albumPage
 import it.vfsfitvnm.vimusic.Database
 import it.vfsfitvnm.vimusic.R
@@ -68,7 +67,7 @@ fun AlbumScreen(
 
                 if (albumPage == null && (currentAlbum?.timestamp == null || tabIndex == 1)) {
                     withContext(Dispatchers.IO) {
-                        Innertube.albumPage(BrowseBody(browseId = browseId))
+                        Innertube.albumPage(browseId = browseId)
                             ?.completed()
                             ?.onSuccess { currentAlbumPage ->
                                 albumPage = currentAlbumPage

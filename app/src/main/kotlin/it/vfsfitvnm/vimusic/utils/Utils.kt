@@ -8,7 +8,6 @@ import androidx.core.os.bundleOf
 import androidx.media3.common.MediaItem
 import androidx.media3.common.MediaMetadata
 import it.vfsfitvnm.innertube.Innertube
-import it.vfsfitvnm.innertube.models.bodies.ContinuationBody
 import it.vfsfitvnm.innertube.requests.playlistPage
 import it.vfsfitvnm.innertube.utils.plus
 import it.vfsfitvnm.vimusic.models.Song
@@ -98,7 +97,7 @@ suspend fun Result<Innertube.PlaylistOrAlbumPage>.completed(): Result<Innertube.
 
     while (playlistPage.songsPage?.continuation != null) {
         val continuation = playlistPage.songsPage?.continuation!!
-        val otherPlaylistPageResult = Innertube.playlistPage(ContinuationBody(continuation = continuation)) ?: break
+        val otherPlaylistPageResult = Innertube.playlistPage(continuation = continuation) ?: break
 
         if (otherPlaylistPageResult.isFailure) break
 

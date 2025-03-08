@@ -48,7 +48,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import it.vfsfitvnm.innertube.Innertube
-import it.vfsfitvnm.innertube.models.bodies.SearchSuggestionsBody
 import it.vfsfitvnm.innertube.requests.searchSuggestions
 import it.vfsfitvnm.vimusic.Database
 import it.vfsfitvnm.vimusic.LocalPlayerPadding
@@ -105,7 +104,7 @@ fun SearchScreen(
     LaunchedEffect(query) {
         suggestionsResult = if (query.isNotEmpty()) {
             delay(200)
-            Innertube.searchSuggestions(SearchSuggestionsBody(input = query))
+            Innertube.searchSuggestions(input = query)
         } else null
     }
 

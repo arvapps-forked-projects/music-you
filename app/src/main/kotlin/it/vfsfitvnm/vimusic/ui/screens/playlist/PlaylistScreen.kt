@@ -30,7 +30,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import it.vfsfitvnm.innertube.Innertube
-import it.vfsfitvnm.innertube.models.bodies.BrowseBody
 import it.vfsfitvnm.innertube.requests.playlistPage
 import it.vfsfitvnm.vimusic.Database
 import it.vfsfitvnm.vimusic.R
@@ -63,8 +62,7 @@ fun PlaylistScreen(
         if (playlistPage != null && playlistPage?.songsPage?.continuation == null) return@LaunchedEffect
 
         playlistPage = withContext(Dispatchers.IO) {
-            Innertube.playlistPage(BrowseBody(browseId = browseId))?.completed()
-                ?.getOrNull()
+            Innertube.playlistPage(browseId = browseId)?.completed()?.getOrNull()
         }
     }
 

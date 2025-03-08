@@ -12,11 +12,17 @@ import it.vfsfitvnm.innertube.models.bodies.SearchBody
 import it.vfsfitvnm.innertube.utils.runCatchingNonCancellable
 
 suspend fun <T : Innertube.Item> Innertube.searchPage(
-    body: SearchBody,
+    query: String,
+    params: String,
     fromMusicShelfRendererContent: (MusicShelfRenderer.Content) -> T?
 ) = runCatchingNonCancellable {
     val response = client.post(SEARCH) {
-        setBody(body)
+        setBody(
+            SearchBody(
+                query = query,
+                params = params
+            )
+        )
         mask("contents.tabbedSearchResultsRenderer.tabs.tabRenderer.content.sectionListRenderer.contents.musicShelfRenderer(continuations,contents.$MUSIC_RESPONSIVE_LIST_ITEM_RENDERER_MASK)")
     }.body<SearchResponse>()
 
@@ -35,11 +41,11 @@ suspend fun <T : Innertube.Item> Innertube.searchPage(
 }
 
 suspend fun <T : Innertube.Item> Innertube.searchPage(
-    body: ContinuationBody,
+    continuation: String,
     fromMusicShelfRendererContent: (MusicShelfRenderer.Content) -> T?
 ) = runCatchingNonCancellable {
     val response = client.post(SEARCH) {
-        setBody(body)
+        setBody(ContinuationBody(continuation = continuation))
         mask("continuationContents.musicShelfContinuation(continuations,contents.$MUSIC_RESPONSIVE_LIST_ITEM_RENDERER_MASK)")
     }.body<ContinuationResponse>()
 

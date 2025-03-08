@@ -5,7 +5,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import it.vfsfitvnm.innertube.Innertube
-import it.vfsfitvnm.innertube.models.bodies.NextBody
 import it.vfsfitvnm.innertube.requests.relatedPage
 import it.vfsfitvnm.vimusic.Database
 import it.vfsfitvnm.vimusic.enums.QuickPicksSource
@@ -27,8 +26,7 @@ class QuickPicksViewModel : ViewModel() {
             if (quickPicksSource == QuickPicksSource.Random && song != null && trending != null) return@collect
 
             if ((song == null && relatedPageResult == null) || trending?.id != song?.id || relatedPageResult?.isSuccess != true) {
-                relatedPageResult =
-                    Innertube.relatedPage(NextBody(videoId = (song?.id ?: "fJ9rUzIMcZQ")))
+                relatedPageResult = Innertube.relatedPage(videoId = (song?.id ?: "fJ9rUzIMcZQ"))
             }
 
             trending = song

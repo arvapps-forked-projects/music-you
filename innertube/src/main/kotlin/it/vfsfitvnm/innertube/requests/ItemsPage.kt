@@ -15,13 +15,18 @@ import it.vfsfitvnm.innertube.models.bodies.ContinuationBody
 import it.vfsfitvnm.innertube.utils.runCatchingNonCancellable
 
 suspend fun <T : Innertube.Item> Innertube.itemsPage(
-    body: BrowseBody,
+    browseId: String,
+    params: String?,
     fromMusicResponsiveListItemRenderer: (MusicResponsiveListItemRenderer) -> T? = { null },
     fromMusicTwoRowItemRenderer: (MusicTwoRowItemRenderer) -> T? = { null },
 ) = runCatchingNonCancellable {
     val response = client.post(BROWSE) {
-        setBody(body)
-//        mask("contents.singleColumnBrowseResultsRenderer.tabs.tabRenderer.content.sectionListRenderer.contents(musicPlaylistShelfRenderer(continuations,contents.$musicResponsiveListItemRendererMask),gridRenderer(continuations,items.$musicTwoRowItemRendererMask))")
+        setBody(
+            BrowseBody(
+                browseId = browseId,
+                params = params
+            )
+        )
     }.body<BrowseResponse>()
 
     val sectionListRendererContent = response
@@ -46,13 +51,12 @@ suspend fun <T : Innertube.Item> Innertube.itemsPage(
 }
 
 suspend fun <T : Innertube.Item> Innertube.itemsPage(
-    body: ContinuationBody,
+    continuation: String,
     fromMusicResponsiveListItemRenderer: (MusicResponsiveListItemRenderer) -> T? = { null },
     fromMusicTwoRowItemRenderer: (MusicTwoRowItemRenderer) -> T? = { null },
 ) = runCatchingNonCancellable {
     val response = client.post(BROWSE) {
-        setBody(body)
-//        mask("contents.singleColumnBrowseResultsRenderer.tabs.tabRenderer.content.sectionListRenderer.contents(musicPlaylistShelfRenderer(continuations,contents.$musicResponsiveListItemRendererMask),gridRenderer(continuations,items.$musicTwoRowItemRendererMask))")
+        setBody(ContinuationBody(continuation = continuation))
     }.body<ContinuationResponse>()
 
     itemsPageFromMusicShelRendererOrGridRenderer(
@@ -91,7 +95,5 @@ private fun <T : Innertube.Item> itemsPageFromMusicShelRendererOrGridRenderer(
                 ?.mapNotNull(GridRenderer.Item::musicTwoRowItemRenderer)
                 ?.mapNotNull(fromMusicTwoRowItemRenderer)
         )
-    } else {
-        null
-    }
+    } else null
 }

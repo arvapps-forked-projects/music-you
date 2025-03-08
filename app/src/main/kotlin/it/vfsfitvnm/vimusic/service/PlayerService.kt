@@ -69,7 +69,6 @@ import androidx.media3.exoplayer.source.MediaSource
 import androidx.media3.extractor.DefaultExtractorsFactory
 import it.vfsfitvnm.innertube.Innertube
 import it.vfsfitvnm.innertube.models.NavigationEndpoint
-import it.vfsfitvnm.innertube.models.bodies.PlayerBody
 import it.vfsfitvnm.innertube.requests.player
 import it.vfsfitvnm.vimusic.Database
 import it.vfsfitvnm.vimusic.MainActivity
@@ -827,7 +826,7 @@ class PlayerService : InvincibleService(), Player.Listener, PlaybackStatsListene
                     ringBuffer.getOrNull(1)?.first -> dataSpec.withUri(ringBuffer.getOrNull(1)!!.second)
                     else -> {
                         val urlResult = runBlocking(Dispatchers.IO) {
-                            Innertube.player(PlayerBody(videoId = videoId))
+                            Innertube.player(videoId = videoId)
                         }?.mapCatching { body ->
                             if (body.videoDetails?.videoId != videoId) {
                                 throw VideoIdMismatchException()

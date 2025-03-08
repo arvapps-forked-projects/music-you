@@ -32,8 +32,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import it.vfsfitvnm.innertube.Innertube
-import it.vfsfitvnm.innertube.models.bodies.ContinuationBody
-import it.vfsfitvnm.innertube.models.bodies.SearchBody
 import it.vfsfitvnm.innertube.requests.searchPage
 import it.vfsfitvnm.innertube.utils.from
 import it.vfsfitvnm.vimusic.Database
@@ -104,15 +102,13 @@ fun SearchResults(
                     itemsPageProvider = { continuation ->
                         if (continuation == null) {
                             Innertube.searchPage(
-                                body = SearchBody(
-                                    query = query,
-                                    params = Innertube.SearchFilter.Song.value
-                                ),
+                                query = query,
+                                params = Innertube.SearchFilter.Song.value,
                                 fromMusicShelfRendererContent = Innertube.SongItem.Companion::from
                             )
                         } else {
                             Innertube.searchPage(
-                                body = ContinuationBody(continuation = continuation),
+                                continuation = continuation,
                                 fromMusicShelfRendererContent = Innertube.SongItem.Companion::from
                             )
                         }
@@ -159,15 +155,13 @@ fun SearchResults(
                     itemsPageProvider = { continuation ->
                         if (continuation == null) {
                             Innertube.searchPage(
-                                body = SearchBody(
-                                    query = query,
-                                    params = Innertube.SearchFilter.Album.value
-                                ),
+                                query = query,
+                                params = Innertube.SearchFilter.Album.value,
                                 fromMusicShelfRendererContent = Innertube.AlbumItem::from
                             )
                         } else {
                             Innertube.searchPage(
-                                body = ContinuationBody(continuation = continuation),
+                                continuation = continuation,
                                 fromMusicShelfRendererContent = Innertube.AlbumItem::from
                             )
                         }
@@ -192,15 +186,13 @@ fun SearchResults(
                     itemsPageProvider = { continuation ->
                         if (continuation == null) {
                             Innertube.searchPage(
-                                body = SearchBody(
-                                    query = query,
-                                    params = Innertube.SearchFilter.Artist.value
-                                ),
+                                query = query,
+                                params = Innertube.SearchFilter.Artist.value,
                                 fromMusicShelfRendererContent = Innertube.ArtistItem::from
                             )
                         } else {
                             Innertube.searchPage(
-                                body = ContinuationBody(continuation = continuation),
+                                continuation = continuation,
                                 fromMusicShelfRendererContent = Innertube.ArtistItem::from
                             )
                         }
@@ -227,15 +219,13 @@ fun SearchResults(
                     itemsPageProvider = { continuation ->
                         if (continuation == null) {
                             Innertube.searchPage(
-                                body = SearchBody(
-                                    query = query,
-                                    params = Innertube.SearchFilter.Video.value
-                                ),
+                                query = query,
+                                params = Innertube.SearchFilter.Video.value,
                                 fromMusicShelfRendererContent = Innertube.VideoItem::from
                             )
                         } else {
                             Innertube.searchPage(
-                                body = ContinuationBody(continuation = continuation),
+                                continuation = continuation,
                                 fromMusicShelfRendererContent = Innertube.VideoItem::from
                             )
                         }
@@ -288,12 +278,13 @@ fun SearchResults(
                                 if (index == 4) Innertube.SearchFilter.CommunityPlaylist else Innertube.SearchFilter.FeaturedPlaylist
 
                             Innertube.searchPage(
-                                body = SearchBody(query = query, params = filter.value),
+                                query = query,
+                                params = filter.value,
                                 fromMusicShelfRendererContent = Innertube.PlaylistItem::from
                             )
                         } else {
                             Innertube.searchPage(
-                                body = ContinuationBody(continuation = continuation),
+                                continuation = continuation,
                                 fromMusicShelfRendererContent = Innertube.PlaylistItem::from
                             )
                         }

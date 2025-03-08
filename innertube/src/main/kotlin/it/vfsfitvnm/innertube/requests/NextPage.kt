@@ -11,12 +11,22 @@ import it.vfsfitvnm.innertube.models.bodies.NextBody
 import it.vfsfitvnm.innertube.utils.from
 import it.vfsfitvnm.innertube.utils.runCatchingNonCancellable
 
-
-
-suspend fun Innertube.nextPage(body: NextBody): Result<Innertube.NextPage>? =
+suspend fun Innertube.nextPage(
+    videoId: String? = null,
+    playlistId: String? = null,
+    params: String? = null,
+    playlistSetVideoId: String? = null
+): Result<Innertube.NextPage>? =
     runCatchingNonCancellable {
         val response = client.post(NEXT) {
-            setBody(body)
+            setBody(
+                NextBody(
+                    videoId = videoId,
+                    playlistId = playlistId,
+                    params = params,
+                    playlistSetVideoId = playlistSetVideoId
+                )
+            )
             mask("contents.singleColumnMusicWatchNextResultsRenderer.tabbedRenderer.watchNextTabbedResultsRenderer.tabs.tabRenderer.content.musicQueueRenderer.content.playlistPanelRenderer(continuations,contents(automixPreviewVideoRenderer,$PLAYLIST_PANEL_VIDEO_RENDERER_MASK))")
         }.body<NextResponse>()
 
@@ -35,7 +45,7 @@ suspend fun Innertube.nextPage(body: NextBody): Result<Innertube.NextPage>? =
             ?.content
             ?.playlistPanelRenderer
 
-        if (body.playlistId == null) {
+        if (playlistId == null) {
             val endpoint = playlistPanelRenderer
                 ?.contents
                 ?.lastOrNull()
@@ -47,26 +57,26 @@ suspend fun Innertube.nextPage(body: NextBody): Result<Innertube.NextPage>? =
 
             if (endpoint != null) {
                 return nextPage(
-                    body.copy(
-                        playlistId = endpoint.playlistId,
-                        params = endpoint.params
-                    )
+                    videoId = videoId,
+                    playlistId = endpoint.playlistId,
+                    params = endpoint.params,
+                    playlistSetVideoId = playlistSetVideoId
                 )
             }
         }
 
         Innertube.NextPage(
-            playlistId = body.playlistId,
-            playlistSetVideoId = body.playlistSetVideoId,
-            params = body.params,
+            playlistId = playlistId,
+            playlistSetVideoId = playlistSetVideoId,
+            params = params,
             itemsPage = playlistPanelRenderer
                 ?.toSongsPage()
         )
     }
 
-suspend fun Innertube.nextPage(body: ContinuationBody) = runCatchingNonCancellable {
+suspend fun Innertube.nextPage(continuation: String) = runCatchingNonCancellable {
     val response = client.post(NEXT) {
-        setBody(body)
+        setBody(ContinuationBody(continuation = continuation))
         mask("continuationContents.playlistPanelContinuation(continuations,contents.$PLAYLIST_PANEL_VIDEO_RENDERER_MASK)")
     }.body<ContinuationResponse>()
 

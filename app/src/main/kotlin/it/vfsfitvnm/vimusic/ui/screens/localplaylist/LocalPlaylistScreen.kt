@@ -29,7 +29,6 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import it.vfsfitvnm.innertube.Innertube
-import it.vfsfitvnm.innertube.models.bodies.BrowseBody
 import it.vfsfitvnm.innertube.requests.playlistPage
 import it.vfsfitvnm.vimusic.Database
 import it.vfsfitvnm.vimusic.R
@@ -58,7 +57,7 @@ fun LocalPlaylistScreen(
     onGoToArtist: (String) -> Unit
 ) {
     var playlist: Playlist? by remember { mutableStateOf(null) }
-    
+
     var isRenaming by rememberSaveable { mutableStateOf(false) }
     var isDeleting by rememberSaveable { mutableStateOf(false) }
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
@@ -95,9 +94,7 @@ fun LocalPlaylistScreen(
                                     transaction {
                                         runBlocking(Dispatchers.IO) {
                                             withContext(Dispatchers.IO) {
-                                                Innertube.playlistPage(
-                                                    BrowseBody(browseId = browseId)
-                                                )
+                                                Innertube.playlistPage(browseId = browseId)
                                                     ?.completed()
                                             }
                                         }?.getOrNull()?.let { remotePlaylist ->

@@ -9,9 +9,9 @@ import it.vfsfitvnm.innertube.models.bodies.QueueBody
 import it.vfsfitvnm.innertube.utils.from
 import it.vfsfitvnm.innertube.utils.runCatchingNonCancellable
 
-suspend fun Innertube.queue(body: QueueBody) = runCatchingNonCancellable {
+suspend fun Innertube.queue(videoIds: List<String>) = runCatchingNonCancellable {
     val response = client.post(QUEUE) {
-        setBody(body)
+        setBody(QueueBody(videoIds = videoIds))
         mask("queueDatas.content.$PLAYLIST_PANEL_VIDEO_RENDERER_MASK")
     }.body<GetQueueResponse>()
 
@@ -26,4 +26,4 @@ suspend fun Innertube.queue(body: QueueBody) = runCatchingNonCancellable {
 }
 
 suspend fun Innertube.song(videoId: String): Result<Innertube.SongItem?>? =
-    queue(QueueBody(videoIds = listOf(videoId)))?.map { it?.firstOrNull() }
+    queue(videoIds = listOf(videoId))?.map { it?.firstOrNull() }

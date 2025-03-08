@@ -76,6 +76,7 @@ dependencies {
     implementation(libs.compose.ui.util)
     implementation(libs.core.splashscreen)
     implementation(libs.lifecycle.viewmodel.compose)
+    implementation(libs.material.motion.compose)
     implementation(libs.media)
     implementation(libs.media3.exoplayer)
     implementation(libs.reorderable)

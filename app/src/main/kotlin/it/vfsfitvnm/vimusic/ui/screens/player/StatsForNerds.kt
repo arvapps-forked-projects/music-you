@@ -36,7 +36,6 @@ import androidx.media3.common.util.UnstableApi
 import androidx.media3.datasource.cache.Cache
 import androidx.media3.datasource.cache.CacheSpan
 import it.vfsfitvnm.innertube.Innertube
-import it.vfsfitvnm.innertube.models.bodies.PlayerBody
 import it.vfsfitvnm.innertube.requests.player
 import it.vfsfitvnm.vimusic.Database
 import it.vfsfitvnm.vimusic.LocalPlayerServiceBinder
@@ -72,7 +71,7 @@ fun StatsForNerds(
                 binder.player.currentMediaItem?.takeIf { it.mediaId == mediaId }?.let { mediaItem ->
                     withContext(Dispatchers.IO) {
                         delay(2000)
-                        Innertube.player(PlayerBody(videoId = mediaId))?.onSuccess { response ->
+                        Innertube.player(videoId = mediaId)?.onSuccess { response ->
                             response.streamingData?.highestQualityFormat?.let { format ->
                                 Database.insert(mediaItem)
                                 Database.insert(

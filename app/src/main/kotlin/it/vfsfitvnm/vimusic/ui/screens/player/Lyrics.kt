@@ -53,7 +53,6 @@ import androidx.media3.common.C
 import androidx.media3.common.MediaMetadata
 import com.valentinilk.shimmer.shimmer
 import it.vfsfitvnm.innertube.Innertube
-import it.vfsfitvnm.innertube.models.bodies.NextBody
 import it.vfsfitvnm.innertube.requests.lyrics
 import it.vfsfitvnm.kugou.KuGou
 import it.vfsfitvnm.vimusic.Database
@@ -148,7 +147,7 @@ fun Lyrics(
                             isError = true
                         }
                     } else if (!isShowingSynchronizedLyrics && it?.fixed == null) {
-                        Innertube.lyrics(NextBody(videoId = mediaId))?.onSuccess { fixedLyrics ->
+                        Innertube.lyrics(videoId = mediaId)?.onSuccess { fixedLyrics ->
                             Database.upsert(
                                 Lyrics(
                                     songId = mediaId,

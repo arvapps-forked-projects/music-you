@@ -14,19 +14,19 @@ import it.vfsfitvnm.innertube.models.bodies.PlayerBody
 import it.vfsfitvnm.innertube.utils.runCatchingNonCancellable
 import kotlinx.serialization.Serializable
 
-suspend fun Innertube.player(body: PlayerBody) = runCatchingNonCancellable {
+suspend fun Innertube.player(videoId: String) = runCatchingNonCancellable {
     val response = client.post(PLAYER) {
         setBody(
-            body.copy(
-                context = YouTubeClient.IOS.toContext(visitorData)
+            PlayerBody(
+                context = YouTubeClient.IOS.toContext(visitorData),
+                videoId = videoId
             )
         )
         mask("playabilityStatus.status,playerConfig.audioConfig,streamingData.adaptiveFormats,videoDetails.videoId")
     }.body<PlayerResponse>()
 
-    if (response.playabilityStatus?.status == "OK") {
-        response
-    } else {
+    if (response.playabilityStatus?.status == "OK") response
+    else {
         @Serializable
         data class AudioStream(
             val url: String,
@@ -40,12 +40,13 @@ suspend fun Innertube.player(body: PlayerBody) = runCatchingNonCancellable {
 
         val safePlayerResponse = client.post(PLAYER) {
             setBody(
-                body.copy(
+                PlayerBody(
                     context = YouTubeClient.TVHTML5_SIMPLY_EMBEDDED_PLAYER.toContext().copy(
                         thirdParty = Context.ThirdParty(
-                            embedUrl = "https://www.youtube.com/watch?v=${body.videoId}"
+                            embedUrl = "https://www.youtube.com/watch?v=$videoId"
                         )
-                    )
+                    ),
+                    videoId = videoId
                 )
             )
             mask("playabilityStatus.status,playerConfig.audioConfig,streamingData.adaptiveFormats,videoDetails.videoId")
@@ -55,7 +56,7 @@ suspend fun Innertube.player(body: PlayerBody) = runCatchingNonCancellable {
             return@runCatchingNonCancellable response
         }
 
-        val audioStreams = client.get("https://pipedapi.adminforge.de/streams/${body.videoId}") {
+        val audioStreams = client.get("https://pipedapi.adminforge.de/streams/$videoId") {
             contentType(ContentType.Application.Json)
         }.body<PipedResponse>().audioStreams
 

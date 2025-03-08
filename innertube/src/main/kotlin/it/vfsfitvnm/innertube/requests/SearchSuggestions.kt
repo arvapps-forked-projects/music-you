@@ -8,9 +8,9 @@ import it.vfsfitvnm.innertube.models.SearchSuggestionsResponse
 import it.vfsfitvnm.innertube.models.bodies.SearchSuggestionsBody
 import it.vfsfitvnm.innertube.utils.runCatchingNonCancellable
 
-suspend fun Innertube.searchSuggestions(body: SearchSuggestionsBody) = runCatchingNonCancellable {
+suspend fun Innertube.searchSuggestions(input: String) = runCatchingNonCancellable {
     val response = client.post(SEARCH_SUGGESTIONS) {
-        setBody(body)
+        setBody(SearchSuggestionsBody(input = input))
         mask("contents.searchSuggestionsSectionRenderer.contents.searchSuggestionRenderer.navigationEndpoint.searchEndpoint.query")
     }.body<SearchSuggestionsResponse>()
 

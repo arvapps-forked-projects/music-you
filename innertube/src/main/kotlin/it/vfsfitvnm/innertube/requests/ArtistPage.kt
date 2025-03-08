@@ -13,10 +13,10 @@ import it.vfsfitvnm.innertube.utils.findSectionByTitle
 import it.vfsfitvnm.innertube.utils.from
 import it.vfsfitvnm.innertube.utils.runCatchingNonCancellable
 
-suspend fun Innertube.artistPage(body: BrowseBody): Result<Innertube.ArtistPage>? =
+suspend fun Innertube.artistPage(browseId: String): Result<Innertube.ArtistPage>? =
     runCatchingNonCancellable {
         val response = client.post(BROWSE) {
-            setBody(body)
+            setBody(BrowseBody(browseId = browseId))
             mask("contents,header")
         }.body<BrowseResponse>()
 
@@ -52,9 +52,9 @@ suspend fun Innertube.artistPage(body: BrowseBody): Result<Innertube.ArtistPage>
                 ?.musicImmersiveHeaderRenderer
                 ?.foregroundThumbnail
                 ?: response
-                .header
-                ?.musicImmersiveHeaderRenderer
-                ?.thumbnail)
+                    .header
+                    ?.musicImmersiveHeaderRenderer
+                    ?.thumbnail)
                 ?.musicThumbnailRenderer
                 ?.thumbnail
                 ?.thumbnails

@@ -6,7 +6,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.lifecycle.ViewModel
 import it.vfsfitvnm.innertube.Innertube
-import it.vfsfitvnm.innertube.models.bodies.BrowseBody
 import it.vfsfitvnm.innertube.requests.artistPage
 import it.vfsfitvnm.vimusic.Database
 import it.vfsfitvnm.vimusic.models.Artist
@@ -30,7 +29,7 @@ class ArtistViewModel : ViewModel() {
 
                 if (artistPage == null && (currentArtist?.timestamp == null || mustFetch)) {
                     withContext(Dispatchers.IO) {
-                        Innertube.artistPage(BrowseBody(browseId = browseId))
+                        Innertube.artistPage(browseId = browseId)
                             ?.onSuccess { currentArtistPage ->
                                 artistPage = currentArtistPage
 

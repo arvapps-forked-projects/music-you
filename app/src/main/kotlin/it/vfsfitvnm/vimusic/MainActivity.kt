@@ -44,7 +44,6 @@ import androidx.media3.common.MediaItem
 import androidx.media3.common.Player
 import androidx.navigation.compose.rememberNavController
 import it.vfsfitvnm.innertube.Innertube
-import it.vfsfitvnm.innertube.models.bodies.BrowseBody
 import it.vfsfitvnm.innertube.requests.playlistPage
 import it.vfsfitvnm.innertube.requests.song
 import it.vfsfitvnm.vimusic.models.LocalMenuState
@@ -187,7 +186,7 @@ class MainActivity : ComponentActivity() {
                             val browseId = "VL$playlistId"
 
                             if (playlistId.startsWith("OLAK5uy_")) {
-                                Innertube.playlistPage(BrowseBody(browseId = browseId))?.getOrNull()
+                                Innertube.playlistPage(browseId = browseId)?.getOrNull()
                                     ?.let {
                                         it.songsPage?.items?.firstOrNull()?.album?.endpoint?.browseId?.let { browseId ->
                                             navController.navigate(
