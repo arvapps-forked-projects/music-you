@@ -20,11 +20,12 @@ data class PlayerResponse(
     ) {
         @Serializable
         data class AudioConfig(
-            private val loudnessDb: Double?
+            private val loudnessDb: Double?,
+            private val perceptualLoudnessDb: Double?
         ) {
             // For music clients only
             val normalizedLoudnessDb: Float?
-                get() = loudnessDb?.plus(7)?.toFloat()
+                get() = (loudnessDb ?: perceptualLoudnessDb)?.plus(7)?.toFloat()
         }
     }
 

@@ -48,8 +48,11 @@ import androidx.media3.common.PlaybackException
 import androidx.media3.common.Player
 import androidx.media3.common.util.UnstableApi
 import coil3.compose.AsyncImage
+import it.vfsfitvnm.innertube.Innertube
+import it.vfsfitvnm.innertube.requests.visitorData
 import it.vfsfitvnm.vimusic.Database
 import it.vfsfitvnm.vimusic.LocalPlayerServiceBinder
+import it.vfsfitvnm.vimusic.service.VideoIdMismatchException
 import it.vfsfitvnm.vimusic.ui.styling.Dimensions
 import it.vfsfitvnm.vimusic.ui.styling.px
 import it.vfsfitvnm.vimusic.utils.DisposableListener
@@ -59,6 +62,7 @@ import it.vfsfitvnm.vimusic.utils.forceSeekToPrevious
 import it.vfsfitvnm.vimusic.utils.playerGesturesEnabledKey
 import it.vfsfitvnm.vimusic.utils.rememberPreference
 import it.vfsfitvnm.vimusic.utils.thumbnail
+import kotlinx.coroutines.runBlocking
 
 @OptIn(ExperimentalFoundationApi::class)
 @ExperimentalAnimationApi
@@ -99,6 +103,9 @@ fun Thumbnail(
                 error = playbackException
 
                 if (errorCounter == 0) {
+                    if (playbackException.cause?.cause is VideoIdMismatchException) runBlocking {
+                        Innertube.visitorData = Innertube.visitorData().getOrNull()
+                    }
                     player.prepare()
                     errorCounter += 1
                 }
