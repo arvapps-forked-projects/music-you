@@ -1015,8 +1015,14 @@ class PlayerService : InvincibleService(), Player.Listener, PlaybackStatsListene
         }
     }
 
+    private fun play() {
+        if (player.playerError != null) player.prepare()
+        else if (player.playbackState == Player.STATE_ENDED) player.seekToDefaultPosition(0)
+        else player.play()
+    }
+
     private inner class SessionCallback(private val player: Player) : MediaSession.Callback() {
-        override fun onPlay() = player.play()
+        override fun onPlay() = play()
         override fun onPause() = player.pause()
         override fun onSkipToPrevious() = runCatching(player::forceSeekToPrevious).let { }
         override fun onSkipToNext() = runCatching(player::forceSeekToNext).let { }
@@ -1032,11 +1038,12 @@ class PlayerService : InvincibleService(), Player.Listener, PlaybackStatsListene
         }
     }
 
-    private class NotificationActionReceiver(private val player: Player) : BroadcastReceiver() {
+    private inner class NotificationActionReceiver(private val player: Player) :
+        BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
             when (intent.action) {
                 Action.pause.value -> player.pause()
-                Action.play.value -> player.play()
+                Action.play.value -> play()
                 Action.next.value -> player.forceSeekToNext()
                 Action.previous.value -> player.forceSeekToPrevious()
             }

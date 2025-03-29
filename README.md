@@ -55,6 +55,7 @@ height="80">](https://github.com/DanielSevillano/music-you/releases/latest)
 - [RiMusic](https://github.com/fast4x/RiMusic)
 - [ViTune](https://github.com/25huizengek1/ViTune)
 - [InnerTune](https://github.com/z-huang/InnerTune)
+- [OuterTune](https://github.com/OuterTune/OuterTune)
 - [Symphony](https://github.com/zyrouge/symphony)
 
 ## ℹ️ Disclaimer

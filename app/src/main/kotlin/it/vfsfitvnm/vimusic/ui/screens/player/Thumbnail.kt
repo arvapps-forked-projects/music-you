@@ -88,6 +88,13 @@ fun Thumbnail(
         it to (it - 64.dp).px
     }
 
+    val retry = {
+        if (error?.cause?.cause is VideoIdMismatchException) runBlocking {
+            Innertube.visitorData = Innertube.visitorData().getOrNull()
+        }
+        if (error != null) player.prepare()
+    }
+
     player.DisposableListener {
         object : Player.Listener {
             override fun onMediaItemTransition(mediaItem: MediaItem?, reason: Int) {
@@ -103,10 +110,7 @@ fun Thumbnail(
                 error = playbackException
 
                 if (errorCounter == 0) {
-                    if (playbackException.cause?.cause is VideoIdMismatchException) runBlocking {
-                        Innertube.visitorData = Innertube.visitorData().getOrNull()
-                    }
-                    player.prepare()
+                    retry()
                     errorCounter += 1
                 }
             }
@@ -244,7 +248,7 @@ fun Thumbnail(
 
                 PlaybackError(
                     error = error,
-                    onDismiss = player::prepare
+                    onDismiss = retry
                 )
             }
         }
