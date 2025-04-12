@@ -50,7 +50,7 @@ suspend fun <T : Innertube.Item> Innertube.itemsPage(
     )
 }
 
-suspend fun <T : Innertube.Item> Innertube.itemsPage(
+suspend fun <T : Innertube.Item> Innertube.itemsPageContinuation(
     continuation: String,
     fromMusicResponsiveListItemRenderer: (MusicResponsiveListItemRenderer) -> T? = { null },
     fromMusicTwoRowItemRenderer: (MusicTwoRowItemRenderer) -> T? = { null },

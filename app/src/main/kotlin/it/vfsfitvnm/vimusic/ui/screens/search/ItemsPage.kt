@@ -40,15 +40,15 @@ import kotlinx.coroutines.withContext
 
 @ExperimentalAnimationApi
 @Composable
-inline fun <T : Innertube.Item> ItemsPage(
+fun <T : Innertube.Item> ItemsPage(
     tag: String,
-    crossinline itemContent: @Composable LazyGridItemScope.(T) -> Unit,
-    noinline itemPlaceholderContent: @Composable () -> Unit,
+    itemContent: @Composable LazyGridItemScope.(T) -> Unit,
+    itemPlaceholderContent: @Composable () -> Unit,
     modifier: Modifier = Modifier,
     initialPlaceholderCount: Int = 8,
     continuationPlaceholderCount: Int = 3,
     emptyItemsText: String = stringResource(id = R.string.no_items_found),
-    noinline itemsPageProvider: (suspend (String?) -> Result<Innertube.ItemsPage<T>?>?)? = null,
+    itemsPageProvider: (suspend (String?) -> Result<Innertube.ItemsPage<T>?>?)? = null,
 ) {
     val playerPadding = LocalPlayerPadding.current
 

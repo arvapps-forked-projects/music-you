@@ -169,11 +169,11 @@ fun AlbumScreen(
                     initialPlaceholderCount = 1,
                     continuationPlaceholderCount = 1,
                     emptyItemsText = stringResource(id = R.string.no_alternative_versions),
-                    itemsPageProvider = albumPage?.let {
+                    itemsPageProvider = albumPage?.let { page ->
                         {
                             Result.success(
                                 Innertube.ItemsPage(
-                                    items = albumPage?.otherVersions,
+                                    items = page.otherVersions,
                                     continuation = null
                                 )
                             )

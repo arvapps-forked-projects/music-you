@@ -24,6 +24,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.viewmodel.compose.viewModel
 import it.vfsfitvnm.innertube.Innertube
 import it.vfsfitvnm.innertube.requests.itemsPage
+import it.vfsfitvnm.innertube.requests.itemsPageContinuation
 import it.vfsfitvnm.innertube.utils.from
 import it.vfsfitvnm.vimusic.Database
 import it.vfsfitvnm.vimusic.LocalPlayerServiceBinder
@@ -161,15 +162,15 @@ fun ArtistScreen(
 
                 ItemsPage(
                     tag = "artist/$browseId/songs",
-                    itemsPageProvider = viewModel.artistPage?.let {
-                        ({ continuation ->
+                    itemsPageProvider = viewModel.artistPage?.let { artistPage ->
+                        { continuation ->
                             continuation?.let {
-                                Innertube.itemsPage(
+                                Innertube.itemsPageContinuation(
                                     continuation = continuation,
                                     fromMusicResponsiveListItemRenderer = Innertube.SongItem::from,
                                 )
-                            } ?: viewModel.artistPage
-                                ?.songsEndpoint
+                            } ?: artistPage
+                                .songsEndpoint
                                 ?.takeIf { it.browseId != null }
                                 ?.let { endpoint ->
                                     Innertube.itemsPage(
@@ -180,11 +181,11 @@ fun ArtistScreen(
                                 }
                             ?: Result.success(
                                 Innertube.ItemsPage(
-                                    items = viewModel.artistPage?.songs,
+                                    items = artistPage.songs,
                                     continuation = null
                                 )
                             )
-                        })
+                        }
                     },
                     itemContent = { song ->
                         SongItem(
@@ -211,87 +212,83 @@ fun ArtistScreen(
                 )
             }
 
-            2 -> {
-                ItemsPage(
-                    tag = "artist/$browseId/albums",
-                    emptyItemsText = stringResource(id = R.string.no_albums_artist),
-                    itemsPageProvider = viewModel.artistPage?.let {
-                        ({ continuation ->
-                            continuation?.let {
+            2 -> ItemsPage(
+                tag = "artist/$browseId/albums",
+                emptyItemsText = stringResource(id = R.string.no_albums_artist),
+                itemsPageProvider = viewModel.artistPage?.let { artistPage ->
+                    { continuation ->
+                        continuation?.let {
+                            Innertube.itemsPageContinuation(
+                                continuation = continuation,
+                                fromMusicTwoRowItemRenderer = Innertube.AlbumItem::from,
+                            )
+                        } ?: artistPage
+                            .albumsEndpoint
+                            ?.takeIf { it.browseId != null }
+                            ?.let { endpoint ->
                                 Innertube.itemsPage(
-                                    continuation = continuation,
+                                    browseId = endpoint.browseId!!,
+                                    params = endpoint.params,
                                     fromMusicTwoRowItemRenderer = Innertube.AlbumItem::from,
                                 )
-                            } ?: viewModel.artistPage
-                                ?.albumsEndpoint
-                                ?.takeIf { it.browseId != null }
-                                ?.let { endpoint ->
-                                    Innertube.itemsPage(
-                                        browseId = endpoint.browseId!!,
-                                        params = endpoint.params,
-                                        fromMusicTwoRowItemRenderer = Innertube.AlbumItem::from,
-                                    )
-                                }
-                            ?: Result.success(
-                                Innertube.ItemsPage(
-                                    items = viewModel.artistPage?.albums,
-                                    continuation = null
-                                )
+                            }
+                        ?: Result.success(
+                            Innertube.ItemsPage(
+                                items = artistPage.albums,
+                                continuation = null
                             )
-                        })
-                    },
-                    itemContent = { album ->
-                        AlbumItem(
-                            album = album,
-                            onClick = { onAlbumClick(album.key) }
                         )
-                    },
-                    itemPlaceholderContent = {
-                        ItemPlaceholder()
                     }
-                )
-            }
+                },
+                itemContent = { album ->
+                    AlbumItem(
+                        album = album,
+                        onClick = { onAlbumClick(album.key) }
+                    )
+                },
+                itemPlaceholderContent = {
+                    ItemPlaceholder()
+                }
+            )
 
-            3 -> {
-                ItemsPage(
-                    tag = "artist/$browseId/singles",
-                    emptyItemsText = stringResource(id = R.string.no_singles_artist),
-                    itemsPageProvider = viewModel.artistPage?.let {
-                        ({ continuation ->
-                            continuation?.let {
+            3 -> ItemsPage(
+                tag = "artist/$browseId/singles",
+                emptyItemsText = stringResource(id = R.string.no_singles_artist),
+                itemsPageProvider = viewModel.artistPage?.let { artistPage ->
+                    { continuation ->
+                        continuation?.let {
+                            Innertube.itemsPageContinuation(
+                                continuation = continuation,
+                                fromMusicTwoRowItemRenderer = Innertube.AlbumItem::from,
+                            )
+                        } ?: artistPage
+                            .singlesEndpoint
+                            ?.takeIf { it.browseId != null }
+                            ?.let { endpoint ->
                                 Innertube.itemsPage(
-                                    continuation = continuation,
+                                    browseId = endpoint.browseId!!,
+                                    params = endpoint.params,
                                     fromMusicTwoRowItemRenderer = Innertube.AlbumItem::from,
                                 )
-                            } ?: viewModel.artistPage
-                                ?.singlesEndpoint
-                                ?.takeIf { it.browseId != null }
-                                ?.let { endpoint ->
-                                    Innertube.itemsPage(
-                                        browseId = endpoint.browseId!!,
-                                        params = endpoint.params,
-                                        fromMusicTwoRowItemRenderer = Innertube.AlbumItem::from,
-                                    )
-                                }
-                            ?: Result.success(
-                                Innertube.ItemsPage(
-                                    items = viewModel.artistPage?.singles,
-                                    continuation = null
-                                )
+                            }
+                        ?: Result.success(
+                            Innertube.ItemsPage(
+                                items = artistPage.singles,
+                                continuation = null
                             )
-                        })
-                    },
-                    itemContent = { album ->
-                        AlbumItem(
-                            album = album,
-                            onClick = { onAlbumClick(album.key) }
                         )
-                    },
-                    itemPlaceholderContent = {
-                        ItemPlaceholder()
                     }
-                )
-            }
+                },
+                itemContent = { album ->
+                    AlbumItem(
+                        album = album,
+                        onClick = { onAlbumClick(album.key) }
+                    )
+                },
+                itemPlaceholderContent = {
+                    ItemPlaceholder()
+                }
+            )
 
             4 -> ArtistLocalSongs(
                 browseId = browseId,

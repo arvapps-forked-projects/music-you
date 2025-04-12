@@ -52,7 +52,9 @@ import it.vfsfitvnm.innertube.Innertube
 import it.vfsfitvnm.innertube.requests.visitorData
 import it.vfsfitvnm.vimusic.Database
 import it.vfsfitvnm.vimusic.LocalPlayerServiceBinder
-import it.vfsfitvnm.vimusic.service.VideoIdMismatchException
+import it.vfsfitvnm.vimusic.service.LoginRequiredException
+import it.vfsfitvnm.vimusic.service.PlayableFormatNotFoundException
+import it.vfsfitvnm.vimusic.service.UnplayableException
 import it.vfsfitvnm.vimusic.ui.styling.Dimensions
 import it.vfsfitvnm.vimusic.ui.styling.px
 import it.vfsfitvnm.vimusic.utils.DisposableListener
@@ -63,6 +65,8 @@ import it.vfsfitvnm.vimusic.utils.playerGesturesEnabledKey
 import it.vfsfitvnm.vimusic.utils.rememberPreference
 import it.vfsfitvnm.vimusic.utils.thumbnail
 import kotlinx.coroutines.runBlocking
+import java.net.UnknownHostException
+import java.nio.channels.UnresolvedAddressException
 
 @OptIn(ExperimentalFoundationApi::class)
 @ExperimentalAnimationApi
@@ -89,10 +93,20 @@ fun Thumbnail(
     }
 
     val retry = {
-        if (error?.cause?.cause is VideoIdMismatchException) runBlocking {
-            Innertube.visitorData = Innertube.visitorData().getOrNull()
+        when (error?.cause?.cause) {
+            is UnresolvedAddressException,
+            is UnknownHostException,
+            is PlayableFormatNotFoundException,
+            is UnplayableException,
+            is LoginRequiredException -> player.prepare()
+
+            else -> {
+                runBlocking {
+                    Innertube.visitorData = Innertube.visitorData().getOrNull()
+                }
+                player.prepare()
+            }
         }
-        if (error != null) player.prepare()
     }
 
     player.DisposableListener {

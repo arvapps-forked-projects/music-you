@@ -237,7 +237,7 @@ interface Database {
 
     @Transaction
     @Query("SELECT Song.* FROM SongPlaylistMap JOIN Song on Song.id = SongPlaylistMap.songId WHERE playlistId = :id ORDER BY position")
-    fun playlistSongs(id: Long): Flow<List<Song>?>
+    fun playlistSongs(id: Long): Flow<List<Song>>
 
     @Transaction
     @Query("SELECT * FROM Playlist WHERE id = :id")
@@ -288,7 +288,7 @@ interface Database {
     }
 
     @Query("SELECT thumbnailUrl FROM Song JOIN SongPlaylistMap ON id = songId WHERE playlistId = :id ORDER BY position LIMIT 4")
-    fun playlistThumbnailUrls(id: Long): Flow<List<String?>>
+    fun playlistThumbnailUrls(id: Long): Flow<List<String>>
 
     @Transaction
     @Query("SELECT * FROM Song JOIN SongArtistMap ON Song.id = SongArtistMap.songId WHERE SongArtistMap.artistId = :artistId AND totalPlayTimeMs > 0 ORDER BY Song.ROWID DESC")
