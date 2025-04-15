@@ -326,7 +326,7 @@ interface Database {
     fun search(query: String): Flow<List<Song>>
 
     @Query("SELECT albumId AS id, NULL AS name FROM SongAlbumMap WHERE songId = :songId")
-    fun songAlbumInfo(songId: String): Info
+    fun songAlbumInfo(songId: String): Info?
 
     @Query("SELECT id, name FROM Artist LEFT JOIN SongArtistMap ON id = artistId WHERE songId = :songId")
     fun songArtistInfo(songId: String): List<Info>

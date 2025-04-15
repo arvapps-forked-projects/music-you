@@ -3,13 +3,13 @@ activity = "1.10.1"
 agp = "8.9.1"
 brotli = "0.1.2"
 coil = "3.1.0"
-compose-bom = "2025.03.01"
+compose-bom = "2025.04.00"
 compose-shimmer = "1.3.2"
 core-splashscreen = "1.0.1"
 desugaring = "2.1.5"
 kotlin = "2.1.20"
 kotlin-coroutines = "1.10.1"
-kotlin-ksp = "2.1.20-1.0.31"
+kotlin-ksp = "2.1.20-2.0.0"
 lifecycle = "2.8.7"
 ktor = "3.1.1"
 material-motion = "1.2.1"
@@ -17,7 +17,7 @@ media = "1.7.0"
 media3 = "1.6.0"
 navigation = "2.8.9"
 reorderable = "2.4.3"
-room = "2.6.1"
+room = "2.7.0"
 
 [libraries]
 brotli = { group = "org.brotli", name = "dec", version.ref = "brotli" }
@@ -45,7 +45,7 @@ material-motion-compose = { group = "io.github.fornewid", name = "material-motio
 media = { group = "androidx.media", name = "media", version.ref = "media" }
 media3-exoplayer = { group = "androidx.media3", name = "media3-exoplayer", version.ref = "media3" }
 reorderable = { module = "sh.calvin.reorderable:reorderable", version.ref = "reorderable" }
-room = { group = "androidx.room", name = "room-ktx", version.ref = "room" }
+room = { group = "androidx.room", name = "room-runtime", version.ref = "room" }
 room-compiler = { group = "androidx.room", name = "room-compiler", version.ref = "room" }
 
 [plugins]
