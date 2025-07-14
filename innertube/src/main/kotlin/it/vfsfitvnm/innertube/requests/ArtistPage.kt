@@ -32,9 +32,9 @@ suspend fun Innertube.artistPage(browseId: String): Result<Innertube.ArtistPage>
                 ?.findSectionByTitle(text)
         }
 
-        val songsSection = findSectionByTitle("Songs")?.musicShelfRenderer
+        val songsSection = findSectionByTitle("Top songs")?.musicShelfRenderer
         val albumsSection = findSectionByTitle("Albums")?.musicCarouselShelfRenderer
-        val singlesSection = findSectionByTitle("Singles")?.musicCarouselShelfRenderer
+        val singlesSection = findSectionByTitle("Singles & EPs")?.musicCarouselShelfRenderer
 
         Innertube.ArtistPage(
             name = response
