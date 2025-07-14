@@ -220,6 +220,7 @@ class PlayerService : InvincibleService(), Player.Listener, PlaybackStatsListene
         super.onCreate()
 
         bitmapProvider = BitmapProvider(
+            context = applicationContext,
             bitmapSize = (256 * resources.displayMetrics.density).roundToInt(),
             colorProvider = { isSystemInDarkMode ->
                 if (isSystemInDarkMode) Color.BLACK else Color.WHITE

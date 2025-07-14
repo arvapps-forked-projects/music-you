@@ -10,7 +10,7 @@ import android.widget.Toast
 import androidx.core.content.getSystemService
 
 inline fun <reified T> Context.intent(): Intent =
-    Intent(this@Context, T::class.java)
+    Intent(this, T::class.java)
 
 inline fun <reified T : BroadcastReceiver> Context.broadCastPendingIntent(
     requestCode: Int = 0,
