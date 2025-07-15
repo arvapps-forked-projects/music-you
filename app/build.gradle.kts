@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.compose.compiler)
@@ -5,14 +7,21 @@ plugins {
     alias(libs.plugins.kotlin.ksp)
 }
 
+kotlin {
+    compilerOptions {
+        jvmTarget = JvmTarget.fromTarget("17")
+        freeCompilerArgs.addAll("-Xcontext-receivers")
+    }
+}
+
 android {
     namespace = "it.vfsfitvnm.vimusic"
-    compileSdk = 35
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "com.github.musicyou"
         minSdk = 21
-        targetSdk = 35
+        targetSdk = 36
         versionCode = 12
         versionName = "0.12"
     }
@@ -51,11 +60,6 @@ android {
         isCoreLibraryDesugaringEnabled = true
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
-    }
-
-    kotlinOptions {
-        freeCompilerArgs += "-Xcontext-receivers"
-        jvmTarget = "17"
     }
 }
 
