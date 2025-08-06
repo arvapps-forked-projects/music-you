@@ -14,9 +14,7 @@ import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
@@ -165,53 +163,50 @@ fun Thumbnail(
         contentAlignment = Alignment.Center,
         label = "thumbnail"
     ) { currentWindow ->
-        val dismissState = rememberSwipeToDismissBoxState(
-            confirmValueChange = { value ->
-                if (value == SwipeToDismissBoxValue.StartToEnd) binder.player.forceSeekToPrevious()
-                else if (value == SwipeToDismissBoxValue.EndToStart) binder.player.forceSeekToNext()
-
-                return@rememberSwipeToDismissBoxState false
-            }
-        )
+        val dismissState = rememberSwipeToDismissBoxState()
 
         SwipeToDismissBox(
             state = dismissState,
             backgroundContent = {
                 val color by animateColorAsState(
-                    targetValue = when (dismissState.targetValue) {
-                        SwipeToDismissBoxValue.StartToEnd -> MaterialTheme.colorScheme.primaryContainer
-                        SwipeToDismissBoxValue.EndToStart -> MaterialTheme.colorScheme.primaryContainer
-                        SwipeToDismissBoxValue.Settled -> Color.Transparent
-                    },
+                    targetValue = if (dismissState.targetValue == SwipeToDismissBoxValue.Settled) Color.Transparent else MaterialTheme.colorScheme.primaryContainer,
                     label = "background"
                 )
 
-                Row(
+                Box(
                     modifier = Modifier
                         .fillMaxSize()
                         .background(color)
-                        .padding(horizontal = 16.dp),
-                    horizontalArrangement = when (dismissState.targetValue) {
-                        SwipeToDismissBoxValue.StartToEnd -> Arrangement.Start
-                        SwipeToDismissBoxValue.EndToStart -> Arrangement.End
-                        SwipeToDismissBoxValue.Settled -> Arrangement.Center
-                    },
-                    verticalAlignment = Alignment.CenterVertically
+                        .padding(horizontal = 32.dp),
                 ) {
-                    if (dismissState.targetValue != SwipeToDismissBoxValue.Settled) {
+                    if (dismissState.dismissDirection == SwipeToDismissBoxValue.StartToEnd) {
                         Icon(
-                            imageVector = when (dismissState.targetValue) {
-                                SwipeToDismissBoxValue.StartToEnd -> Icons.Outlined.SkipPrevious
-                                else -> Icons.Outlined.SkipNext
-                            },
+                            imageVector = Icons.Outlined.SkipPrevious,
                             contentDescription = null,
-                            tint = MaterialTheme.colorScheme.onPrimaryContainer
+                            modifier = Modifier.align(Alignment.CenterStart),
+                            tint = if (dismissState.targetValue == SwipeToDismissBoxValue.StartToEnd) {
+                                MaterialTheme.colorScheme.onPrimaryContainer
+                            } else MaterialTheme.colorScheme.onSurface
+                        )
+                    }
+                    if (dismissState.dismissDirection == SwipeToDismissBoxValue.EndToStart) {
+                        Icon(
+                            imageVector = Icons.Outlined.SkipNext,
+                            contentDescription = null,
+                            modifier = Modifier.align(Alignment.CenterEnd),
+                            tint = if (dismissState.targetValue == SwipeToDismissBoxValue.EndToStart) {
+                                MaterialTheme.colorScheme.onPrimaryContainer
+                            } else MaterialTheme.colorScheme.onSurface
                         )
                     }
                 }
             },
             modifier = modifier.clip(MaterialTheme.shapes.large),
-            gesturesEnabled = playerGesturesEnabled
+            gesturesEnabled = playerGesturesEnabled,
+            onDismiss = { value ->
+                if (value == SwipeToDismissBoxValue.StartToEnd) binder.player.forceSeekToPrevious()
+                else if (value == SwipeToDismissBoxValue.EndToStart) binder.player.forceSeekToNext()
+            }
         ) {
             Box(
                 modifier = Modifier
