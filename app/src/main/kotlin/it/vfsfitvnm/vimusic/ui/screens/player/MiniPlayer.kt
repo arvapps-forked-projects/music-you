@@ -3,7 +3,7 @@ package it.vfsfitvnm.vimusic.ui.screens.player
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -34,6 +34,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.neverEqualPolicy
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -56,6 +57,7 @@ import it.vfsfitvnm.vimusic.utils.positionAndDurationState
 import it.vfsfitvnm.vimusic.utils.rememberPreference
 import it.vfsfitvnm.vimusic.utils.shouldBePlaying
 import it.vfsfitvnm.vimusic.utils.thumbnail
+import kotlinx.coroutines.launch
 import kotlin.math.absoluteValue
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -93,14 +95,8 @@ fun MiniPlayer(
     val mediaItem = nullableMediaItem ?: return
     val positionAndDuration by binder.player.positionAndDurationState()
 
-    val dismissState = rememberSwipeToDismissBoxState(
-        confirmValueChange = { value ->
-            if (value == SwipeToDismissBoxValue.StartToEnd) binder.player.forceSeekToPrevious()
-            else if (value == SwipeToDismissBoxValue.EndToStart) binder.player.forceSeekToNext()
-
-            return@rememberSwipeToDismissBoxState false
-        }
-    )
+    val dismissState = rememberSwipeToDismissBoxState()
+    val scope = rememberCoroutineScope()
 
     SwipeToDismissBox(
         state = dismissState,
@@ -110,25 +106,42 @@ fun MiniPlayer(
                 label = "background"
             )
 
-            Row(
+            Box(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(76.dp)
                     .background(color)
-                    .padding(horizontal = 16.dp),
-                horizontalArrangement = if (dismissState.targetValue == SwipeToDismissBoxValue.StartToEnd) Arrangement.Start else Arrangement.End,
-                verticalAlignment = Alignment.CenterVertically
+                    .padding(horizontal = 32.dp),
             ) {
-                if (dismissState.targetValue != SwipeToDismissBoxValue.Settled) {
+                if (dismissState.dismissDirection == SwipeToDismissBoxValue.StartToEnd) {
                     Icon(
-                        imageVector = if (dismissState.targetValue == SwipeToDismissBoxValue.StartToEnd) Icons.Outlined.SkipPrevious else Icons.Outlined.SkipNext,
+                        imageVector = Icons.Outlined.SkipPrevious,
                         contentDescription = null,
-                        tint = MaterialTheme.colorScheme.onPrimaryContainer
+                        modifier = Modifier.align(Alignment.CenterStart),
+                        tint = if (dismissState.targetValue == SwipeToDismissBoxValue.StartToEnd) {
+                            MaterialTheme.colorScheme.onPrimaryContainer
+                        } else MaterialTheme.colorScheme.onSurface
+                    )
+                }
+
+                if (dismissState.dismissDirection == SwipeToDismissBoxValue.EndToStart) {
+                    Icon(
+                        imageVector = Icons.Outlined.SkipNext,
+                        contentDescription = null,
+                        modifier = Modifier.align(Alignment.CenterEnd),
+                        tint = if (dismissState.targetValue == SwipeToDismissBoxValue.EndToStart) {
+                            MaterialTheme.colorScheme.onPrimaryContainer
+                        } else MaterialTheme.colorScheme.onSurface
                     )
                 }
             }
         },
-        gesturesEnabled = miniplayerGesturesEnabled
+        gesturesEnabled = miniplayerGesturesEnabled,
+        onDismiss = { value ->
+            if (value == SwipeToDismissBoxValue.StartToEnd) binder.player.forceSeekToPrevious()
+            else if (value == SwipeToDismissBoxValue.EndToStart) binder.player.forceSeekToNext()
+            scope.launch { dismissState.reset() }
+        }
     ) {
         Column(modifier = Modifier.clickable(onClick = openPlayer)) {
             ListItem(
@@ -173,9 +186,9 @@ fun MiniPlayer(
                         ) {
                             Icon(
                                 imageVector =
-                                if (shouldBePlaying) Icons.Outlined.Pause
-                                else if (binder.player.playbackState == Player.STATE_ENDED) Icons.Outlined.Replay
-                                else Icons.Outlined.PlayArrow,
+                                    if (shouldBePlaying) Icons.Outlined.Pause
+                                    else if (binder.player.playbackState == Player.STATE_ENDED) Icons.Outlined.Replay
+                                    else Icons.Outlined.PlayArrow,
                                 contentDescription = null,
                             )
                         }

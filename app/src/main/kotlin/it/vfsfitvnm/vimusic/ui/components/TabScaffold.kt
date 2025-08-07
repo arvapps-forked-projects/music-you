@@ -58,7 +58,7 @@ fun TabScaffold(
                         }
                     },
                     actions = { appBarActions?.invoke() },
-                    colors = TopAppBarDefaults.mediumTopAppBarColors(scrolledContainerColor = MaterialTheme.colorScheme.surface),
+                    colors = TopAppBarDefaults.topAppBarColors(scrolledContainerColor = MaterialTheme.colorScheme.surface),
                     scrollBehavior = scrollBehavior
                 )
 
