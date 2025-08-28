@@ -31,6 +31,7 @@ import it.vfsfitvnm.vimusic.enums.PlaylistSortBy
 import it.vfsfitvnm.vimusic.enums.SortOrder
 import it.vfsfitvnm.vimusic.models.Playlist
 import it.vfsfitvnm.vimusic.query
+import it.vfsfitvnm.vimusic.ui.components.HomeScaffold
 import it.vfsfitvnm.vimusic.ui.components.SortingHeader
 import it.vfsfitvnm.vimusic.ui.components.themed.TextFieldDialog
 import it.vfsfitvnm.vimusic.ui.items.BuiltInPlaylistItem
@@ -44,6 +45,8 @@ import it.vfsfitvnm.vimusic.viewmodels.HomePlaylistsViewModel
 @ExperimentalFoundationApi
 @Composable
 fun HomePlaylists(
+    openSearch: () -> Unit,
+    openSettings: () -> Unit,
     onBuiltInPlaylist: (Int) -> Unit,
     onPlaylistClick: (Playlist) -> Unit
 ) {
@@ -77,60 +80,70 @@ fun HomePlaylists(
         )
     }
 
-    LazyVerticalGrid(
-        columns = GridCells.Adaptive(minSize = 150.dp),
-        contentPadding = PaddingValues(start = 8.dp, end = 8.dp, bottom = 16.dp + playerPadding),
-        verticalArrangement = Arrangement.spacedBy(4.dp),
-        modifier = Modifier.fillMaxSize()
+    HomeScaffold(
+        title = R.string.playlists,
+        openSearch = openSearch,
+        openSettings = openSettings
     ) {
-        item(
-            key = "header",
-            span = { GridItemSpan(maxLineSpan) }
+        LazyVerticalGrid(
+            columns = GridCells.Adaptive(minSize = 150.dp),
+            contentPadding = PaddingValues(
+                start = 8.dp,
+                end = 8.dp,
+                bottom = 16.dp + playerPadding
+            ),
+            verticalArrangement = Arrangement.spacedBy(4.dp),
+            modifier = Modifier.fillMaxSize()
         ) {
-            SortingHeader(
-                sortBy = sortBy,
-                changeSortBy = { sortBy = it },
-                sortByEntries = PlaylistSortBy.entries.toList(),
-                sortOrder = sortOrder,
-                toggleSortOrder = { sortOrder = !sortOrder },
-                size = viewModel.items.size,
-                itemCountText = R.plurals.number_of_playlists
-            )
-        }
+            item(
+                key = "header",
+                span = { GridItemSpan(maxLineSpan) }
+            ) {
+                SortingHeader(
+                    sortBy = sortBy,
+                    changeSortBy = { sortBy = it },
+                    sortByEntries = PlaylistSortBy.entries.toList(),
+                    sortOrder = sortOrder,
+                    toggleSortOrder = { sortOrder = !sortOrder },
+                    size = viewModel.items.size,
+                    itemCountText = R.plurals.number_of_playlists
+                )
+            }
 
-        item(key = "favorites") {
-            BuiltInPlaylistItem(
-                icon = Icons.Default.Favorite,
-                name = stringResource(id = R.string.favorites),
-                onClick = { onBuiltInPlaylist(BuiltInPlaylist.Favorites.ordinal) }
-            )
-        }
+            item(key = "favorites") {
+                BuiltInPlaylistItem(
+                    icon = Icons.Default.Favorite,
+                    name = stringResource(id = R.string.favorites),
+                    onClick = { onBuiltInPlaylist(BuiltInPlaylist.Favorites.ordinal) }
+                )
+            }
 
-        item(key = "offline") {
-            BuiltInPlaylistItem(
-                icon = Icons.Default.DownloadForOffline,
-                name = stringResource(id = R.string.offline),
-                onClick = { onBuiltInPlaylist(BuiltInPlaylist.Offline.ordinal) }
-            )
-        }
+            item(key = "offline") {
+                BuiltInPlaylistItem(
+                    icon = Icons.Default.DownloadForOffline,
+                    name = stringResource(id = R.string.offline),
+                    onClick = { onBuiltInPlaylist(BuiltInPlaylist.Offline.ordinal) }
+                )
+            }
 
-        item(key = "new") {
-            BuiltInPlaylistItem(
-                icon = Icons.Default.Add,
-                name = stringResource(id = R.string.new_playlist),
-                onClick = { isCreatingANewPlaylist = true }
-            )
-        }
+            item(key = "new") {
+                BuiltInPlaylistItem(
+                    icon = Icons.Default.Add,
+                    name = stringResource(id = R.string.new_playlist),
+                    onClick = { isCreatingANewPlaylist = true }
+                )
+            }
 
-        items(
-            items = viewModel.items,
-            key = { it.playlist.id }
-        ) { playlistPreview ->
-            LocalPlaylistItem(
-                modifier = Modifier.animateItem(),
-                playlist = playlistPreview,
-                onClick = { onPlaylistClick(playlistPreview.playlist) }
-            )
+            items(
+                items = viewModel.items,
+                key = { it.playlist.id }
+            ) { playlistPreview ->
+                LocalPlaylistItem(
+                    modifier = Modifier.animateItem(),
+                    playlist = playlistPreview,
+                    onClick = { onPlaylistClick(playlistPreview.playlist) }
+                )
+            }
         }
     }
 }

@@ -35,7 +35,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
@@ -49,7 +48,7 @@ import it.vfsfitvnm.innertube.requests.song
 import it.vfsfitvnm.vimusic.models.LocalMenuState
 import it.vfsfitvnm.vimusic.service.PlayerService
 import it.vfsfitvnm.vimusic.ui.components.BottomNavigation
-import it.vfsfitvnm.vimusic.ui.screens.Navigation
+import it.vfsfitvnm.vimusic.ui.navigation.Navigation
 import it.vfsfitvnm.vimusic.ui.screens.player.PlayerScaffold
 import it.vfsfitvnm.vimusic.ui.styling.AppTheme
 import it.vfsfitvnm.vimusic.utils.asMediaItem
@@ -235,4 +234,4 @@ class MainActivity : ComponentActivity() {
 }
 
 val LocalPlayerServiceBinder = staticCompositionLocalOf<PlayerService.Binder?> { null }
-val LocalPlayerPadding = compositionLocalOf<Dp> { 0.dp }
+val LocalPlayerPadding = compositionLocalOf { 0.dp }

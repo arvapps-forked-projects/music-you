@@ -21,6 +21,7 @@ import it.vfsfitvnm.vimusic.R
 import it.vfsfitvnm.vimusic.enums.ArtistSortBy
 import it.vfsfitvnm.vimusic.enums.SortOrder
 import it.vfsfitvnm.vimusic.models.Artist
+import it.vfsfitvnm.vimusic.ui.components.HomeScaffold
 import it.vfsfitvnm.vimusic.ui.components.SortingHeader
 import it.vfsfitvnm.vimusic.ui.items.LocalArtistItem
 import it.vfsfitvnm.vimusic.utils.artistSortByKey
@@ -31,7 +32,11 @@ import it.vfsfitvnm.vimusic.viewmodels.HomeArtistsViewModel
 @ExperimentalFoundationApi
 @ExperimentalAnimationApi
 @Composable
-fun HomeArtistList(onArtistClick: (Artist) -> Unit) {
+fun HomeArtistList(
+    openSearch: () -> Unit,
+    openSettings: () -> Unit,
+    onArtistClick: (Artist) -> Unit
+) {
     val playerPadding = LocalPlayerPadding.current
 
     var sortBy by rememberPreference(artistSortByKey, ArtistSortBy.Name)
@@ -46,33 +51,43 @@ fun HomeArtistList(onArtistClick: (Artist) -> Unit) {
         )
     }
 
-    LazyVerticalGrid(
-        columns = GridCells.Adaptive(minSize = 100.dp),
-        contentPadding = PaddingValues(start = 8.dp, end = 8.dp, bottom = 16.dp + playerPadding),
-        verticalArrangement = Arrangement.spacedBy(4.dp),
-        modifier = Modifier.fillMaxSize()
+    HomeScaffold(
+        title = R.string.artists,
+        openSearch = openSearch,
+        openSettings = openSettings
     ) {
-        item(
-            key = "header",
-            span = { GridItemSpan(maxLineSpan) }
+        LazyVerticalGrid(
+            columns = GridCells.Adaptive(minSize = 100.dp),
+            contentPadding = PaddingValues(
+                start = 8.dp,
+                end = 8.dp,
+                bottom = 16.dp + playerPadding
+            ),
+            verticalArrangement = Arrangement.spacedBy(4.dp),
+            modifier = Modifier.fillMaxSize()
         ) {
-            SortingHeader(
-                sortBy = sortBy,
-                changeSortBy = { sortBy = it },
-                sortByEntries = ArtistSortBy.entries.toList(),
-                sortOrder = sortOrder,
-                toggleSortOrder = { sortOrder = !sortOrder },
-                size = viewModel.items.size,
-                itemCountText = R.plurals.number_of_artists
-            )
-        }
+            item(
+                key = "header",
+                span = { GridItemSpan(maxLineSpan) }
+            ) {
+                SortingHeader(
+                    sortBy = sortBy,
+                    changeSortBy = { sortBy = it },
+                    sortByEntries = ArtistSortBy.entries.toList(),
+                    sortOrder = sortOrder,
+                    toggleSortOrder = { sortOrder = !sortOrder },
+                    size = viewModel.items.size,
+                    itemCountText = R.plurals.number_of_artists
+                )
+            }
 
-        items(items = viewModel.items, key = Artist::id) { artist ->
-            LocalArtistItem(
-                modifier = Modifier.animateItem(),
-                artist = artist,
-                onClick = { onArtistClick(artist) }
-            )
+            items(items = viewModel.items, key = Artist::id) { artist ->
+                LocalArtistItem(
+                    modifier = Modifier.animateItem(),
+                    artist = artist,
+                    onClick = { onArtistClick(artist) }
+                )
+            }
         }
     }
 }
