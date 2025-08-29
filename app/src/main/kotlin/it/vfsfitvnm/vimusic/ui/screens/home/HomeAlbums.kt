@@ -21,6 +21,7 @@ import it.vfsfitvnm.vimusic.R
 import it.vfsfitvnm.vimusic.enums.AlbumSortBy
 import it.vfsfitvnm.vimusic.enums.SortOrder
 import it.vfsfitvnm.vimusic.models.Album
+import it.vfsfitvnm.vimusic.ui.components.HomeScaffold
 import it.vfsfitvnm.vimusic.ui.components.SortingHeader
 import it.vfsfitvnm.vimusic.ui.items.LocalAlbumItem
 import it.vfsfitvnm.vimusic.utils.albumSortByKey
@@ -31,7 +32,11 @@ import it.vfsfitvnm.vimusic.viewmodels.HomeAlbumsViewModel
 @ExperimentalFoundationApi
 @ExperimentalAnimationApi
 @Composable
-fun HomeAlbums(onAlbumClick: (Album) -> Unit) {
+fun HomeAlbums(
+    openSearch: () -> Unit,
+    openSettings: () -> Unit,
+    onAlbumClick: (Album) -> Unit
+) {
     val playerPadding = LocalPlayerPadding.current
 
     var sortBy by rememberPreference(albumSortByKey, AlbumSortBy.Title)
@@ -46,36 +51,46 @@ fun HomeAlbums(onAlbumClick: (Album) -> Unit) {
         )
     }
 
-    LazyVerticalGrid(
-        columns = GridCells.Adaptive(minSize = 150.dp),
-        contentPadding = PaddingValues(start = 8.dp, end = 8.dp, bottom = 16.dp + playerPadding),
-        verticalArrangement = Arrangement.spacedBy(4.dp),
-        modifier = Modifier.fillMaxSize()
+    HomeScaffold(
+        title = R.string.albums,
+        openSearch = openSearch,
+        openSettings = openSettings
     ) {
-        item(
-            key = "header",
-            span = { GridItemSpan(maxCurrentLineSpan) }
+        LazyVerticalGrid(
+            columns = GridCells.Adaptive(minSize = 150.dp),
+            contentPadding = PaddingValues(
+                start = 8.dp,
+                end = 8.dp,
+                bottom = 16.dp + playerPadding
+            ),
+            verticalArrangement = Arrangement.spacedBy(4.dp),
+            modifier = Modifier.fillMaxSize()
         ) {
-            SortingHeader(
-                sortBy = sortBy,
-                changeSortBy = { sortBy = it },
-                sortByEntries = AlbumSortBy.entries.toList(),
-                sortOrder = sortOrder,
-                toggleSortOrder = { sortOrder = !sortOrder },
-                size = viewModel.items.size,
-                itemCountText = R.plurals.number_of_albums
-            )
-        }
+            item(
+                key = "header",
+                span = { GridItemSpan(maxCurrentLineSpan) }
+            ) {
+                SortingHeader(
+                    sortBy = sortBy,
+                    changeSortBy = { sortBy = it },
+                    sortByEntries = AlbumSortBy.entries.toList(),
+                    sortOrder = sortOrder,
+                    toggleSortOrder = { sortOrder = !sortOrder },
+                    size = viewModel.items.size,
+                    itemCountText = R.plurals.number_of_albums
+                )
+            }
 
-        items(
-            items = viewModel.items,
-            key = Album::id
-        ) { album ->
-            LocalAlbumItem(
-                modifier = Modifier.animateItem(),
-                album = album,
-                onClick = { onAlbumClick(album) }
-            )
+            items(
+                items = viewModel.items,
+                key = Album::id
+            ) { album ->
+                LocalAlbumItem(
+                    modifier = Modifier.animateItem(),
+                    album = album,
+                    onClick = { onAlbumClick(album) }
+                )
+            }
         }
     }
 }

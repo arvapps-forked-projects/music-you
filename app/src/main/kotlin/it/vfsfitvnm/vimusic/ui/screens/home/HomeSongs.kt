@@ -10,8 +10,6 @@ import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -26,7 +24,6 @@ import androidx.compose.material.icons.outlined.Shuffle
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
@@ -59,6 +56,7 @@ import it.vfsfitvnm.vimusic.models.ActionInfo
 import it.vfsfitvnm.vimusic.models.LocalMenuState
 import it.vfsfitvnm.vimusic.models.Song
 import it.vfsfitvnm.vimusic.query
+import it.vfsfitvnm.vimusic.ui.components.HomeScaffold
 import it.vfsfitvnm.vimusic.ui.components.SortingHeader
 import it.vfsfitvnm.vimusic.ui.components.SwipeToActionBox
 import it.vfsfitvnm.vimusic.ui.components.themed.InHistoryMediaItemMenu
@@ -80,6 +78,8 @@ import kotlinx.coroutines.launch
 @ExperimentalAnimationApi
 @Composable
 fun HomeSongs(
+    openSearch: () -> Unit,
+    openSettings: () -> Unit,
     onGoToAlbum: (String) -> Unit,
     onGoToArtist: (String) -> Unit
 ) {
@@ -103,7 +103,8 @@ fun HomeSongs(
         )
     }
 
-    Scaffold(
+    HomeScaffold(
+        title = R.string.songs,
         snackbarHost = {
             SnackbarHost(hostState = snackbarHostState)
         },
@@ -129,14 +130,13 @@ fun HomeSongs(
                 }
             }
         },
-        contentWindowInsets = WindowInsets(bottom = 0)
-    ) { paddingValues ->
+        openSearch = openSearch,
+        openSettings = openSettings
+    ) {
         LazyVerticalGrid(
             columns = GridCells.Adaptive(minSize = 400.dp),
             contentPadding = PaddingValues(bottom = if (viewModel.items.isNotEmpty()) 16.dp + 72.dp + playerPadding else 16.dp + playerPadding),
-            modifier = Modifier
-                .fillMaxSize()
-                .consumeWindowInsets(paddingValues)
+            modifier = Modifier.fillMaxSize()
         ) {
             item(
                 key = "header",

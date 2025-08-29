@@ -12,12 +12,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import it.vfsfitvnm.vimusic.enums.NavigationLabelsVisibility
-import it.vfsfitvnm.vimusic.models.Screen
+import it.vfsfitvnm.vimusic.ui.navigation.TopDestinations
 import it.vfsfitvnm.vimusic.utils.homeScreenTabIndexKey
 import it.vfsfitvnm.vimusic.utils.navigationLabelsVisibilityKey
 import it.vfsfitvnm.vimusic.utils.rememberPreference
@@ -35,44 +36,36 @@ fun BottomNavigation(navController: NavHostController) {
         defaultValue = 0
     )
 
-    val homeScreens = listOf(
-        Screen.Home,
-        Screen.Songs,
-        Screen.Artists,
-        Screen.Albums,
-        Screen.Playlists
-    )
-
     NavigationBar(
-        modifier = if (navigationLabelsVisibility == NavigationLabelsVisibility.Hidden) Modifier.heightIn(
-            max = 90.dp
-        ) else Modifier
+        modifier = if (navigationLabelsVisibility == NavigationLabelsVisibility.Hidden) {
+            Modifier.heightIn(max = 90.dp)
+        } else Modifier
     ) {
-        homeScreens.forEachIndexed { index, screen ->
+        TopDestinations.list.forEachIndexed { index, destination ->
             val selected =
-                currentDestination?.hierarchy?.any { it.route == screen.route } == true
+                currentDestination?.hierarchy?.any { it.hasRoute(route = destination.route::class) } == true
 
             NavigationBarItem(
                 selected = selected,
                 onClick = {
                     if (!selected) {
                         onScreenChanged(index)
-                        navController.navigate(screen.route) {
-                            popUpTo(navController.graph.findStartDestination().id)
+                        navController.navigate(route = destination.route) {
+                            popUpTo(id = navController.graph.findStartDestination().id)
                             launchSingleTop = true
                         }
                     }
                 },
                 icon = {
                     Icon(
-                        imageVector = if (selected) screen.selectedIcon else screen.unselectedIcon,
-                        contentDescription = stringResource(id = screen.resourceId)
+                        imageVector = if (selected) destination.selectedIcon else destination.unselectedIcon,
+                        contentDescription = stringResource(id = destination.resourceId)
                     )
                 },
                 label = {
                     if (navigationLabelsVisibility != NavigationLabelsVisibility.Hidden) {
                         Text(
-                            text = stringResource(id = screen.resourceId),
+                            text = stringResource(id = destination.resourceId),
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis
                         )
