@@ -116,12 +116,8 @@ fun Navigation(
             QuickPicks(
                 openSearch = { navController.navigate(route = Routes.Search) },
                 openSettings = { navController.navigate(route = Routes.Settings) },
-                onAlbumClick = { browseId ->
-                    navController.navigate(route = Routes.Album(id = browseId))
-                },
-                onArtistClick = { browseId ->
-                    navController.navigate(route = Routes.Artist(id = browseId))
-                },
+                onAlbumClick = navigateToAlbum,
+                onArtistClick = navigateToArtist,
                 onPlaylistClick = { browseId ->
                     navController.navigate(route = Routes.Playlist(id = browseId))
                 },
@@ -135,12 +131,8 @@ fun Navigation(
             HomeSongs(
                 openSearch = { navController.navigate(route = Routes.Search) },
                 openSettings = { navController.navigate(route = Routes.Settings) },
-                onGoToAlbum = { browseId ->
-                    navController.navigate(route = Routes.Album(id = browseId))
-                },
-                onGoToArtist = { browseId ->
-                    navController.navigate(route = Routes.Artist(id = browseId))
-                }
+                onGoToAlbum = navigateToAlbum,
+                onGoToArtist = navigateToArtist
             )
         }
 
@@ -148,9 +140,7 @@ fun Navigation(
             HomeArtistList(
                 openSearch = { navController.navigate(route = Routes.Search) },
                 openSettings = { navController.navigate(route = Routes.Settings) },
-                onArtistClick = { artist ->
-                    navController.navigate(route = Routes.Artist(id = artist.id))
-                }
+                onArtistClick = { artist -> navigateToArtist(artist.id) }
             )
         }
 
@@ -158,9 +148,7 @@ fun Navigation(
             HomeAlbums(
                 openSearch = { navController.navigate(route = Routes.Search) },
                 openSettings = { navController.navigate(route = Routes.Settings) },
-                onAlbumClick = { album ->
-                    navController.navigate(route = Routes.Album(id = album.id))
-                }
+                onAlbumClick = { album -> navigateToAlbum(album.id) }
             )
         }
 

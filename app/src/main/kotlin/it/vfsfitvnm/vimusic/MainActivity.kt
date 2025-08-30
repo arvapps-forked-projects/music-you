@@ -49,6 +49,7 @@ import it.vfsfitvnm.vimusic.models.LocalMenuState
 import it.vfsfitvnm.vimusic.service.PlayerService
 import it.vfsfitvnm.vimusic.ui.components.BottomNavigation
 import it.vfsfitvnm.vimusic.ui.navigation.Navigation
+import it.vfsfitvnm.vimusic.ui.navigation.Routes
 import it.vfsfitvnm.vimusic.ui.screens.player.PlayerScaffold
 import it.vfsfitvnm.vimusic.ui.styling.AppTheme
 import it.vfsfitvnm.vimusic.utils.asMediaItem
@@ -189,16 +190,18 @@ class MainActivity : ComponentActivity() {
                                     ?.let {
                                         it.songsPage?.items?.firstOrNull()?.album?.endpoint?.browseId?.let { browseId ->
                                             navController.navigate(
-                                                route = "album/$browseId"
+                                                route = Routes.Album(id = browseId)
                                             )
                                         }
                                     }
-                            } else navController.navigate(route = "playlist/$browseId")
+                            } else navController.navigate(
+                                route = Routes.Playlist(id = browseId)
+                            )
                         }
 
                         "channel", "c" -> uri.lastPathSegment?.let { channelId ->
                             navController.navigate(
-                                route = "artist/$channelId"
+                                route = Routes.Artist(id = channelId)
                             )
                         }
 
