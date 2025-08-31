@@ -24,6 +24,7 @@ import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import it.vfsfitvnm.vimusic.LocalPlayerPadding
+import it.vfsfitvnm.vimusic.ui.navigation.Routes
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -59,11 +60,15 @@ fun PlayerScaffold(
                         Player(
                             onGoToAlbum = { browseId ->
                                 scope.launch { sheetState.partialExpand() }
-                                navController.navigate(route = "album/$browseId")
+                                navController.navigate(
+                                    route = Routes.Album(id = browseId)
+                                )
                             },
                             onGoToArtist = { browseId ->
                                 scope.launch { sheetState.partialExpand() }
-                                navController.navigate(route = "artist/$browseId")
+                                navController.navigate(
+                                    route = Routes.Artist(id = browseId)
+                                )
                             }
                         )
                     } else {
