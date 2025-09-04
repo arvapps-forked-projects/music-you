@@ -34,7 +34,12 @@ suspend fun Innertube.relatedPage(videoId: String) = runCatchingNonCancellable {
         ?: return@runCatchingNonCancellable null
 
     val response = client.post(BROWSE) {
-        setBody(BrowseBody(browseId = browseId))
+        setBody(
+            BrowseBody(
+                localized = false,
+                browseId = browseId
+            )
+        )
         mask("contents.sectionListRenderer.contents.musicCarouselShelfRenderer(header.musicCarouselShelfBasicHeaderRenderer(title,strapline),contents($MUSIC_RESPONSIVE_LIST_ITEM_RENDERER_MASK,$MUSIC_TWO_ROW_ITEM_RENDERER_MASK))")
     }.body<BrowseResponse>()
 

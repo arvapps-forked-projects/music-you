@@ -1,5 +1,7 @@
 package it.vfsfitvnm.innertube.models
 
+import java.util.Locale
+
 class YouTubeClient(
     val clientName: String,
     val clientVersion: String,
@@ -8,15 +10,20 @@ class YouTubeClient(
     val userAgent: String,
     val osVersion: String? = null
 ) {
-    fun toContext(visitorData: String? = null) = Context(
+    fun toContext(
+        localized: Boolean = true,
+        visitorData: String? = null
+    ) = Context(
         client = Context.Client(
             clientName = clientName,
             clientVersion = clientVersion,
             clientId = clientId,
-            platform = platform,
-            visitorData = visitorData,
-            userAgent = userAgent,
             osVersion = osVersion,
+            platform = platform,
+            userAgent = userAgent,
+            gl = if (localized) Locale.getDefault().country else "US",
+            hl = if (localized) Locale.getDefault().toLanguageTag() else "en",
+            visitorData = visitorData
         )
     )
 
