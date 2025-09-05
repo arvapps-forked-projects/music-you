@@ -12,11 +12,12 @@ data class Context(
         val clientName: String,
         val clientVersion: String,
         val clientId: String,
+        val osVersion: String?,
         val platform: String,
-        val hl: String = "en",
-        val visitorData: String?,
         val userAgent: String,
-        val osVersion: String?
+        val gl: String,
+        val hl: String,
+        val visitorData: String?
     )
 
     @Serializable

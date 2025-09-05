@@ -16,7 +16,12 @@ import it.vfsfitvnm.innertube.utils.runCatchingNonCancellable
 suspend fun Innertube.artistPage(browseId: String): Result<Innertube.ArtistPage>? =
     runCatchingNonCancellable {
         val response = client.post(BROWSE) {
-            setBody(BrowseBody(browseId = browseId))
+            setBody(
+                BrowseBody(
+                    localized = false,
+                    browseId = browseId
+                )
+            )
             mask("contents,header")
         }.body<BrowseResponse>()
 
