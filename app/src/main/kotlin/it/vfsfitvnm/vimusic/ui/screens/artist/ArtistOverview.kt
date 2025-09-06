@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Podcasts
@@ -40,8 +41,10 @@ import it.vfsfitvnm.vimusic.ui.components.ShimmerHost
 import it.vfsfitvnm.vimusic.ui.components.themed.NonQueuedMediaItemMenu
 import it.vfsfitvnm.vimusic.ui.components.themed.TextPlaceholder
 import it.vfsfitvnm.vimusic.ui.items.AlbumItem
+import it.vfsfitvnm.vimusic.ui.items.ArtistItem
 import it.vfsfitvnm.vimusic.ui.items.ItemPlaceholder
 import it.vfsfitvnm.vimusic.ui.items.ListItemPlaceholder
+import it.vfsfitvnm.vimusic.ui.items.PlaylistItem
 import it.vfsfitvnm.vimusic.ui.items.SongItem
 import it.vfsfitvnm.vimusic.ui.styling.Dimensions
 import it.vfsfitvnm.vimusic.utils.asMediaItem
@@ -56,6 +59,8 @@ fun ArtistOverview(
     onViewAllAlbumsClick: () -> Unit,
     onViewAllSinglesClick: () -> Unit,
     onAlbumClick: (String) -> Unit,
+    onArtistClick: (String) -> Unit,
+    onPlaylistClick: (String) -> Unit,
     thumbnailContent: @Composable () -> Unit,
 ) {
     val binder = LocalPlayerServiceBinder.current
@@ -204,7 +209,6 @@ fun ArtistOverview(
                         TextButton(onClick = onViewAllSinglesClick) {
                             Text(text = stringResource(id = R.string.view_all))
                         }
-
                     }
                 }
 
@@ -220,6 +224,108 @@ fun ArtistOverview(
                             modifier = Modifier.widthIn(max = itemSize),
                             album = album,
                             onClick = { onAlbumClick(album.key) }
+                        )
+                    }
+                }
+            }
+
+            youtubeArtistPage.playlists?.let { playlists ->
+                Spacer(modifier = Modifier.height(Dimensions.spacer))
+
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(horizontal = 16.dp)
+                ) {
+                    Text(
+                        text = stringResource(id = R.string.playlists),
+                        style = MaterialTheme.typography.titleMedium,
+                        modifier = Modifier.padding(vertical = 8.dp)
+                    )
+                }
+
+                LazyRow(
+                    modifier = Modifier.fillMaxWidth(),
+                    contentPadding = PaddingValues(horizontal = 8.dp)
+                ) {
+                    items(
+                        items = playlists,
+                        key = Innertube.PlaylistItem::key
+                    ) { playlist ->
+                        PlaylistItem(
+                            modifier = Modifier.widthIn(max = itemSize),
+                            playlist = playlist,
+                            onClick = { onPlaylistClick(playlist.key) }
+                        )
+                    }
+                }
+            }
+
+            youtubeArtistPage.featuredPlaylists?.let { playlists ->
+                Spacer(modifier = Modifier.height(Dimensions.spacer))
+
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(horizontal = 16.dp)
+                ) {
+                    Text(
+                        text = stringResource(id = R.string.featured_on),
+                        style = MaterialTheme.typography.titleMedium,
+                        modifier = Modifier.padding(vertical = 8.dp)
+                    )
+                }
+
+                LazyRow(
+                    modifier = Modifier.fillMaxWidth(),
+                    contentPadding = PaddingValues(horizontal = 8.dp)
+                ) {
+                    items(
+                        items = playlists,
+                        key = Innertube.PlaylistItem::key
+                    ) { playlist ->
+                        PlaylistItem(
+                            modifier = Modifier.widthIn(max = itemSize),
+                            playlist = playlist,
+                            onClick = { onPlaylistClick(playlist.key) }
+                        )
+                    }
+                }
+            }
+
+            youtubeArtistPage.relatedArtists?.let { artists ->
+                Spacer(modifier = Modifier.height(Dimensions.spacer))
+
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(horizontal = 16.dp)
+                ) {
+                    Text(
+                        text = stringResource(id = R.string.fans_might_also_like),
+                        style = MaterialTheme.typography.titleMedium,
+                        modifier = Modifier.padding(vertical = 8.dp)
+                    )
+                }
+
+                LazyRow(
+                    modifier = Modifier.fillMaxWidth(),
+                    contentPadding = PaddingValues(horizontal = 8.dp)
+                ) {
+                    items(
+                        items = artists,
+                        key = Innertube.ArtistItem::key
+                    ) { artist ->
+                        ArtistItem(
+                            modifier = Modifier.widthIn(max = itemSize),
+                            artist = artist,
+                            onClick = { onArtistClick(artist.key) }
                         )
                     }
                 }
@@ -274,15 +380,28 @@ fun ArtistOverview(
                     ListItemPlaceholder()
                 }
 
-                Spacer(modifier = Modifier.height(Dimensions.spacer))
+                repeat(4) {
+                    Spacer(modifier = Modifier.height(Dimensions.spacer))
 
-                repeat(2) {
                     TextPlaceholder(modifier = placeholderModifier)
 
-                    Row {
+                    Row(modifier = Modifier.padding(start = 8.dp)) {
                         repeat(2) {
                             ItemPlaceholder(modifier = Modifier.widthIn(max = itemSize))
                         }
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(Dimensions.spacer))
+
+                TextPlaceholder(modifier = placeholderModifier)
+
+                Row(modifier = Modifier.padding(start = 8.dp)) {
+                    repeat(2) {
+                        ItemPlaceholder(
+                            modifier = Modifier.widthIn(max = itemSize),
+                            shape = CircleShape
+                        )
                     }
                 }
             }
