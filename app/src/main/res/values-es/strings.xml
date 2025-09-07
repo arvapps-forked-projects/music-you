@@ -193,4 +193,6 @@
     <string name="list_gestures_description">Activa gestos para añadir a la cola o eliminar las canciones</string>
     <string name="copy">Copiar</string>
     <string name="error_log">Registro de errores</string>
+    <string name="featured_on">Destacado en</string>
+    <string name="fans_might_also_like">Puede que también te guste</string>
 </resources>

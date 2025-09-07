@@ -171,7 +171,11 @@ fun Navigation(
             ArtistScreen(
                 browseId = route.id,
                 pop = popDestination,
-                onAlbumClick = navigateToAlbum
+                onAlbumClick = navigateToAlbum,
+                onArtistClick = navigateToArtist,
+                onPlaylistClick = { browseId ->
+                    navController.navigate(route = Routes.Playlist(id = browseId))
+                }
             )
         }
 

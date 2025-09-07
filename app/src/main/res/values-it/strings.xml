@@ -193,4 +193,6 @@
     <string name="list_gestures_description">Enable gestures to enqueue or delete songs</string>
     <string name="copy">Copy</string>
     <string name="error_log">Error log</string>
+    <string name="featured_on">Featured on</string>
+    <string name="fans_might_also_like">Fans might also like</string>
 </resources>

@@ -54,7 +54,9 @@ import kotlinx.coroutines.launch
 fun ArtistScreen(
     browseId: String,
     pop: () -> Unit,
-    onAlbumClick: (String) -> Unit
+    onAlbumClick: (String) -> Unit,
+    onArtistClick: (String) -> Unit,
+    onPlaylistClick: (String) -> Unit
 ) {
     val viewModel: ArtistViewModel = viewModel()
     val scope = rememberCoroutineScope()
@@ -138,7 +140,9 @@ fun ArtistScreen(
             0 -> ArtistOverview(
                 youtubeArtistPage = viewModel.artistPage,
                 thumbnailContent = thumbnailContent,
-                onAlbumClick = { id -> onAlbumClick(id) },
+                onAlbumClick = onAlbumClick,
+                onArtistClick = onArtistClick,
+                onPlaylistClick = onPlaylistClick,
                 onViewAllSongsClick = {
                     scope.launch {
                         pagerState.animateScrollToPage(1)
@@ -153,7 +157,7 @@ fun ArtistScreen(
                     scope.launch {
                         pagerState.animateScrollToPage(3)
                     }
-                },
+                }
             )
 
             1 -> {

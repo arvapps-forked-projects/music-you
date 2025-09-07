@@ -37,16 +37,23 @@ suspend fun Innertube.artistPage(browseId: String): Result<Innertube.ArtistPage>
                 ?.findSectionByTitle(text)
         }
 
+        val artistName = response
+            .header
+            ?.musicImmersiveHeaderRenderer
+            ?.title
+            ?.text
+
         val songsSection = findSectionByTitle("Top songs")?.musicShelfRenderer
         val albumsSection = findSectionByTitle("Albums")?.musicCarouselShelfRenderer
         val singlesSection = findSectionByTitle("Singles & EPs")?.musicCarouselShelfRenderer
+        val playlistsSection =
+            findSectionByTitle("Playlists by $artistName")?.musicCarouselShelfRenderer
+        val featuredPlaylistsSection = findSectionByTitle("Featured on")?.musicCarouselShelfRenderer
+        val relatedArtistsSection =
+            findSectionByTitle("Fans might also like")?.musicCarouselShelfRenderer
 
         Innertube.ArtistPage(
-            name = response
-                .header
-                ?.musicImmersiveHeaderRenderer
-                ?.title
-                ?.text,
+            name = artistName,
             description = response
                 .header
                 ?.musicImmersiveHeaderRenderer
@@ -107,5 +114,17 @@ suspend fun Innertube.artistPage(browseId: String): Result<Innertube.ArtistPage>
                 ?.buttonRenderer
                 ?.navigationEndpoint
                 ?.browseEndpoint,
+            playlists = playlistsSection
+                ?.contents
+                ?.mapNotNull(MusicCarouselShelfRenderer.Content::musicTwoRowItemRenderer)
+                ?.mapNotNull(Innertube.PlaylistItem::from),
+            featuredPlaylists = featuredPlaylistsSection
+                ?.contents
+                ?.mapNotNull(MusicCarouselShelfRenderer.Content::musicTwoRowItemRenderer)
+                ?.mapNotNull(Innertube.PlaylistItem::from),
+            relatedArtists = relatedArtistsSection
+                ?.contents
+                ?.mapNotNull(MusicCarouselShelfRenderer.Content::musicTwoRowItemRenderer)
+                ?.mapNotNull(Innertube.ArtistItem::from)
         )
     }

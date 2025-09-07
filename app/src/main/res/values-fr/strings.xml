@@ -193,4 +193,6 @@
     <string name="list_gestures_description">Activer les gestes pour mettre en file d\'attente ou supprimer des titres</string>
     <string name="copy">Copier</string>
     <string name="error_log">Journal des erreurs</string>
+    <string name="featured_on">Featured on</string>
+    <string name="fans_might_also_like">Fans might also like</string>
 </resources>
