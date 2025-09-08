@@ -49,9 +49,15 @@ suspend fun Innertube.playlistPage(
         ?.firstOrNull()
         ?.musicShelfRenderer
 
-    val musicCarouselShelfRenderer = contents
-        ?.getOrNull(1)
-        ?.musicCarouselShelfRenderer
+    val otherVersionsSection = if (contents?.size == 3) {
+        contents.getOrNull(1)
+    } else null
+
+    val relatedAlbumsSection = when (contents?.size) {
+        2 -> contents.getOrNull(1)
+        3 -> contents.getOrNull(2)
+        else -> null
+    }
 
     Innertube.PlaylistOrAlbumPage(
         title = header
@@ -80,7 +86,13 @@ suspend fun Innertube.playlistPage(
             ?.urlCanonical,
         songsPage = musicShelfRenderer
             ?.toSongsPage(),
-        otherVersions = musicCarouselShelfRenderer
+        otherVersions = otherVersionsSection
+            ?.musicCarouselShelfRenderer
+            ?.contents
+            ?.mapNotNull(MusicCarouselShelfRenderer.Content::musicTwoRowItemRenderer)
+            ?.mapNotNull(Innertube.AlbumItem::from),
+        relatedAlbums = relatedAlbumsSection
+            ?.musicCarouselShelfRenderer
             ?.contents
             ?.mapNotNull(MusicCarouselShelfRenderer.Content::musicTwoRowItemRenderer)
             ?.mapNotNull(Innertube.AlbumItem::from)

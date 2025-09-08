@@ -8,6 +8,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material.icons.filled.Bookmark
 import androidx.compose.material.icons.outlined.Album
+import androidx.compose.material.icons.outlined.AutoAwesome
 import androidx.compose.material.icons.outlined.BookmarkAdd
 import androidx.compose.material.icons.outlined.MusicNote
 import androidx.compose.material.icons.outlined.Share
@@ -54,7 +55,8 @@ fun AlbumScreen(
 
     val tabs = listOf(
         Section(stringResource(id = R.string.songs), Icons.Outlined.MusicNote),
-        Section(stringResource(id = R.string.other_versions), Icons.Outlined.Album)
+        Section(stringResource(id = R.string.other_versions), Icons.Outlined.Album),
+        Section(stringResource(id = R.string.related_albums), Icons.Outlined.AutoAwesome)
     )
     val pagerState = rememberPagerState(pageCount = { tabs.size })
 
@@ -65,7 +67,7 @@ fun AlbumScreen(
             .collect { (currentAlbum, tabIndex) ->
                 album = currentAlbum
 
-                if (albumPage == null && (currentAlbum?.timestamp == null || tabIndex == 1)) {
+                if (albumPage == null && (currentAlbum?.timestamp == null || tabIndex >= 1)) {
                     withContext(Dispatchers.IO) {
                         Innertube.albumPage(browseId = browseId)
                             ?.completed()
@@ -174,6 +176,34 @@ fun AlbumScreen(
                             Result.success(
                                 Innertube.ItemsPage(
                                     items = page.otherVersions,
+                                    continuation = null
+                                )
+                            )
+                        }
+                    },
+                    itemContent = { album ->
+                        AlbumItem(
+                            album = album,
+                            onClick = { onAlbumClick(album.key) }
+                        )
+                    },
+                    itemPlaceholderContent = {
+                        ItemPlaceholder()
+                    }
+                )
+            }
+
+            2 -> {
+                ItemsPage(
+                    tag = "album/$browseId/related",
+                    initialPlaceholderCount = 1,
+                    continuationPlaceholderCount = 1,
+                    emptyItemsText = stringResource(id = R.string.no_related_albums),
+                    itemsPageProvider = albumPage?.let { page ->
+                        {
+                            Result.success(
+                                Innertube.ItemsPage(
+                                    items = page.relatedAlbums,
                                     continuation = null
                                 )
                             )

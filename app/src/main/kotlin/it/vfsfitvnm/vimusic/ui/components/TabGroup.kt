@@ -42,7 +42,7 @@ fun TabGroup(
         }
     }
 
-    if (pagerState.pageCount > 3) {
+    if (pagerState.pageCount >= 3) {
         PrimaryScrollableTabRow(
             selectedTabIndex = pagerState.currentPage,
             tabs = tabs
