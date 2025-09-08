@@ -86,6 +86,7 @@ dependencies {
     implementation(libs.media3.exoplayer)
     implementation(libs.reorderable)
     implementation(libs.room)
+    implementation(libs.swipe)
     ksp(libs.room.compiler)
     implementation(projects.github)
     implementation(projects.innertube)
