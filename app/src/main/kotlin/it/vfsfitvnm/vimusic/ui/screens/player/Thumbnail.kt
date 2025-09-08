@@ -5,6 +5,7 @@ import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.ContentTransform
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.SizeTransform
+import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -14,11 +15,10 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
-import androidx.compose.foundation.layout.aspectRatio
-import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.SkipNext
@@ -161,55 +161,57 @@ fun Thumbnail(
         label = "thumbnail"
     ) { currentWindow ->
         val thumbnailContent: @Composable BoxScope.() -> Unit = @Composable {
-            Box(
-                modifier = Modifier.then(
-                    if (fullScreenLyrics) Modifier
-                        .width(thumbnailSizeDp)
-                        .fillMaxHeight() else Modifier
-                        .aspectRatio(1f)
-                        .size(thumbnailSizeDp)
+            BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
+                val height = animateDpAsState(
+                    targetValue = if (fullScreenLyrics) maxHeight else thumbnailSizeDp
                 )
-            ) {
-                AsyncImage(
-                    model = currentWindow.mediaItem.mediaMetadata.artworkUri.thumbnail(
-                        thumbnailSizePx
-                    ),
-                    contentDescription = null,
-                    contentScale = ContentScale.Crop,
+
+                Box(
                     modifier = Modifier
-                        .combinedClickable(
-                            onClick = { onShowLyrics(true) },
-                            onLongClick = { onShowStatsForNerds(true) }
-                        )
-                        .fillMaxSize()
-                )
+                        .width(thumbnailSizeDp)
+                        .height(height.value)
+                ) {
+                    AsyncImage(
+                        model = currentWindow.mediaItem.mediaMetadata.artworkUri.thumbnail(
+                            size = thumbnailSizePx
+                        ),
+                        contentDescription = null,
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier
+                            .combinedClickable(
+                                onClick = { onShowLyrics(true) },
+                                onLongClick = { onShowStatsForNerds(true) }
+                            )
+                            .fillMaxSize()
+                    )
 
-                Lyrics(
-                    mediaId = currentWindow.mediaItem.mediaId,
-                    isDisplayed = isShowingLyrics && error == null,
-                    onDismiss = {
-                        onShowLyrics(false)
-                        if (fullScreenLyrics) toggleFullScreenLyrics()
-                    },
-                    ensureSongInserted = { Database.insert(currentWindow.mediaItem) },
-                    size = thumbnailSizeDp,
-                    mediaMetadataProvider = currentWindow.mediaItem::mediaMetadata,
-                    durationProvider = player::getDuration,
-                    fullScreenLyrics = fullScreenLyrics,
-                    toggleFullScreenLyrics = toggleFullScreenLyrics
-                )
-
-                if (isShowingStatsForNerds) {
-                    StatsForNerds(
+                    Lyrics(
                         mediaId = currentWindow.mediaItem.mediaId,
-                        onDismiss = { onShowStatsForNerds(false) }
+                        isDisplayed = isShowingLyrics && error == null,
+                        onDismiss = {
+                            onShowLyrics(false)
+                            if (fullScreenLyrics) toggleFullScreenLyrics()
+                        },
+                        ensureSongInserted = { Database.insert(currentWindow.mediaItem) },
+                        size = thumbnailSizeDp,
+                        mediaMetadataProvider = currentWindow.mediaItem::mediaMetadata,
+                        durationProvider = player::getDuration,
+                        fullScreenLyrics = fullScreenLyrics,
+                        toggleFullScreenLyrics = toggleFullScreenLyrics
+                    )
+
+                    if (isShowingStatsForNerds) {
+                        StatsForNerds(
+                            mediaId = currentWindow.mediaItem.mediaId,
+                            onDismiss = { onShowStatsForNerds(false) }
+                        )
+                    }
+
+                    PlaybackError(
+                        error = error,
+                        onDismiss = retry
                     )
                 }
-
-                PlaybackError(
-                    error = error,
-                    onDismiss = retry
-                )
             }
         }
 
