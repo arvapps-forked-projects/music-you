@@ -1,6 +1,5 @@
 package it.vfsfitvnm.vimusic.ui.items
 
-import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -28,7 +27,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 
-@SuppressLint("UnusedBoxWithConstraintsScope")
 @Composable
 fun PlaylistItem(
     modifier: Modifier = Modifier,
@@ -74,7 +72,6 @@ fun BuiltInPlaylistItem(
     }
 }
 
-@SuppressLint("UnusedBoxWithConstraintsScope")
 @Composable
 fun LocalPlaylistItem(
     modifier: Modifier = Modifier,

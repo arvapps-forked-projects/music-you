@@ -1,6 +1,5 @@
 package it.vfsfitvnm.vimusic.ui.screens.settings
 
-import android.annotation.SuppressLint
 import android.content.ActivityNotFoundException
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -46,6 +45,7 @@ import java.io.FileInputStream
 import java.io.FileOutputStream
 import java.text.SimpleDateFormat
 import java.util.Date
+import java.util.Locale
 import kotlin.system.exitProcess
 
 @ExperimentalAnimationApi
@@ -163,8 +163,7 @@ fun DatabaseSettings() {
             text = stringResource(id = R.string.backup_description),
             icon = Icons.Outlined.SaveAlt,
             onClick = {
-                @SuppressLint("SimpleDateFormat")
-                val dateFormat = SimpleDateFormat("yyyyMMddHHmmss")
+                val dateFormat = SimpleDateFormat("yyyyMMddHHmmss", Locale.US)
 
                 try {
                     backupLauncher.launch("musicyou_${dateFormat.format(Date())}.db")

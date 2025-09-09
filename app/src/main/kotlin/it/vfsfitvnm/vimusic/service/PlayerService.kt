@@ -1,6 +1,5 @@
 package it.vfsfitvnm.vimusic.service
 
-import android.annotation.SuppressLint
 import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
@@ -553,7 +552,6 @@ class PlayerService : InvincibleService(), Player.Listener, PlaybackStatsListene
         mediaSession.setMetadata(metadataBuilder.build())
     }
 
-    @SuppressLint("NewApi")
     private fun maybeResumePlaybackWhenDeviceConnected() {
         if (!isAtLeastAndroid6) return
 
@@ -569,7 +567,7 @@ class PlayerService : InvincibleService(), Player.Listener, PlaybackStatsListene
                     return audioDeviceInfo.type == AudioDeviceInfo.TYPE_BLUETOOTH_A2DP ||
                             audioDeviceInfo.type == AudioDeviceInfo.TYPE_WIRED_HEADSET ||
                             audioDeviceInfo.type == AudioDeviceInfo.TYPE_WIRED_HEADPHONES ||
-                            audioDeviceInfo.type == AudioDeviceInfo.TYPE_USB_HEADSET
+                            (isAtLeastAndroid8 && audioDeviceInfo.type == AudioDeviceInfo.TYPE_USB_HEADSET)
                 }
 
                 override fun onAudioDevicesAdded(addedDevices: Array<AudioDeviceInfo>) {
@@ -738,9 +736,10 @@ class PlayerService : InvincibleService(), Player.Listener, PlaybackStatsListene
             .setSmallIcon(player.playerError?.let { R.drawable.alert_circle }
                 ?: R.drawable.app_icon)
             .setOngoing(false)
-            .setContentIntent(activityPendingIntent<MainActivity>(
-                flags = PendingIntent.FLAG_UPDATE_CURRENT
-            ) { putExtra("expandPlayerBottomSheet", true) })
+            .setContentIntent(
+                activityPendingIntent<MainActivity>(
+                    flags = PendingIntent.FLAG_UPDATE_CURRENT
+                ) { putExtra("expandPlayerBottomSheet", true) })
             .setDeleteIntent(broadCastPendingIntent<NotificationDismissReceiver>())
             .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
             .setCategory(NotificationCompat.CATEGORY_TRANSPORT)

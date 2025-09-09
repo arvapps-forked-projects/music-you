@@ -23,7 +23,6 @@ import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SnackbarResult
-import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -157,10 +156,7 @@ fun LocalPlaylistSongs(
                     state = reorderableLazyListState,
                     key = song.id
                 ) {
-                    val dismissState = rememberSwipeToDismissBoxState()
-
                     SwipeToActionBox(
-                        state = dismissState,
                         primaryAction = ActionInfo(
                             onClick = { binder?.player?.enqueue(song.asMediaItem) },
                             icon = Icons.AutoMirrored.Outlined.PlaylistPlay,
@@ -168,22 +164,20 @@ fun LocalPlaylistSongs(
                         ),
                         destructiveAction = ActionInfo(
                             onClick = {
-                                scope.launch { dismissState.reset() }.invokeOnCompletion {
-                                    transaction {
-                                        Database.move(
-                                            playlistId = playlistId,
-                                            fromPosition = index,
-                                            toPosition = Int.MAX_VALUE
-                                        )
+                                transaction {
+                                    Database.move(
+                                        playlistId = playlistId,
+                                        fromPosition = index,
+                                        toPosition = Int.MAX_VALUE
+                                    )
 
-                                        Database.delete(
-                                            SongPlaylistMap(
-                                                songId = song.id,
-                                                playlistId = playlistId,
-                                                position = Int.MAX_VALUE
-                                            )
+                                    Database.delete(
+                                        SongPlaylistMap(
+                                            songId = song.id,
+                                            playlistId = playlistId,
+                                            position = Int.MAX_VALUE
                                         )
-                                    }
+                                    )
                                 }
 
                                 scope.launch {

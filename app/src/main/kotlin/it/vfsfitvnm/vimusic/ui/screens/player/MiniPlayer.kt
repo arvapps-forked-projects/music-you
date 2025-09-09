@@ -1,13 +1,11 @@
 package it.vfsfitvnm.vimusic.ui.screens.player
 
-import androidx.compose.animation.animateColorAsState
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
@@ -25,21 +23,15 @@ import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.SwipeToDismissBox
-import androidx.compose.material3.SwipeToDismissBoxValue
 import androidx.compose.material3.Text
-import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.neverEqualPolicy
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -57,7 +49,8 @@ import it.vfsfitvnm.vimusic.utils.positionAndDurationState
 import it.vfsfitvnm.vimusic.utils.rememberPreference
 import it.vfsfitvnm.vimusic.utils.shouldBePlaying
 import it.vfsfitvnm.vimusic.utils.thumbnail
-import kotlinx.coroutines.launch
+import me.saket.swipe.SwipeAction
+import me.saket.swipe.SwipeableActionsBox
 import kotlin.math.absoluteValue
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -95,54 +88,7 @@ fun MiniPlayer(
     val mediaItem = nullableMediaItem ?: return
     val positionAndDuration by binder.player.positionAndDurationState()
 
-    val dismissState = rememberSwipeToDismissBoxState()
-    val scope = rememberCoroutineScope()
-
-    SwipeToDismissBox(
-        state = dismissState,
-        backgroundContent = {
-            val color by animateColorAsState(
-                targetValue = if (dismissState.targetValue == SwipeToDismissBoxValue.Settled) Color.Transparent else MaterialTheme.colorScheme.primaryContainer,
-                label = "background"
-            )
-
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(76.dp)
-                    .background(color)
-                    .padding(horizontal = 32.dp),
-            ) {
-                if (dismissState.dismissDirection == SwipeToDismissBoxValue.StartToEnd) {
-                    Icon(
-                        imageVector = Icons.Outlined.SkipPrevious,
-                        contentDescription = null,
-                        modifier = Modifier.align(Alignment.CenterStart),
-                        tint = if (dismissState.targetValue == SwipeToDismissBoxValue.StartToEnd) {
-                            MaterialTheme.colorScheme.onPrimaryContainer
-                        } else MaterialTheme.colorScheme.onSurface
-                    )
-                }
-
-                if (dismissState.dismissDirection == SwipeToDismissBoxValue.EndToStart) {
-                    Icon(
-                        imageVector = Icons.Outlined.SkipNext,
-                        contentDescription = null,
-                        modifier = Modifier.align(Alignment.CenterEnd),
-                        tint = if (dismissState.targetValue == SwipeToDismissBoxValue.EndToStart) {
-                            MaterialTheme.colorScheme.onPrimaryContainer
-                        } else MaterialTheme.colorScheme.onSurface
-                    )
-                }
-            }
-        },
-        gesturesEnabled = miniplayerGesturesEnabled,
-        onDismiss = { value ->
-            if (value == SwipeToDismissBoxValue.StartToEnd) binder.player.forceSeekToPrevious()
-            else if (value == SwipeToDismissBoxValue.EndToStart) binder.player.forceSeekToNext()
-            scope.launch { dismissState.reset() }
-        }
-    ) {
+    val miniPlayerContent: @Composable BoxScope.() -> Unit = @Composable {
         Column(modifier = Modifier.clickable(onClick = openPlayer)) {
             ListItem(
                 headlineContent = {
@@ -214,5 +160,41 @@ fun MiniPlayer(
                 color = MaterialTheme.colorScheme.primary
             )
         }
+    }
+
+    val startAction = SwipeAction(
+        onSwipe = { binder.player.forceSeekToPrevious() },
+        icon = {
+            Icon(
+                imageVector = Icons.Outlined.SkipPrevious,
+                contentDescription = null,
+                modifier = Modifier.padding(end = 32.dp),
+                tint = MaterialTheme.colorScheme.onPrimaryContainer
+            )
+        },
+        background = MaterialTheme.colorScheme.primaryContainer
+    )
+
+    val endAction = SwipeAction(
+        onSwipe = { binder.player.forceSeekToNext() },
+        icon = {
+            Icon(
+                imageVector = Icons.Outlined.SkipNext,
+                contentDescription = null,
+                modifier = Modifier.padding(start = 32.dp),
+                tint = MaterialTheme.colorScheme.onPrimaryContainer
+            )
+        },
+        background = MaterialTheme.colorScheme.primaryContainer
+    )
+
+    if (miniplayerGesturesEnabled) {
+        SwipeableActionsBox(
+            startActions = listOf(startAction),
+            endActions = listOf(endAction),
+            content = miniPlayerContent
+        )
+    } else {
+        Box(content = miniPlayerContent)
     }
 }

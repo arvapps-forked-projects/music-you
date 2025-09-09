@@ -175,7 +175,8 @@ object Innertube {
         val thumbnail: Thumbnail?,
         val url: String?,
         val songsPage: ItemsPage<SongItem>?,
-        val otherVersions: List<AlbumItem>?
+        val otherVersions: List<AlbumItem>?,
+        val relatedAlbums: List<AlbumItem>?
     )
 
     data class NextPage(

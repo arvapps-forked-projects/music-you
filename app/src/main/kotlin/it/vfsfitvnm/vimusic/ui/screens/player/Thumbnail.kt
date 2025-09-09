@@ -5,30 +5,26 @@ import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.ContentTransform
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.SizeTransform
-import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.aspectRatio
-import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.BoxScope
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.SkipNext
 import androidx.compose.material.icons.outlined.SkipPrevious
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.SwipeToDismissBox
-import androidx.compose.material3.SwipeToDismissBoxValue
-import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -38,7 +34,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import androidx.media3.common.MediaItem
@@ -63,6 +58,8 @@ import it.vfsfitvnm.vimusic.utils.playerGesturesEnabledKey
 import it.vfsfitvnm.vimusic.utils.rememberPreference
 import it.vfsfitvnm.vimusic.utils.thumbnail
 import kotlinx.coroutines.runBlocking
+import me.saket.swipe.SwipeAction
+import me.saket.swipe.SwipeableActionsBox
 import java.net.UnknownHostException
 import java.nio.channels.UnresolvedAddressException
 
@@ -163,103 +160,99 @@ fun Thumbnail(
         contentAlignment = Alignment.Center,
         label = "thumbnail"
     ) { currentWindow ->
-        val dismissState = rememberSwipeToDismissBoxState()
-
-        SwipeToDismissBox(
-            state = dismissState,
-            backgroundContent = {
-                val color by animateColorAsState(
-                    targetValue = if (dismissState.targetValue == SwipeToDismissBoxValue.Settled) Color.Transparent else MaterialTheme.colorScheme.primaryContainer,
-                    label = "background"
+        val thumbnailContent: @Composable BoxScope.() -> Unit = @Composable {
+            BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
+                val height = animateDpAsState(
+                    targetValue = if (fullScreenLyrics) maxHeight else thumbnailSizeDp
                 )
 
                 Box(
                     modifier = Modifier
-                        .fillMaxSize()
-                        .background(color)
-                        .padding(horizontal = 32.dp),
+                        .width(thumbnailSizeDp)
+                        .height(height.value)
                 ) {
-                    if (dismissState.dismissDirection == SwipeToDismissBoxValue.StartToEnd) {
-                        Icon(
-                            imageVector = Icons.Outlined.SkipPrevious,
-                            contentDescription = null,
-                            modifier = Modifier.align(Alignment.CenterStart),
-                            tint = if (dismissState.targetValue == SwipeToDismissBoxValue.StartToEnd) {
-                                MaterialTheme.colorScheme.onPrimaryContainer
-                            } else MaterialTheme.colorScheme.onSurface
-                        )
-                    }
-                    if (dismissState.dismissDirection == SwipeToDismissBoxValue.EndToStart) {
-                        Icon(
-                            imageVector = Icons.Outlined.SkipNext,
-                            contentDescription = null,
-                            modifier = Modifier.align(Alignment.CenterEnd),
-                            tint = if (dismissState.targetValue == SwipeToDismissBoxValue.EndToStart) {
-                                MaterialTheme.colorScheme.onPrimaryContainer
-                            } else MaterialTheme.colorScheme.onSurface
-                        )
-                    }
-                }
-            },
-            modifier = modifier.clip(MaterialTheme.shapes.large),
-            gesturesEnabled = playerGesturesEnabled,
-            onDismiss = { value ->
-                if (value == SwipeToDismissBoxValue.StartToEnd) binder.player.forceSeekToPrevious()
-                else if (value == SwipeToDismissBoxValue.EndToStart) binder.player.forceSeekToNext()
-            }
-        ) {
-            Box(
-                modifier = Modifier
-                    .clip(MaterialTheme.shapes.large)
-                    .then(
-                        if (fullScreenLyrics) Modifier
-                            .width(thumbnailSizeDp)
-                            .fillMaxHeight() else Modifier
-                            .aspectRatio(1f)
-                            .size(thumbnailSizeDp)
+                    AsyncImage(
+                        model = currentWindow.mediaItem.mediaMetadata.artworkUri.thumbnail(
+                            size = thumbnailSizePx
+                        ),
+                        contentDescription = null,
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier
+                            .combinedClickable(
+                                onClick = { onShowLyrics(true) },
+                                onLongClick = { onShowStatsForNerds(true) }
+                            )
+                            .fillMaxSize()
                     )
-            ) {
-                AsyncImage(
-                    model = currentWindow.mediaItem.mediaMetadata.artworkUri.thumbnail(
-                        thumbnailSizePx
-                    ),
-                    contentDescription = null,
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier
-                        .combinedClickable(
-                            onClick = { onShowLyrics(true) },
-                            onLongClick = { onShowStatsForNerds(true) }
-                        )
-                        .fillMaxSize()
-                )
 
-                Lyrics(
-                    mediaId = currentWindow.mediaItem.mediaId,
-                    isDisplayed = isShowingLyrics && error == null,
-                    onDismiss = {
-                        onShowLyrics(false)
-                        if (fullScreenLyrics) toggleFullScreenLyrics()
-                    },
-                    ensureSongInserted = { Database.insert(currentWindow.mediaItem) },
-                    size = thumbnailSizeDp,
-                    mediaMetadataProvider = currentWindow.mediaItem::mediaMetadata,
-                    durationProvider = player::getDuration,
-                    fullScreenLyrics = fullScreenLyrics,
-                    toggleFullScreenLyrics = toggleFullScreenLyrics
-                )
-
-                if (isShowingStatsForNerds) {
-                    StatsForNerds(
+                    Lyrics(
                         mediaId = currentWindow.mediaItem.mediaId,
-                        onDismiss = { onShowStatsForNerds(false) }
+                        isDisplayed = isShowingLyrics && error == null,
+                        onDismiss = {
+                            onShowLyrics(false)
+                            if (fullScreenLyrics) toggleFullScreenLyrics()
+                        },
+                        ensureSongInserted = { Database.insert(currentWindow.mediaItem) },
+                        size = thumbnailSizeDp,
+                        mediaMetadataProvider = currentWindow.mediaItem::mediaMetadata,
+                        durationProvider = player::getDuration,
+                        fullScreenLyrics = fullScreenLyrics,
+                        toggleFullScreenLyrics = toggleFullScreenLyrics
+                    )
+
+                    if (isShowingStatsForNerds) {
+                        StatsForNerds(
+                            mediaId = currentWindow.mediaItem.mediaId,
+                            onDismiss = { onShowStatsForNerds(false) }
+                        )
+                    }
+
+                    PlaybackError(
+                        error = error,
+                        onDismiss = retry
                     )
                 }
-
-                PlaybackError(
-                    error = error,
-                    onDismiss = retry
-                )
             }
+        }
+
+        val startAction = SwipeAction(
+            onSwipe = { binder.player.forceSeekToPrevious() },
+            icon = {
+                Icon(
+                    imageVector = Icons.Outlined.SkipPrevious,
+                    contentDescription = null,
+                    modifier = Modifier.padding(end = 32.dp),
+                    tint = MaterialTheme.colorScheme.onPrimaryContainer
+                )
+            },
+            background = MaterialTheme.colorScheme.primaryContainer
+        )
+
+        val endAction = SwipeAction(
+            onSwipe = { binder.player.forceSeekToNext() },
+            icon = {
+                Icon(
+                    imageVector = Icons.Outlined.SkipNext,
+                    contentDescription = null,
+                    modifier = Modifier.padding(start = 32.dp),
+                    tint = MaterialTheme.colorScheme.onPrimaryContainer
+                )
+            },
+            background = MaterialTheme.colorScheme.primaryContainer
+        )
+
+        if (playerGesturesEnabled) {
+            SwipeableActionsBox(
+                modifier = modifier.clip(shape = MaterialTheme.shapes.large),
+                startActions = listOf(startAction),
+                endActions = listOf(endAction),
+                content = thumbnailContent
+            )
+        } else {
+            Box(
+                modifier = modifier.clip(shape = MaterialTheme.shapes.large),
+                content = thumbnailContent
+            )
         }
     }
 }

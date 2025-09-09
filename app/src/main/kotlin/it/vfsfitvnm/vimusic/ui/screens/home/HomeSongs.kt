@@ -29,7 +29,6 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Text
-import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -157,11 +156,8 @@ fun HomeSongs(
                 items = viewModel.items,
                 key = { _, song -> song.id }
             ) { index, song ->
-                val dismissState = rememberSwipeToDismissBoxState()
-
                 SwipeToActionBox(
                     modifier = Modifier.animateItem(),
-                    state = dismissState,
                     primaryAction = ActionInfo(
                         onClick = { binder?.player?.enqueue(song.asMediaItem) },
                         icon = Icons.AutoMirrored.Outlined.PlaylistPlay,
@@ -169,14 +165,12 @@ fun HomeSongs(
                     ),
                     destructiveAction = ActionInfo(
                         onClick = {
-                            scope.launch { dismissState.reset() }.invokeOnCompletion {
-                                query {
-                                    binder?.cache?.removeResource(song.id)
-                                    Database.incrementTotalPlayTimeMs(
-                                        id = song.id,
-                                        addition = -song.totalPlayTimeMs
-                                    )
-                                }
+                            query {
+                                binder?.cache?.removeResource(song.id)
+                                Database.incrementTotalPlayTimeMs(
+                                    id = song.id,
+                                    addition = -song.totalPlayTimeMs
+                                )
                             }
 
                             scope.launch {
