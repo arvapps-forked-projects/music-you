@@ -49,14 +49,18 @@ suspend fun Innertube.playlistPage(
         ?.firstOrNull()
         ?.musicShelfRenderer
 
-    val otherVersionsSection = if (contents?.size == 3) {
-        contents.getOrNull(1)
-    } else null
+    val otherVersionsSection = if (contents?.size == 3) contents.getOrNull(1)
+    else {
+        val section = contents?.getOrNull(1)
+        if (section?.musicCarouselShelfRenderer?.contents?.size == 10) null
+        else section
+    }
 
-    val relatedAlbumsSection = when (contents?.size) {
-        2 -> contents.getOrNull(1)
-        3 -> contents.getOrNull(2)
-        else -> null
+    val relatedAlbumsSection = if (contents?.size == 3) contents.getOrNull(2)
+    else {
+        val section = contents?.getOrNull(1)
+        if (section?.musicCarouselShelfRenderer?.contents?.size == 10) section
+        else null
     }
 
     Innertube.PlaylistOrAlbumPage(
